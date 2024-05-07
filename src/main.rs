@@ -1,3 +1,5 @@
+use std::arch::x86_64::_bittestandcomplement;
+use std::fmt::Debug;
 use AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 
 fn main() {
@@ -29,8 +31,32 @@ fn main() {
     let game3 = game_3(da_ham_sie.clone(), jerome.clone(), beef.clone(), wedelmedel.clone(), chris.clone(), malte.clone());
     let game4 = game_4(dos_bros.clone(), flo.clone(), sebi.clone(), da_ham_sie.clone(), jerome.clone(), beef.clone());
     let game5 = game_5(wedelmedel.clone(), malte.clone(), chris.clone(), strammsein.clone(), jonas.clone(), sascha.clone());
+    let game6 = game_6(gewertet.clone(), laura.clone(), hannes.clone(), white_claw.clone(), luise.clone(), tobias.clone());
+    let game7 = game_7(wedelmedel.clone(), chris.clone(), malte.clone(), dos_bros.clone(), flo.clone(), sebi.clone());
+    let game8 = game_8(da_ham_sie.clone(), jerome.clone(), beef.clone(), white_claw.clone(), luise.clone(), tobias.clone());
+    let game9 = game_9(strammsein.clone(), jonas.clone(), sascha.clone(), gewertet.clone(), laura.clone(), hannes.clone());
+    let game10 = game_10(gewertet.clone(), hannes.clone(), laura.clone(), da_ham_sie.clone(), jerome.clone(), beef.clone());
+    let game11 = game_11(white_claw.clone(), tobias.clone(), luise.clone(), wedelmedel.clone(), chris.clone(), malte.clone());
+    let game12 = game_12(dos_bros.clone(), flo.clone(), sebi.clone(), strammsein.clone(), sascha.clone(), jonas.clone());
+    let game13 = game_13(wedelmedel.clone(), chris.clone(), malte.clone(), gewertet.clone(), laura.clone(), hannes.clone());
+    let game14 = game_14(strammsein.clone(), sascha.clone(), jonas.clone(), da_ham_sie.clone(), jerome.clone(), beef.clone());
+    let game15 = game_15(white_claw.clone(), tobias.clone(), luise.clone(), dos_bros.clone(), flo.clone(), sebi.clone());
+    let game16 = game_16(white_claw.clone(), luise.clone(), tobias.clone(), strammsein.clone(), jonas.clone(), sascha.clone());
+    let game17 = game_17(dos_bros.clone(), flo.clone(), sebi.clone(), gewertet.clone(), hannes.clone(), laura.clone());
+    let game18 = game_18(wedelmedel.clone(), chris.clone(), malte.clone(), da_ham_sie.clone(), jerome.clone(), beef.clone());
+    let game19 = game_19(da_ham_sie.clone(), jerome.clone(), beef.clone(), dos_bros.clone(), flo.clone(), sebi.clone());
+    let game20 = game_20(strammsein.clone(), sascha.clone(), jonas.clone(), wedelmedel.clone(), chris.clone(), malte.clone());
+    let game21 = game_21(gewertet.clone(), laura.clone(), hannes.clone(), white_claw.clone(), luise.clone(), tobias.clone());
+    let game22 = game_22(dos_bros.clone(), sebi.clone(), flo.clone(), wedelmedel.clone(), chris.clone(), malte.clone());
+    let game23 = game_23(white_claw.clone(), tobias.clone(), luise.clone(), da_ham_sie.clone(), jerome.clone(), beef.clone());
+    let game26 = game_26(wedelmedel.clone(), chris.clone(), malte.clone(), white_claw.clone(), luise.clone(), tobias.clone());
+    let game27 = game_27(strammsein.clone(), jonas.clone(), sascha.clone(), dos_bros.clone(), flo.clone(), sebi.clone());
+    let game29 = game_29(da_ham_sie.clone(), jerome.clone(), beef.clone(), strammsein.clone(), sascha.clone(), jonas.clone());
+    let game30 = game_30(dos_bros.clone(), flo.clone(), sebi.clone(), white_claw.clone(), tobias.clone(), luise.clone());
+    let game31 = game_31(white_claw.clone(), tobias.clone(), luise.clone(), wedelmedel.clone(), chris.clone(), malte.clone());
 
-    game5.print();
+    game31.print();
+
 
     //println!("{:?}", game5);
 
@@ -40,6 +66,205 @@ fn main() {
         println!("{:?}", game2);
         println!("{:?}", game2_new);
     }*/
+}
+
+/*
+fn game_(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = ;
+    let additionals = vec![];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(), additionals, left_began);
+    Game {result, match_number : , left_team, left_1, left_2, right_team, right_1, right_2, rounds}
+}
+*/
+fn game_31(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(right_1.clone(), 7), ARC::finish(left_1.clone(), 16), ARC::finish(left_2.clone(), 16)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![1,2,4, 1,4,1,3,1]), additionals, left_began);
+    Game {result, match_number : 31, left_team, left_1, left_2, right_team, right_1, right_2, rounds}
+}
+fn game_30(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::schluck(left_1.clone(), 4), ARC::finish(left_1.clone(), 6), ARC::schluck(left_1.clone(),13), ARC::finish(right_1.clone(),13), ARC::finish(left_2.clone(), 16)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![4,3,9,1]), additionals, left_began);
+    Game {result, match_number : 30, left_team, left_1, left_2, right_team, right_1, right_2, rounds}
+}
+fn game_29(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::schluck(right_2.clone(), 2), ARC::finish(left_1.clone(), 2), ARC::finish(left_2.clone(), 5)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![1, 1, 2, 2]), additionals, left_began);
+    Game { result, match_number: 29, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_27(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::beer(left_2.clone(), 3), ARC::finish(right_1.clone(), 6), ARC::finish(right_2.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![4, 2, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 27, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_26(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::schluck(left_2.clone(), 0), ARC::finish(left_1.clone(), 8), ARC::finish(left_2.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![2, 2, 1, 3, 1]), additionals, left_began);
+    Game { result, match_number: 26, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_23(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::schluck(right_1.clone(), 0), ARC::schluck(left_2.clone(), 0), ARC::finish(right_1.clone(), 0), ARC::finish(right_2.clone(), 2)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1,1,1]), additionals, left_began);
+    Game {result, match_number : 23, left_team, left_1, left_2, right_team, right_1, right_2, rounds}
+}
+fn game_22(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_2.clone(), 4), ARC::finish(left_1.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![2, 1, 1, 3]), additionals, left_began);
+    Game { result, match_number: 22, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_21(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::finish(left_2.clone(), 6), ARC::finish(left_1.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 3, 1, 1, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 21, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_20(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::finish(right_2.clone(), 10), ARC::finish(left_1.clone(), 11), ARC::finish(left_2.clone(), 11)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![2, 2, 2, 1, 2, 3]), additionals, left_began);
+    Game { result, match_number: 20, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_19(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_1.clone(), 4), ARC::finish(left_2.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![2, 1, 2, 1, 1]), additionals, left_began);
+    Game { result, match_number: 19, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_18(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(right_1.clone(), 5), ARC::schluck(right_2.clone(), 5), ARC::schluck(left_2.clone(), 5), ARC::finish(right_2.clone(), 5)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![1, 2, 2, 1]), additionals, left_began);
+    Game { result, match_number: 18, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_17(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::schluck(right_1.clone(), 2), ARC::schluck(right_2.clone(), 2), ARC::finish(right_1.clone(), 10),
+                           ARC::schluck(right_2.clone(), 10), ARC::finish(left_1.clone(), 10), ARC::finish(left_2.clone(), 13)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 1, 1, 1, 1, 5, 1, 2, 1]), additionals, left_began);
+    Game { result, match_number: 17, left_team, left_1: left_2, left_2: left_1, right_team, right_1, right_2, rounds }
+}
+
+fn game_16(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::schluck(right_1.clone(), 1), ARC::finish(left_2.clone(), 1), ARC::finish(left_1.clone(), 4)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![3, 1, 1]), additionals, left_began);
+    Game { result, match_number: 16, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_15(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(right_1.clone(), 9), ARC::finish(left_1.clone(), 12), ARC::finish(right_2.clone(), 13)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 6, 3, 1, 3]), additionals, left_began);
+    Game { result, match_number: 15, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_14(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::finish(right_1.clone(), 6), ARC::finish(right_2.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![3, 3, 1]), additionals, left_began);
+    Game { result, match_number: 14, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_13(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_1.clone(), 8), ARC::finish(left_2.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![2, 2, 1, 3, 1]), additionals, left_began);
+    Game { result, match_number: 13, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_12(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::finish(right_1.clone(), 8), ARC::finish(left_1.clone(), 9), ARC::finish(right_2.clone(), 12)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![2, 6, 2, 1, 2]), additionals, left_began);
+    Game { result, match_number: 12, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_11(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::schluck(left_2.clone(), 4), ARC::finish(left_1.clone(), 10), ARC::schluck(left_2.clone(), 12), ARC::finish(right_1.clone(), 12), ARC::finish(right_2.clone(), 12)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![1, 1, 3, 1, 2, 1, 1, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 11, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_10(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(right_1.clone(), 5), ARC::finish(right_2.clone(), 7)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![2, 3, 3]), additionals, left_began);
+    Game { result, match_number: 10, left_team, left_1: left_2, left_2: left_1, right_team, right_1, right_2, rounds }
+}
+
+fn game_9(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_1.clone(), 4), ARC::finish(left_2.clone(), 4)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 1, 3]), additionals, left_began);
+    Game { result, match_number: 9, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_8(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_1.clone(), 4), ARC::beer(left_2.clone(), 4), ARC::beer(right_2.clone(), 5), ARC::finish(left_2.clone(), 14)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 2, 3, 2, 1, 3, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 8, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
+}
+
+fn game_7(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = false;
+    let additionals = vec![ARC::finish(right_1.clone(), 6), ARC::finish(right_2.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![2, 1, 1, 1, 1, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 7, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
+}
+
+fn game_6(left_team: crate::Team, left_1: crate::TeamMember, left_2: crate::TeamMember, right_team: crate::Team, right_1: crate::TeamMember, right_2: crate::TeamMember) -> crate::Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(right_2.clone(), 13), ARC::beer(right_1.clone(), 15), ARC::schluck(right_1.clone(), 17), ARC::finish(left_1.clone(), 28), ARC::finish(left_2.clone(), 28)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(false, vec![7, 1, 5, 1, 1, 1, 1, 3, 6, 1, 1, 1]), additionals, left_began);
+    Game { result, match_number: 6, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
+}
+
+fn game_5(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
+    let left_began = false;
+    let additionals = vec![ARC::schluck(right_1.clone(), 4), ARC::finish(right_1.clone(), 10), ARC::finish(right_2.clone(), 10)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), vec![true, false, false, true, false, false, true, false, false, true, true], additionals, left_began);
+    Game { result, match_number: 5, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
 fn create_normalized_rounds(first_team_1: TeamMember, first_team_2: TeamMember, second_team_1: TeamMember, second_team_2: TeamMember, throw_order: Vec<bool>) -> Vec<Round> {
@@ -57,7 +282,7 @@ fn create_normalized_rounds(first_team_1: TeamMember, first_team_2: TeamMember, 
     ret_vector
 }
 
-fn create_normal_rounds_left_right(left_team_1: TeamMember, left_team_2: TeamMember, right_team_1: TeamMember, right_team_2: TeamMember, throw_order: Vec<bool>, add_round_info: Vec<AdditionalRoundCombination>, left_began: bool) -> Vec<Round> {
+fn create_normal_rounds_left_right(left_team_1: TeamMember, left_team_2: TeamMember, right_team_1: TeamMember, right_team_2: TeamMember, throw_order: Vec<bool>, add_round_info: Vec<ARC>, left_began: bool) -> Vec<Round> {
     if left_began {
         create_normal_rounds_with_additionals_and_correct_order(left_team_1, left_team_2, right_team_1, right_team_2, throw_order, add_round_info)
     } else {
@@ -65,7 +290,7 @@ fn create_normal_rounds_left_right(left_team_1: TeamMember, left_team_2: TeamMem
     }
 }
 
-fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: TeamMember, first_team_2: TeamMember, second_team_1: TeamMember, second_team_2: TeamMember, throw_order: Vec<bool>, additional_round_info: Vec<AdditionalRoundCombination>) -> Vec<Round> {
+fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: TeamMember, first_team_2: TeamMember, second_team_1: TeamMember, second_team_2: TeamMember, throw_order: Vec<bool>, additional_round_info: Vec<ARC>) -> Vec<Round> {
     let mut ret_vector = Vec::new();
     let mut first_team: Vec<TeamMember> = vec![first_team_1, first_team_2];
     let mut second_team: Vec<TeamMember> = vec![second_team_1, second_team_2];
@@ -98,22 +323,21 @@ fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: TeamMem
     ret_vector
 }
 
-fn results_from_additionals(additionals: &Vec<AdditionalRoundCombination>, left_team_first: bool) -> Result {
+fn results_from_additionals(additionals: &Vec<ARC>, left_team_first: bool, left_team: &Team) -> Result {
     let mut result: Result = Result { points_left: 0, points_right: 0 };
     let mut result_values: Vec<u32> = vec![7, 5, 3];
     let mut round_checker_offset = 0;
     if (!left_team_first) {
         round_checker_offset = 1;
     }
-    for  additional_round in additionals {
+    for additional_round in additionals {
         if (additional_round.additional.kind == FINISHED) {
-            if ((additional_round.round_nr + round_checker_offset) % 2 == 0) {
+            if (additional_round.additional.source.id == left_team.member_2.id || additional_round.additional.source.id == left_team.member_1.id) {
                 result.points_left = result.points_left + result_values.first().unwrap();
-                result_values.remove(0);
             } else {
                 result.points_right = result.points_right + result_values.first().unwrap();
-                result_values.remove(0);
             }
+            result_values.remove(0);
         }
     }
     // Adding 2 to the winning team
@@ -127,42 +351,48 @@ fn results_from_additionals(additionals: &Vec<AdditionalRoundCombination>, left_
 
 fn first_game_new(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
-    let additionals: Vec<AdditionalRoundCombination> = vec![AdditionalRoundCombination::schluck(left_1.clone(), 0), AdditionalRoundCombination::finish(left_1.clone(), 14), AdditionalRoundCombination::finish(left_2.clone(), 14)];
-    let result = results_from_additionals(&additionals, left_began);
+    let additionals: Vec<ARC> = vec![ARC::schluck(left_1.clone(), 0), ARC::finish(left_1.clone(), 14), ARC::finish(left_2.clone(), 14)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
     let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(),
                                                  vec![true, false, false, false, true, false, false, false, false, false, false, true, false, false, true], additionals.clone(), left_began);
-    Game { result, match_number: 1, left_team, right_team, rounds }
+    Game { result, match_number: 1, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
 fn second_game_new(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = false;
-    let mut additionals = vec![AdditionalRoundCombination::finish(right_1.clone(), 4), AdditionalRoundCombination::finish(right_2.clone(), 6)];
-    let result = results_from_additionals(&additionals, left_began);
+    let mut additionals = vec![ARC::finish(right_1.clone(), 4), ARC::finish(right_2.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
     let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(),
                                                  vec![true, true, true, true, false, true], additionals.clone(), left_began);
-    Game { result, match_number: 2, left_team, right_team, rounds }
+    Game { result, match_number: 2, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
 fn game_3(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
-    let additionals = vec![AdditionalRoundCombination::finish(left_1.clone(), 6), AdditionalRoundCombination::finish(left_2.clone(), 6)];
-    let result = results_from_additionals(&additionals, left_began);
-    let rounds = create_normal_rounds_left_right(left_1, left_2, right_1, right_2, vec![true, true, true, false, false, true, true], additionals, left_began);
-    Game { result, match_number: 3, left_team, right_team, rounds }
+    let additionals = vec![ARC::finish(left_1.clone(), 6), ARC::finish(left_2.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), vec![true, true, true, false, false, true, true], additionals, left_began);
+    Game { result, match_number: 3, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
+
 fn game_4(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
-    let additionals = vec![AdditionalRoundCombination::finish(left_1.clone(), 6), AdditionalRoundCombination::finish(right_1.clone(), 7), AdditionalRoundCombination::finish(left_2.clone(), 8)];
-    let result = results_from_additionals(&additionals, left_began);
-    let rounds = create_normal_rounds_left_right(left_1, left_2, right_1, right_2, vec![false, false, true, true, true, false, true, true, true], additionals, left_began);
-    Game{result, match_number:4, left_team, right_team, rounds}
+    let additionals = vec![ARC::finish(left_1.clone(), 6), ARC::finish(right_1.clone(), 7), ARC::finish(left_2.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), vec![false, false, true, true, true, false, true, true, true], additionals, left_began);
+    Game { result, match_number: 4, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
-fn game_5(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
-    let left_began = false;
-    let additionals = vec![AdditionalRoundCombination::schluck(right_1.clone(),4), AdditionalRoundCombination::finish(right_1.clone(), 10), AdditionalRoundCombination::finish(right_2.clone(),10)];
-    let result = results_from_additionals(&additionals, left_began);
-    let rounds = create_normal_rounds_left_right(left_1, left_2, right_1, right_2, vec![true, false, false, true, false, false, true,false,false,true,true], additionals, left_began);
-    Game {result, match_number:5, left_team, right_team, rounds}
+
+fn bool_vec_from_int(first_value: bool, int_vec: Vec<u32>) -> Vec<bool> {
+    let mut ret: Vec<bool> = Vec::new();
+    let mut curr_bool = first_value;
+    for val in int_vec {
+        for i in 0..val {
+            ret.push(curr_bool);
+        }
+        curr_bool = !curr_bool;
+    }
+    ret
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -212,20 +442,20 @@ impl Additional {
 
 
 #[derive(Clone, Debug, PartialEq)]
-pub struct AdditionalRoundCombination {
+pub struct ARC {
     additional: Additional,
     round_nr: u32, // Round starts with 0
 }
 
-impl AdditionalRoundCombination {
-    fn finish(team_member: TeamMember, round_nr: u32) -> AdditionalRoundCombination {
-        AdditionalRoundCombination { additional: Additional::finish(team_member), round_nr }
+impl ARC {
+    fn finish(team_member: TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::finish(team_member), round_nr }
     }
-    fn beer(team_member: TeamMember, round_nr: u32) -> AdditionalRoundCombination {
-        AdditionalRoundCombination { additional: Additional::beer(team_member), round_nr }
+    fn beer(team_member: TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::beer(team_member), round_nr }
     }
-    fn schluck(team_member: TeamMember, round_nr: u32) -> AdditionalRoundCombination {
-        AdditionalRoundCombination { additional: Additional::schluck(team_member), round_nr }
+    fn schluck(team_member: TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::schluck(team_member), round_nr }
     }
 }
 
@@ -247,51 +477,56 @@ impl Round {
 pub struct Game {
     match_number: u32,
     left_team: Team,
+    left_1: TeamMember,
+    left_2: TeamMember,
     right_team: Team,
+    right_1: TeamMember,
+    right_2: TeamMember,
     result: Result,
     rounds: Vec<Round>,
 }
-fn player_round_string(player : &TeamMember, round:  &Round, left_team : bool) -> (String, String){
-    let mut add_string : String = String::new();
-    let mut round_string : String = String::new();
-    for additionals in round.additionals.iter().filter(|x| x.source.id == player.id){
-        match additionals.kind{
-            FINISHED=>add_string.push('v'),
-            STRAFSCHLUCK=>add_string.push('S'),
-            STRAFBIER=>add_string.push('B')
+
+fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) -> (String, String) {
+    let mut add_string: String = String::new();
+    let mut round_string: String = String::new();
+    for additionals in round.additionals.iter().filter(|x| x.source.id == player.id) {
+        match additionals.kind {
+            FINISHED => add_string.push('v'),
+            STRAFSCHLUCK => add_string.push('S'),
+            STRAFBIER => add_string.push('B')
         }
     }
-    if(round.runner.id == player.id){
+    if (round.runner.id == player.id) {
         round_string.push('*');
     }
-    if(round.thrower.id == player.id){
-        if(round.hit){
+    if (round.thrower.id == player.id) {
+        if (round.hit) {
             round_string.push('X');
-        }else{
+        } else {
             round_string.push('/');
         }
     }
-    if(left_team){
+    if (left_team) {
         (add_string, round_string)
-    }else{
+    } else {
         (round_string, add_string)
     }
 }
 
-impl Game{
-    fn print(&self){
+impl Game {
+    fn print(&self) {
         println!("Spielnr: {}", self.match_number);
         println!("Team: {0:<16.16} | Team: {1:<16.16}", self.left_team.name, self.right_team.name);
-        println!("Spieler1: {0:<12.12} | Spieler1: {1:<12.12}", self.left_team.member_1.name, self.right_team.member_1.name);
-        println!("Spieler2: {0:<12.12} | Spieler2: {1:<12.12}", self.left_team.member_2.name, self.right_team.member_2.name);
-        for round in &self.rounds{
-            let left1 = player_round_string(&self.left_team.member_1, &round, true);
-            let left2 = player_round_string(&self.left_team.member_2, &round, true);
-            let right1 = player_round_string(&self.right_team.member_1, &round, false);
-            let right2 = player_round_string(&self.right_team.member_2, &round, false);
+        println!("Spieler1: {0:<12.12} | Spieler1: {1:<12.12}", self.left_1.name, self.right_1.name);
+        println!("Spieler2: {0:<12.12} | Spieler2: {1:<12.12}", self.left_2.name, self.right_2.name);
+        for round in &self.rounds {
+            let left1 = player_round_string(&self.left_1, &round, true);
+            let left2 = player_round_string(&self.left_2, &round, true);
+            let right1 = player_round_string(&self.right_1, &round, false);
+            let right2 = player_round_string(&self.right_2, &round, false);
             println!("{0:^5}|{1:^5}|{2:^5}|{3:^5}|{4:^5}|{5:^5}|{6:^5}|{7:^5}", left1.0, left2.0, left1.1, left2.1, right1.0, right2.0, right1.1, right2.1);
         }
-        println!("Punkte: {0:>14} | Punkte: {1:<14}", self.result.points_left, self.result.points_right );
+        println!("Punkte: {0:>14} | Punkte: {1:<14}", self.result.points_left, self.result.points_right);
     }
 }
 
@@ -304,7 +539,7 @@ fn first_game_old(left_team: Team, left_1: TeamMember, left_2: TeamMember, right
     let finished_jonas = Additional { kind: FINISHED, source: left_2.clone() };
     rounds.last_mut().unwrap().additionals(vec![finished_sasch, finished_jonas]);
     let result = Result { points_left: 14, points_right: 0 };
-    Game { result, match_number: 1, left_team, right_team, rounds }
+    Game { result, match_number: 1, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
 }
 
 //THIS IS FAULTY, because Florian was finished but according to this sheet ran in the 2nd to last throw
@@ -315,5 +550,5 @@ fn second_game_old_faulty(left_team: Team, left_1: TeamMember, left_2: TeamMembe
     let finish_sebi = Additional::finish(right_2.clone());
     rounds.get_mut(4).unwrap().additionals(vec![finish_flo]);
     rounds.last_mut().unwrap().additionals(vec![finish_sebi]);
-    Game { result, match_number: 2, left_team, right_team, rounds }
+    Game { result, left_1, left_2, right_1, right_2, match_number: 2, left_team, right_team, rounds }
 }
