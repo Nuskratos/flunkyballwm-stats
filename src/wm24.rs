@@ -3,6 +3,23 @@ use crate::data::{Additional, ARC, bool_vec_from_int, create_normalized_rounds, 
 use crate::data::AdditionalType::{FINISHED, STRAFSCHLUCK};
 use crate::team_player_data::*;
 
+pub fn create_games_without_me_or_sebi() -> Vec<Game>{
+    let mut ret_vec: Vec<Game> = Vec::new();
+    ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
+    ret_vec.push(game_5(WEDELMEDEL.clone(), MALTE.clone(), CHRIS.clone(), STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone()));
+    ret_vec.push(game_6(GEWERTET.clone(), LAURA.clone(), HANNES.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
+    ret_vec.push(game_9(STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone(), GEWERTET.clone(), LAURA.clone(), HANNES.clone()));
+    ret_vec.push(game_11(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_13(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), GEWERTET.clone(), LAURA.clone(), HANNES.clone()));
+    ret_vec.push(game_16(WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone(), STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone()));
+    ret_vec.push(game_20(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_21(GEWERTET.clone(), LAURA.clone(), HANNES.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
+    ret_vec.push(game_26(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
+    ret_vec.push(game_31(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec
+
+}
+
 pub fn create_all_games_wm_2024() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();
     ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));

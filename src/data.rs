@@ -106,6 +106,13 @@ impl Game {
         }
         println!("Punkte: {0:>14} | Punkte: {1:<14}", self.result.points_left, self.result.points_right);
     }
+    pub fn winning_team_id(&self) -> u32 {
+        if(self.result.points_left > self.result.points_right){
+            self.left_team.id
+        }else{
+            self.right_team.id
+        }
+    }
 }
 
 pub fn bool_vec_from_int(first_value: bool, int_vec: Vec<u32>) -> Vec<bool> {

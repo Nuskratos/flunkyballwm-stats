@@ -1,6 +1,10 @@
 use std::collections::HashMap;
 use crate::data::{Game, Team, TeamMember, AdditionalType};
 
+pub fn percentage(first: usize, second: usize) -> f32 {
+    first as f32 / second as f32 * 100.0
+}
+
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let mut throws = 0;
     let mut hits = 0;
@@ -87,16 +91,17 @@ pub fn print_side_information(games: &Vec<Game>) {
                     AdditionalType::STRAFSCHLUCK => {
                         if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
                             schluck_left += 1;
-                        }else{
+                        } else {
                             schluck_right += 1;
                         }
                     }
                     AdditionalType::STRAFBIER => {
                         if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
                             beer_left += 1;
-                        }else{
+                        } else {
                             beer_right += 1;
-                        }}
+                        }
+                    }
                     _ => {}
                 }
             }
@@ -105,6 +110,60 @@ pub fn print_side_information(games: &Vec<Game>) {
     println!("Seite  | Siege | Punkte | Trefferwahrscheinlichkeit | StrafS | StrafB");
     println!("Links  | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", left_wins, left_points, left_hits as f32 / left_throws as f32 * 100.0, left_hits, left_throws, schluck_left, beer_left);
     println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", right_wins, right_points, right_hits as f32 / right_throws as f32 * 100.0, right_hits, right_throws, schluck_right, beer_right);
+}
+
+
+pub fn print_team_first_throws(games: &Vec<Game>, teams :&Vec<Team>){
+    // Times going first, times won going first, times going second, times won going second
+    let mut first_throws :HashMap<u32, (u32, u32, u32, u32)> = HashMap::new();
+    for game in games{
+        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, teams);
+        let (ffirst, fwon, fsecond, fw_second) = first_throws.entry(team_id_going_first).or_insert((0,0,0,0));
+        *ffirst +=1;
+        if team_id_going_first == game.winning_team_id(){
+            *fwon+=1;
+        }else{
+        }
+    }
+    for game in games{ // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
+        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, teams);
+        let (sfirst, swon, ssecond, sw_second) = first_throws.entry(team_id_going_second).or_insert((0,0,0,0));
+        *ssecond+=1;
+        if team_id_going_first == game.winning_team_id(){
+        }else{
+            *sw_second+=1;
+        }
+    }
+
+    let mut result_team_vec: Vec<(u32,(u32, u32, u32, u32))> = Vec::new();
+    for team_info in first_throws {
+        result_team_vec.push(team_info);
+    }
+    result_team_vec.sort_by(|a, b| a.1.0.cmp(&b.1.0) );
+    result_team_vec.reverse();
+    println!("Teamname:                   | Going first | Won as first | Going Second | Won as Second");
+    for elem in result_team_vec {
+        println!("{:<27} | {:<11} | {:<12} | {:<12} | {:<8}", team_name_from_id(elem.0, teams), elem.1.0, elem.1.1, elem.1.2, elem.1.3);
+    }
+}
+
+pub fn print_first_throw_effect(games: &Vec<Game>) {
+    let mut amount_first_throw_win = 0;
+    for game in games {
+        let mut winning_ids = (0, 0);
+        if game.result.points_left > game.result.points_right {
+            winning_ids = (game.left_1.id, game.left_2.id);
+        }else{
+            winning_ids = (game.right_1.id, game.right_2.id);
+        }
+        let thrower_id = game.rounds.first().unwrap().thrower.id;
+        if (thrower_id == winning_ids.0 || thrower_id == winning_ids.1) {
+            amount_first_throw_win += 1;
+        }
+    }
+    println!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {}%", games.len(), amount_first_throw_win, percentage(amount_first_throw_win, games.len()));
 }
 
 
@@ -127,6 +186,14 @@ fn team_id_from_player(playerid: u32, teams: &Vec<Team>) -> u32 {
         }
     }
     0
+}
+fn team_name_from_id(team_id : u32, teams : &Vec<Team>) -> &str {
+    for team in teams {
+        if team.id == team_id{
+            return team.name;
+        }
+    }
+    "Not Found"
 }
 
 fn name_from_id(id: u32, teams: &Vec<Team>, players: &Vec<TeamMember>) -> &'static str {
