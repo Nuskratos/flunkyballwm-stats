@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::data::{Game, Team, TeamMember, AdditionalType, bool_vec_from_int};
+use crate::data::{Game, Team, TeamMember, AdditionalType};
 
 pub fn percentage(first: usize, second: usize) -> f32 {
     first as f32 / second as f32 * 100.0
@@ -77,7 +77,7 @@ pub fn print_side_information(games: &Vec<Game>) {
             throws += 1;
             if round.thrower.id == game.left_1.id || round.thrower.id == game.left_2.id {
                 left_throws += 1;
-                if (round.hit) {
+                if round.hit {
                     left_hits += 1;
                 }
             } else {
@@ -113,35 +113,31 @@ pub fn print_side_information(games: &Vec<Game>) {
 }
 
 
-pub fn print_team_first_throws(games: &Vec<Game>, teams :&Vec<Team>){
+pub fn print_team_first_throws(games: &Vec<Game>, teams: &Vec<Team>) {
     // Times going first, times won going first, times going second, times won going second
-    let mut first_throws :HashMap<u32, (u32, u32, u32, u32)> = HashMap::new();
-    for game in games{
+    let mut first_throws: HashMap<u32, (u32, u32, u32, u32)> = HashMap::new();
+    for game in games {
         let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
-        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, teams);
-        let (ffirst, fwon, fsecond, fw_second) = first_throws.entry(team_id_going_first).or_insert((0,0,0,0));
-        *ffirst +=1;
-        if team_id_going_first == game.winning_team_id(){
-            *fwon+=1;
-        }else{
-        }
+        let (ffirst, fwon, _, _) = first_throws.entry(team_id_going_first).or_insert((0, 0, 0, 0));
+        *ffirst += 1;
+        if team_id_going_first == game.winning_team_id() {
+            *fwon += 1;
+        } else {}
     }
-    for game in games{ // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
-        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+    for game in games { // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
         let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, teams);
-        let (sfirst, swon, ssecond, sw_second) = first_throws.entry(team_id_going_second).or_insert((0,0,0,0));
-        *ssecond+=1;
-        if team_id_going_first == game.winning_team_id(){
-        }else{
-            *sw_second+=1;
+        let (_, _, ssecond, sw_second) = first_throws.entry(team_id_going_second).or_insert((0, 0, 0, 0));
+        *ssecond += 1;
+        if team_id_going_second == game.winning_team_id() {
+            *sw_second += 1;
         }
     }
 
-    let mut result_team_vec: Vec<(u32,(u32, u32, u32, u32))> = Vec::new();
+    let mut result_team_vec: Vec<(u32, (u32, u32, u32, u32))> = Vec::new();
     for team_info in first_throws {
         result_team_vec.push(team_info);
     }
-    result_team_vec.sort_by(|a, b| a.1.0.cmp(&b.1.0) );
+    result_team_vec.sort_by(|a, b| a.1.0.cmp(&b.1.0));
     result_team_vec.reverse();
     println!("Teamname:                   | Going first | Won as first | Going Second | Won as Second");
     for elem in result_team_vec {
@@ -154,19 +150,19 @@ pub fn print_first_throw_effect(games: &Vec<Game>) {
     let mut amount_first_hit = 0;
     let mut amount_first_hit_win = 0;
     for game in games {
-        let mut first_hit =  false;
-        if game.rounds.first().unwrap().hit{
-            amount_first_hit +=1;
+        let mut first_hit = false;
+        if game.rounds.first().unwrap().hit {
+            amount_first_hit += 1;
             first_hit = true;
         }
         let mut winning_ids = (0, 0);
         if game.result.points_left > game.result.points_right {
             winning_ids = (game.left_1.id, game.left_2.id);
-        }else{
+        } else {
             winning_ids = (game.right_1.id, game.right_2.id);
         }
         let thrower_id = game.rounds.first().unwrap().thrower.id;
-        if (thrower_id == winning_ids.0 || thrower_id == winning_ids.1) {
+        if thrower_id == winning_ids.0 || thrower_id == winning_ids.1 {
             amount_first_throw_win += 1;
             if first_hit {
                 amount_first_hit_win += 1;
@@ -195,15 +191,16 @@ impl Accuracy {
 
 fn team_id_from_player(playerid: u32, teams: &Vec<Team>) -> u32 {
     for team in teams {
-        if (team.member_1.id == playerid || team.member_2.id == playerid) {
+        if team.member_1.id == playerid || team.member_2.id == playerid {
             return team.id;
         }
     }
     0
 }
-fn team_name_from_id(team_id : u32, teams : &Vec<Team>) -> &str {
+
+fn team_name_from_id(team_id: u32, teams: &Vec<Team>) -> &str {
     for team in teams {
-        if team.id == team_id{
+        if team.id == team_id {
             return team.name;
         }
     }

@@ -1,4 +1,4 @@
-use crate::data::AdditionalType::FINISHED;
+use crate::data::AdditionalType::*;
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum AdditionalType {
@@ -35,13 +35,13 @@ pub struct Additional {
 
 impl Additional {
     pub(crate) fn finish(team_member: TeamMember) -> Additional {
-        Additional { kind: crate::AdditionalType::FINISHED, source: team_member }
+        Additional { kind: FINISHED, source: team_member }
     }
     fn beer(team_member: TeamMember) -> Additional {
-        Additional { kind: crate::AdditionalType::STRAFBIER, source: team_member }
+        Additional { kind: STRAFBIER, source: team_member }
     }
     fn schluck(team_member: TeamMember) -> Additional {
-        Additional { kind: crate::AdditionalType::STRAFSCHLUCK, source: team_member }
+        Additional { kind: STRAFSCHLUCK, source: team_member }
     }
 }
 
@@ -107,9 +107,9 @@ impl Game {
         println!("Punkte: {0:>14} | Punkte: {1:<14}", self.result.points_left, self.result.points_right);
     }
     pub fn winning_team_id(&self) -> u32 {
-        if(self.result.points_left > self.result.points_right){
+        if self.result.points_left > self.result.points_right {
             self.left_team.id
-        }else{
+        } else {
             self.right_team.id
         }
     }
@@ -137,17 +137,17 @@ pub fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) 
             STRAFBIER => add_string.push('B')
         }
     }
-    if (round.runner.id == player.id) {
+    if round.runner.id == player.id {
         round_string.push('*');
     }
-    if (round.thrower.id == player.id) {
-        if (round.hit) {
+    if round.thrower.id == player.id {
+        if round.hit {
             round_string.push('X');
         } else {
             round_string.push('/');
         }
     }
-    if (left_team) {
+    if left_team {
         (add_string, round_string)
     } else {
         (round_string, add_string)
@@ -158,12 +158,12 @@ pub fn results_from_additionals(additionals: &Vec<ARC>, left_team_first: bool, l
     let mut result: Result = Result { points_left: 0, points_right: 0 };
     let mut result_values: Vec<u32> = vec![7, 5, 3];
     let mut round_checker_offset = 0;
-    if (!left_team_first) {
+    if !left_team_first {
         round_checker_offset = 1;
     }
     for additional_round in additionals {
-        if (additional_round.additional.kind == FINISHED) {
-            if (additional_round.additional.source.id == left_team.member_2.id || additional_round.additional.source.id == left_team.member_1.id) {
+        if additional_round.additional.kind == FINISHED {
+            if additional_round.additional.source.id == left_team.member_2.id || additional_round.additional.source.id == left_team.member_1.id {
                 result.points_left = result.points_left + result_values.first().unwrap();
             } else {
                 result.points_right = result.points_right + result_values.first().unwrap();
@@ -172,7 +172,7 @@ pub fn results_from_additionals(additionals: &Vec<ARC>, left_team_first: bool, l
         }
     }
     // Adding 2 to the winning team
-    if (result.points_left > result.points_right) {
+    if result.points_left > result.points_right {
         result.points_left = result.points_left + 2;
     } else {
         result.points_right = result.points_right + 2;
@@ -222,14 +222,14 @@ pub fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: Tea
         }
         for round in &additional_round_info {
             if round.round_nr == ix as u32 { // Remove done drinkers. Can't be together with the loop above because otherwise the Roundcreation fails (because I'm still new at Rust)
-                if (round.additional.kind == FINISHED) {
+                if round.additional.kind == FINISHED {
                     first_team.retain(|x| x.id != round.additional.source.id);
                     second_team.retain(|x| x.id != round.additional.source.id);
                 }
             }
         }
         // flip members after every 2 rounds
-        if ((ix + 1) % 2 == 0) {
+        if (ix + 1) % 2 == 0 {
             first_team.reverse();
             second_team.reverse();
         }
