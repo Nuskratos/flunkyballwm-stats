@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use crate::data::{Game, Team, TeamMember, AdditionalType};
+use crate::data::{Game, Team, TeamMember, AdditionalType, bool_vec_from_int};
 
 pub fn percentage(first: usize, second: usize) -> f32 {
     first as f32 / second as f32 * 100.0
@@ -151,7 +151,14 @@ pub fn print_team_first_throws(games: &Vec<Game>, teams :&Vec<Team>){
 
 pub fn print_first_throw_effect(games: &Vec<Game>) {
     let mut amount_first_throw_win = 0;
+    let mut amount_first_hit = 0;
+    let mut amount_first_hit_win = 0;
     for game in games {
+        let mut first_hit =  false;
+        if game.rounds.first().unwrap().hit{
+            amount_first_hit +=1;
+            first_hit = true;
+        }
         let mut winning_ids = (0, 0);
         if game.result.points_left > game.result.points_right {
             winning_ids = (game.left_1.id, game.left_2.id);
@@ -161,9 +168,16 @@ pub fn print_first_throw_effect(games: &Vec<Game>) {
         let thrower_id = game.rounds.first().unwrap().thrower.id;
         if (thrower_id == winning_ids.0 || thrower_id == winning_ids.1) {
             amount_first_throw_win += 1;
+            if first_hit {
+                amount_first_hit_win += 1;
+            }
         }
     }
-    println!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {}%", games.len(), amount_first_throw_win, percentage(amount_first_throw_win, games.len()));
+    let amount_first_miss = games.len() - amount_first_hit;
+    let amount_first_miss_win = amount_first_throw_win - amount_first_hit_win;
+    println!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {:.1}%", games.len(), amount_first_throw_win, percentage(amount_first_throw_win, games.len()));
+    println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst getroffen. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_hit, amount_first_hit_win, percentage(amount_first_hit_win, amount_first_hit));
+    println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst verfehlt. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_miss, amount_first_miss_win, percentage(amount_first_miss_win, amount_first_miss));
 }
 
 

@@ -12,12 +12,13 @@ use crate::team_player_data::{BEEF, CHRIS, DA_HAM_SIE, DOS_BROS, FLO, GEWERTET, 
 fn main() {
     let all_players: Vec<TeamMember> = vec![JEROME, BEEF, SEBI, FLO, SASCHA, JONAS, LUISE, TOBIAS, MALTE, CHRIS, HANNES, LAURA];
     let all_teams: Vec<Team> = vec![DA_HAM_SIE, DOS_BROS, STRAMMSEIN, WHITE_CLAW, WEDELMEDEL, GEWERTET];
-    let games_24 = create_all_games_wm_2024();
+    let games24 = create_all_games_wm_2024();
+    //let games24_no_dos_no_wedel = create_all_games_without_dos_or_wedelmedel();
     //let games_24_no_sebi_or_me = create_games_without_me_or_sebi();
     //print_throwing_accuracy(&games_24, &all_teams, &all_players);
     //print_side_information(&games_24);
-    print_first_throw_effect(&games_24);
-    print_team_first_throws(&games_24, &all_teams);
+    print_first_throw_effect(&games24);
+    print_team_first_throws(&games24, &all_teams);
 
 }
 
