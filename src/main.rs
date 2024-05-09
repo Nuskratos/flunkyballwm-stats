@@ -2,12 +2,14 @@ pub mod data;
 mod wm24;
 mod team_player_data;
 mod calculation;
+mod test_stuff;
 
 use std::fmt::Debug;
 use data::*;
 use wm24::*;
 use crate::calculation::{print_first_throw_effect, print_side_information, print_team_first_throws, print_throwing_accuracy};
 use crate::team_player_data::{BEEF, CHRIS, DA_HAM_SIE, DOS_BROS, FLO, GEWERTET, HANNES, JEROME, JONAS, LAURA, LUISE, MALTE, SASCHA, SEBI, STRAMMSEIN, TOBIAS, WEDELMEDEL, WHITE_CLAW};
+use crate::test_stuff::test_first_throw_value;
 
 fn main() {
     let all_players: Vec<TeamMember> = vec![JEROME, BEEF, SEBI, FLO, SASCHA, JONAS, LUISE, TOBIAS, MALTE, CHRIS, HANNES, LAURA];
@@ -17,8 +19,14 @@ fn main() {
     //let games_24_no_sebi_or_me = create_games_without_me_or_sebi();
     //print_throwing_accuracy(&games_24, &all_teams, &all_players);
     //print_side_information(&games_24);
-    print_first_throw_effect(&games24);
-    print_team_first_throws(&games24, &all_teams);
+    //print_first_throw_effect(&games24);
+    //print_team_first_throws(&games24, &all_teams);
+    test_first_throw_value(2, Option::Some(50));
+    test_first_throw_value(3, Option::Some(50));
+    test_first_throw_value(4, Option::Some(50));
+    test_first_throw_value(2, Option::None);
+    test_first_throw_value(3, Option::None);
+    test_first_throw_value(4, Option::None);
 
 }
 

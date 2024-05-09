@@ -5,6 +5,7 @@ pub fn percentage(first: usize, second: usize) -> f32 {
     first as f32 / second as f32 * 100.0
 }
 
+
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let mut throws = 0;
     let mut hits = 0;
