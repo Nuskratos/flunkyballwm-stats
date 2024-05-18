@@ -21,12 +21,12 @@ fn main() {
     //print_side_information(&games_24);
     //print_first_throw_effect(&games24);
     //print_team_first_throws(&games24, &all_teams);
-    test_first_throw_value(2, Option::Some(50));
-    test_first_throw_value(3, Option::Some(50));
-    test_first_throw_value(4, Option::Some(50));
-    test_first_throw_value(2, Option::None);
-    test_first_throw_value(3, Option::None);
-    test_first_throw_value(4, Option::None);
+    test_first_throw_value(2, Some(50));
+    test_first_throw_value(3, Some(50));
+    test_first_throw_value(4, Some(50));
+    test_first_throw_value(2, None);
+    test_first_throw_value(3, None);
+    test_first_throw_value(4, None);
 
 }
 

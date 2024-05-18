@@ -25,15 +25,15 @@ fn test_generate_game(hits_finished: u32, throw_percentage: Option<u32>) -> Test
         if throw_percentage.is_some() {
             current_throw_percentage = throw_percentage.unwrap();
         } else {
-            if ((1+iteration) % 2 == 0) {
+            if (1+iteration) % 2 == 0 {
                 current_throw_percentage = first_percentage;
             } else {
                 current_throw_percentage = second_percentage;
             }
         }
-        if (guess_hit <= current_throw_percentage) {
-            if (iteration + 1) % 2 == 0 {
-                if (iteration == 1) {
+        if guess_hit <= current_throw_percentage {
+            if iteration + 1 % 2 == 0 {
+                if iteration == 1 {
                     first_throw_hits = true;
                 }
                 first_hits += 1;
@@ -41,11 +41,11 @@ fn test_generate_game(hits_finished: u32, throw_percentage: Option<u32>) -> Test
                 second_hits += 1;
             }
         }
-        if (first_hits >= hits_finished) {
+        if first_hits >= hits_finished {
             first_throw_won = true;
             break;
         }
-        if (second_hits >= hits_finished) {
+        if second_hits >= hits_finished {
             break;
         }
         iteration += 1;
@@ -69,7 +69,7 @@ pub fn test_first_throw_value(hits_finished: u32, throw_percentage: Option<u32>)
                 first_miss_win += 1;
             }
         }
-        if (game.first_hit) {
+        if game.first_hit {
             first_throw_hit += 1;
         }
     }
