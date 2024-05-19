@@ -1,6 +1,5 @@
-use std::backtrace::BacktraceStatus;
 use std::collections::HashMap;
-use crate::data::{Game, Team, TeamMember, AdditionalType};
+use crate::data::{Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 
 pub fn percentage(first: usize, second: usize) -> f32 {
@@ -23,6 +22,7 @@ Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (r
 All finished: Finished drinks with Strafschluck
 All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
 for all above: StrafBeer counts as finished +1");
+    println!("Selected Strafschluck effect: {:.2} rounds", schluck_effect);
     let mut playerspeeds : Vec<(PlayerFinishedStats, PlayerAvgStats, &TeamMember)> = Vec::new();
     for player in players {
         let finisheds = calculate_finished(games, player, teams, schluck_effect);
@@ -121,6 +121,8 @@ pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, 
                     }
                     avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
                     // continuing in case the strafbier was finished
+                    tmp_schluck = 0.0;
+                    tmp_round =0;
                 }
                 if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
                     tmp_schluck += schluck_effect;
@@ -128,10 +130,12 @@ pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, 
                 }
             }
             if i == game.rounds.len() - 1 && !person_finished{
-                if tmp_round >= average(finished_stats.pure_finished.0, finished_stats.pure_finished.1).floor() as u32 {
+                let pure_finished_average = average(finished_stats.pure_finished.0, finished_stats.pure_finished.1).floor() as u32;
+                if tmp_round >= pure_finished_average && pure_finished_average > 0{
                     avg_stats.p_avg(1, tmp_round + 1)
                 }
-                if tmp_round as f32 + tmp_schluck >= average_f(finished_stats.all_finished.0, finished_stats.all_finished.1).floor() {
+                let all_finished_average = average_f(finished_stats.all_finished.0, finished_stats.all_finished.1).floor();
+                if tmp_round as f32 + tmp_schluck >= all_finished_average && all_finished_average > 0.0{
                     avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
                 }
             }
@@ -171,6 +175,8 @@ pub fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Te
                         finshed_stats.p_finished(1, tmp_round + 1);
                     }
                     finshed_stats.a_finished(1, tmp_round as f32 + tmp_schluck + 1.0);
+                    tmp_round = 0;
+                    tmp_schluck = 0.0;
                     // continuing in case the strafbier was finished
                 }
                 if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
@@ -266,14 +272,14 @@ pub fn print_side_information(games: &Vec<Game>) {
             }
             for additional in &round.additionals {
                 match &additional.kind {
-                    AdditionalType::STRAFSCHLUCK => {
+                    STRAFSCHLUCK => {
                         if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
                             schluck_left += 1;
                         } else {
                             schluck_right += 1;
                         }
                     }
-                    AdditionalType::STRAFBIER => {
+                    STRAFBIER => {
                         if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
                             beer_left += 1;
                         } else {

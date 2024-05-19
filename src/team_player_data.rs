@@ -1,4 +1,3 @@
-use std::env::join_paths;
 use crate::data::*;
 
 pub const JEROME: TeamMember = TeamMember { name: "Jerome", id: 1 };
