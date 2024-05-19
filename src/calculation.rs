@@ -1,15 +1,65 @@
 use std::collections::HashMap;
 use crate::data::{Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
+use crate::team_player_data::TEAM_INVALID;
 
-pub fn percentage(first: usize, second: usize) -> f32 {
-    first as f32 / second as f32 * 100.0
+pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
+
+pub fn average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
+
+pub fn average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
+
+pub struct TeamThrowGames {
+    throws: u32,
+    games: u32,
 }
 
-pub fn average(beers: u32, rounds: u32) -> f32 { rounds as f32 / beers as f32 }
+impl TeamThrowGames {
+    pub fn add_throws(&mut self, throws: u32) {
+        self.throws += throws;
+        self.games += 1;
+    }
+    pub fn new(throws: u32) -> TeamThrowGames {
+        TeamThrowGames {
+            throws,
+            games: 1,
+        }
+    }
+}
 
-pub fn average_f(beers: u32, rounds: f32) -> f32 { rounds / beers as f32 }
-
+pub fn print_average_throws(games: &Vec<Game>, teams: &Vec<Team>) {
+    let mut total_throws: u32 = 0;
+    let mut team_throws: HashMap<&Team, TeamThrowGames> = HashMap::new();
+    for game in games {
+        total_throws += game.rounds.len() as u32;
+        let throws_of_second_team = game.rounds.len() as u32 / 2;
+        if game.rounds.len() % 2 == 0 { // Both teams have the same number of throws
+            team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
+            team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
+        } else { // Opening team had more throws
+            let opening_team = team_from_player(game.rounds.first().unwrap().thrower.id, teams);
+            if &game.left_team == opening_team {
+                team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(TeamThrowGames::new(throws_of_second_team + 1));
+                team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
+            } else {
+                team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(TeamThrowGames::new(throws_of_second_team + 1));
+                team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
+            }
+        }
+    }
+    println!("Games: {:>3}\tRounds: {:>4}\tAverage: {:>2.2}", games.len(), total_throws, average(games.len() as u32, total_throws));
+    let mut team_vec: Vec<(&Team, TeamThrowGames)> = Vec::new();
+    for team in team_throws {
+        team_vec.push((team.0, team.1));
+    }
+    team_vec.sort_by(|a, b| average(a.1.games, a.1.throws).partial_cmp(&average(b.1.games, b.1.throws)).unwrap());
+    let width = 10;
+    let name_width = 27;
+    println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
+    for team in team_vec {
+        println!("| {:>name_width$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.games, team.1.throws, average(team.1.games, team.1.throws));
+    }
+}
 
 pub fn player_in_game(game: &Game, player: &TeamMember) -> bool {
     let player_ids = vec![game.left_1.id, game.left_2.id, game.right_1.id, game.right_2.id];
@@ -23,7 +73,7 @@ All finished: Finished drinks with Strafschluck
 All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
 for all above: StrafBeer counts as finished +1");
     println!("Selected Strafschluck effect: {:.2} rounds", schluck_effect);
-    let mut playerspeeds : Vec<(PlayerFinishedStats, PlayerAvgStats, &TeamMember)> = Vec::new();
+    let mut playerspeeds: Vec<(PlayerFinishedStats, PlayerAvgStats, &TeamMember)> = Vec::new();
     for player in players {
         let finisheds = calculate_finished(games, player, teams, schluck_effect);
         let averages = calculate_avg(games, player, teams, &finisheds, schluck_effect);
@@ -89,7 +139,7 @@ impl PlayerFinishedStats {
     }
 }
 
-pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, finished_stats: &PlayerFinishedStats, schluck_effect : f32) -> PlayerAvgStats {
+pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, finished_stats: &PlayerFinishedStats, schluck_effect: f32) -> PlayerAvgStats {
     let mut avg_stats = PlayerAvgStats::new();
     for game in games {
         if !player_in_game(game, player) {
@@ -122,20 +172,20 @@ pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, 
                     avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
                     // continuing in case the strafbier was finished
                     tmp_schluck = 0.0;
-                    tmp_round =0;
+                    tmp_round = 0;
                 }
                 if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
                     tmp_schluck += schluck_effect;
                     schluck_happened = true;
                 }
             }
-            if i == game.rounds.len() - 1 && !person_finished{
+            if i == game.rounds.len() - 1 && !person_finished {
                 let pure_finished_average = average(finished_stats.pure_finished.0, finished_stats.pure_finished.1).floor() as u32;
-                if tmp_round >= pure_finished_average && pure_finished_average > 0{
+                if tmp_round >= pure_finished_average && pure_finished_average > 0 {
                     avg_stats.p_avg(1, tmp_round + 1)
                 }
                 let all_finished_average = average_f(finished_stats.all_finished.0, finished_stats.all_finished.1).floor();
-                if tmp_round as f32 + tmp_schluck >= all_finished_average && all_finished_average > 0.0{
+                if tmp_round as f32 + tmp_schluck >= all_finished_average && all_finished_average > 0.0 {
                     avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
                 }
             }
@@ -144,7 +194,7 @@ pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, 
     avg_stats
 }
 
-pub fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, schluck_effect : f32) -> PlayerFinishedStats {
+pub fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, schluck_effect: f32) -> PlayerFinishedStats {
     let mut finshed_stats = PlayerFinishedStats::new();
     for game in games {
         if !player_in_game(game, player) {
@@ -373,13 +423,17 @@ impl Accuracy {
     }
 }
 
-fn team_id_from_player(playerid: u32, teams: &Vec<Team>) -> u32 {
+fn team_from_player(playerid: u32, teams: &Vec<Team>) -> &Team {
     for team in teams {
         if team.member_1.id == playerid || team.member_2.id == playerid {
-            return team.id;
+            return team;
         }
     }
-    0
+    &TEAM_INVALID
+}
+
+fn team_id_from_player(playerid: u32, teams: &Vec<Team>) -> u32 {
+    team_from_player(playerid, teams).id
 }
 
 fn team_name_from_id(team_id: u32, teams: &Vec<Team>) -> &str {

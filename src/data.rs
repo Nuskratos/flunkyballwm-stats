@@ -7,13 +7,13 @@ pub enum AdditionalType {
     STRAFSCHLUCK,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct TeamMember {
     pub(crate) name: &'static str,
     pub(crate) id: u32,
 }
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Team {
     pub(crate) name: &'static str,
     pub(crate) id: u32,
