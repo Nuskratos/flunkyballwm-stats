@@ -22,3 +22,5 @@ pub const STRAMMSEIN: Team = Team { name: "Strammsein", id: 103, member_1: JONAS
 pub const WHITE_CLAW: Team = Team { name: "White Claw", id: 104, member_1: LUISE, member_2: TOBIAS };
 pub const WEDELMEDEL: Team = Team { name: "Team Wädelmädel", id: 105, member_1: MALTE, member_2: CHRIS };
 pub const GEWERTET: Team = Team { name: "Wurde das gewertet?", id: 106, member_1: HANNES, member_2: LAURA };
+
+pub const NAME_WIDTH : usize = 27;

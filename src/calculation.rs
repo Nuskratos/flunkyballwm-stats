@@ -1,13 +1,111 @@
 use std::collections::HashMap;
 use crate::data::{Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
-use crate::team_player_data::TEAM_INVALID;
+use crate::team_player_data::*;
 
 pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
 
 pub fn average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
 pub fn average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
+
+
+#[derive(Default)]
+pub struct ChainInformation{
+    current_hit : u32,
+    current_miss : u32,
+    total_hit : u32,
+    total_miss :u32
+}
+impl ChainInformation{
+    pub fn create(hit : bool) -> ChainInformation{
+        let mut ret: ChainInformation = Default::default();
+        ret.throw(hit);
+        ret
+    }
+    pub fn throw(&mut self,hit : bool){
+        if hit{
+            self.hit();
+        }else{
+            self.miss();
+        }
+    }
+    fn hit(& mut self){
+        self.current_hit+=1;
+        if self.current_hit > self.total_hit{
+            self.total_hit = self.current_hit;
+        }
+        self.current_miss = 0;
+    }
+    fn miss(& mut self){
+        self.current_miss +=1;
+        if self.current_miss > self.total_miss{
+            self.total_miss = self.current_miss;
+        }
+        self.current_hit = 0;
+    }
+}
+
+pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>){
+    let mut team_chain : HashMap<&Team, ChainInformation> = HashMap::new();
+    let mut player_chain : HashMap<&TeamMember, ChainInformation> = HashMap::new();
+    for game in games {
+        for round in &game.rounds{
+            let team = team_from_player(round.thrower.id, teams);
+            team_chain.entry(team).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
+            player_chain.entry(&round.thrower).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
+        }
+    }
+    let width = 11;
+    let total_line_width = 59;
+    println!("Hit and miss chains");
+    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Hit-chain", "Miss-chain");
+    print_line_break(total_line_width);
+    let mut team_vec : Vec<(&Team, ChainInformation)> = Vec::new();
+    for team in team_chain{
+        team_vec.push((team.0, team.1));
+    }
+    team_vec.sort_by(|a, b| a.1.total_hit.partial_cmp(&b.1.total_hit).unwrap());
+    team_vec.reverse();
+    for team in team_vec{
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team.0.name, team.1.total_hit, team.1.total_miss);
+    }
+
+
+    print_line_break(total_line_width);
+    let mut player_vec : Vec<(&TeamMember, ChainInformation)> = Vec::new();
+    for player in player_chain{
+        player_vec.push((player.0, player.1));
+    }
+    player_vec.sort_by(|a, b| a.1.total_hit.partial_cmp(&b.1.total_hit).unwrap());
+    player_vec.reverse();
+    for player in player_vec{
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player.0.name, player.1.total_hit, player.1.total_miss);
+    }
+}
+
+pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
+    let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
+    for game in games {
+        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let second_enemy_stats = if &game.left_team == first_enemy_stats { &game.right_team } else { &game.left_team };
+        for (ix, round) in game.rounds.iter().enumerate() {
+            let passive_team = if ix % 2 == 0 { second_enemy_stats}else {first_enemy_stats};
+            enemy_accuracy.entry(passive_team).and_modify(|x| x.add_throw(round.hit)).or_insert(Accuracy { name: passive_team.name, hits: if round.hit { 1 } else { 0 }, throws: 1 });
+        }
+    }
+    let mut acc_vec : Vec<(&Team, Accuracy)> = Vec::new();
+    for team in enemy_accuracy{
+        acc_vec.push((team.0, team.1));
+    }
+    acc_vec.sort_by(|a, b| a.1.percentage().partial_cmp(&b.1.percentage()).unwrap());
+    println!("Enemy Accuracy:");
+    let width = 10;
+    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Teamname", "Throws", "Hits", "Percentage");
+    for team in acc_vec {
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.throws, team.1.hits, team.1.percentage());
+    }
+}
 
 pub struct TeamThrowGames {
     throws: u32,
@@ -47,17 +145,16 @@ pub fn print_average_throws(games: &Vec<Game>, teams: &Vec<Team>) {
             }
         }
     }
-    println!("Games: {:>3}\tRounds: {:>4}\tAverage: {:>2.2}", games.len(), total_throws, average(games.len() as u32, total_throws));
+    println!("Average throws: Games: {:>3}\tRounds: {:>4}\tAverage: {:>2.2}", games.len(), total_throws, average(games.len() as u32, total_throws));
     let mut team_vec: Vec<(&Team, TeamThrowGames)> = Vec::new();
     for team in team_throws {
         team_vec.push((team.0, team.1));
     }
     team_vec.sort_by(|a, b| average(a.1.games, a.1.throws).partial_cmp(&average(b.1.games, b.1.throws)).unwrap());
     let width = 10;
-    let name_width = 27;
-    println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
+    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
     for team in team_vec {
-        println!("| {:>name_width$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.games, team.1.throws, average(team.1.games, team.1.throws));
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.games, team.1.throws, average(team.1.games, team.1.throws));
     }
 }
 
@@ -67,7 +164,8 @@ pub fn player_in_game(game: &Game, player: &TeamMember) -> bool {
 }
 
 pub fn print_complete_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) {
-    println!("Pure finished: Finished drinks without StrafSchluck
+    println!("Different drinking speed metrics:
+Pure finished: Finished drinks without StrafSchluck
 Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (rounds+1) - no StrafSchluck
 All finished: Finished drinks with Strafschluck
 All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
@@ -260,7 +358,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
         }
     }
     println!("{:<30} threw: {} and hit: {} which is {:4.2}%", "Overall", throws, hits, hits as f32 / throws as f32 * 100.0);
-    print_line_break();
+    print_line_break(70);
 
     let mut result_team_vec: Vec<Accuracy> = Vec::new();
     for score in team_scores {
@@ -271,7 +369,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     for accuracy in &result_team_vec {
         print_accuracy(accuracy);
     }
-    print_line_break();
+    print_line_break(70);
     let mut result_vec: Vec<Accuracy> = Vec::new();
     for score in player_scores {
         result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
@@ -281,7 +379,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     for accuracy in &result_vec {
         print_accuracy(accuracy);
     }
-    print_line_break();
+    print_line_break(70);
 }
 
 pub fn print_side_information(games: &Vec<Game>) {
@@ -421,6 +519,12 @@ impl Accuracy {
     fn percentage(&self) -> f32 {
         self.hits as f32 / self.throws as f32 * 100.0
     }
+    fn add_throw(&mut self, hit: bool) {
+        self.throws += 1;
+        if hit {
+            self.hits += 1;
+        }
+    }
 }
 
 fn team_from_player(playerid: u32, teams: &Vec<Team>) -> &Team {
@@ -463,6 +567,6 @@ fn print_accuracy(accuracy: &Accuracy) {
     println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage());
 }
 
-fn print_line_break() {
-    println!("{:-<70}", "-")
+fn print_line_break(width : usize) {
+    println!("{:-<width$}", "-")
 }

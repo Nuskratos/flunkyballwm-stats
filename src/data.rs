@@ -215,11 +215,8 @@ pub fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: &Te
                 round_additionals.push(round.additional.clone());
             }
         }
-        if ix % 2 == 0 { // Add the Round information
-            ret_vector.push(Round { thrower: first_team.first().unwrap().clone(), runner: second_team.first().unwrap().clone(), hit: *hit, additionals: round_additionals });
-        } else {
-            ret_vector.push(Round { thrower: second_team.first().unwrap().clone(), runner: first_team.first().unwrap().clone(), hit: *hit, additionals: round_additionals });
-        }
+        let (thrower, runner) = if ix % 2 == 0 { (first_team.first().unwrap(), second_team.first().unwrap()) } else { (second_team.first().unwrap(), first_team.first().unwrap()) };
+        ret_vector.push(Round { thrower: thrower.clone(), runner: runner.clone(), hit: *hit, additionals: round_additionals });
         for round in &additional_round_info {
             if round.round_nr == ix as u32 { // Remove done drinkers. Can't be together with the loop above because otherwise the Roundcreation fails (because I'm still new at Rust)
                 if round.additional.kind == FINISHED {
