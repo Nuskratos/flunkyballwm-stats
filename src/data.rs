@@ -132,7 +132,7 @@ pub fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) 
     let mut round_string: String = String::new();
     for additionals in round.additionals.iter().filter(|x| x.source.id == player.id) {
         match &additionals.kind {
-            FINISHED => add_string.push('v'),
+            FINISHED => add_string.push('\u{2713}'),
             STRAFSCHLUCK => add_string.push('S'),
             STRAFBIER => add_string.push('B')
         }

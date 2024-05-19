@@ -39,9 +39,9 @@ pub fn create_games_without_me_or_sebi() -> Vec<Game>{
 pub fn create_all_games_wm_2024() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();
     ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
-    ret_vec.push(second_game_new(GEWERTET.clone(), LAURA.clone(), HANNES.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
+    ret_vec.push(game_2(GEWERTET.clone(), LAURA.clone(), HANNES.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
     ret_vec.push(game_3(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
-    ret_vec.push(game_4(DOS_BROS.clone(), FLO.clone(), SEBI.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
+    ret_vec.push(game_4(DOS_BROS.clone(), SEBI.clone(), FLO.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
     ret_vec.push(game_5(WEDELMEDEL.clone(), MALTE.clone(), CHRIS.clone(), STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone()));
     ret_vec.push(game_6(GEWERTET.clone(), LAURA.clone(), HANNES.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
     ret_vec.push(game_7(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
@@ -117,7 +117,7 @@ pub fn game_23(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_te
     Game { result, match_number: 23, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
 }
 
-pub fn game_22(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
+pub fn game_22(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game { //TODO This needs a manual change for the running, because chris ran twice
     let left_began = true;
     let additionals = vec![ARC::finish(left_2.clone(), 4), ARC::finish(left_1.clone(), 6)];
     let result = results_from_additionals(&additionals, left_began, &left_team);
@@ -127,7 +127,7 @@ pub fn game_22(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_te
 
 pub fn game_21(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = false;
-    let additionals = vec![ARC::finish(left_2.clone(), 6), ARC::finish(left_1.clone(), 8)];
+    let additionals = vec![ARC::finish(right_2.clone(), 6), ARC::finish(right_1.clone(), 8)];
     let result = results_from_additionals(&additionals, left_began, &left_team);
     let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), bool_vec_from_int(true, vec![1, 3, 1, 1, 1, 1, 1]), additionals, left_began);
     Game { result, match_number: 21, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
@@ -262,6 +262,22 @@ pub fn game_5(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_tea
     Game { result, match_number: 5, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
+fn game_4(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
+    let left_began = true;
+    let additionals = vec![ARC::finish(left_2.clone(), 6), ARC::finish(right_1.clone(), 7), ARC::finish(left_1.clone(), 8)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_2.clone(), left_1.clone(), right_1.clone(), right_2.clone(), vec![false, false, true, true, true, false, true, true, true], additionals, left_began);
+    Game { result, match_number: 4, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
+}
+fn game_2(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
+    let left_began = false;
+    let mut additionals = vec![ARC::finish(right_1.clone(), 4), ARC::finish(right_2.clone(), 6)];
+    let result = results_from_additionals(&additionals, left_began, &left_team);
+    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(),
+                                                 vec![true, true, true, true, true, false, true], additionals.clone(), left_began);
+    Game { result, match_number: 2, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
+}
+
 fn first_game_new(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
     let additionals: Vec<ARC> = vec![ARC::schluck(left_1.clone(), 0), ARC::finish(left_1.clone(), 14), ARC::finish(left_2.clone(), 14)];
@@ -271,14 +287,6 @@ fn first_game_new(left_team: Team, left_1: TeamMember, left_2: TeamMember, right
     Game { result, match_number: 1, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
-fn second_game_new(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
-    let left_began = false;
-    let mut additionals = vec![ARC::finish(right_1.clone(), 4), ARC::finish(right_2.clone(), 6)];
-    let result = results_from_additionals(&additionals, left_began, &left_team);
-    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(),
-                                                 vec![true, true, true, true, false, true], additionals.clone(), left_began);
-    Game { result, match_number: 2, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
-}
 
 fn game_3(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
@@ -288,13 +296,6 @@ fn game_3(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: T
     Game { result, match_number: 3, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
 }
 
-fn game_4(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
-    let left_began = true;
-    let additionals = vec![ARC::finish(left_1.clone(), 6), ARC::finish(right_1.clone(), 7), ARC::finish(left_2.clone(), 8)];
-    let result = results_from_additionals(&additionals, left_began, &left_team);
-    let rounds = create_normal_rounds_left_right(left_1.clone(), left_2.clone(), right_1.clone(), right_2.clone(), vec![false, false, true, true, true, false, true, true, true], additionals, left_began);
-    Game { result, match_number: 4, left_team, left_1, left_2, right_1, right_2, right_team, rounds }
-}
 
 
 fn first_game_old(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {

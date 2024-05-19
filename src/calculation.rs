@@ -1,10 +1,187 @@
+use std::backtrace::BacktraceStatus;
 use std::collections::HashMap;
 use crate::data::{Game, Team, TeamMember, AdditionalType};
+use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 
 pub fn percentage(first: usize, second: usize) -> f32 {
     first as f32 / second as f32 * 100.0
 }
 
+pub fn average(beers: u32, rounds: u32) -> f32 { rounds as f32 / beers as f32 }
+
+pub fn average_f(beers: u32, rounds: f32) -> f32 { rounds / beers as f32 }
+
+
+pub fn player_in_game(game: &Game, player: &TeamMember) -> bool {
+    let player_ids = vec![game.left_1.id, game.left_2.id, game.right_1.id, game.right_2.id];
+    return player_ids.contains(&player.id);
+}
+
+pub fn print_complete_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) {
+    println!("Pure finished: Finished drinks without StrafSchluck
+Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (rounds+1) - no StrafSchluck
+All finished: Finished drinks with Strafschluck
+All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
+for all above: StrafBeer counts as finished +1");
+    let mut playerspeeds : Vec<(PlayerFinishedStats, PlayerAvgStats, &TeamMember)> = Vec::new();
+    for player in players {
+        let finisheds = calculate_finished(games, player, teams, schluck_effect);
+        let averages = calculate_avg(games, player, teams, &finisheds, schluck_effect);
+        playerspeeds.push((finisheds, averages, player));
+    }
+    playerspeeds.sort_by(|a, b| average_f(a.1.all_avg.0, a.1.all_avg.1).partial_cmp(&average_f(b.1.all_avg.0, b.1.all_avg.1)).unwrap());
+    let n_c = 10;
+    let width = 17;
+    println!("{:-<94}", "-");
+    println!("| {:^n_c$} | {:^width$} | {:^width$} | {:^width$} | {:^width$} |", "Player", "Pure finished", "Pure average", "All finished", "All average");
+    println!("{:-<94}", "-");
+    for player in playerspeeds {
+        let pure_finished = format!("{:>.2} ({:>4} / {:>2})", average(player.0.pure_finished.0, player.0.pure_finished.1), player.0.pure_finished.1, player.0.pure_finished.0);
+        let pure_average = format!("{:>.2} ({:>4} / {:>2})", average(player.1.pure_avg.0, player.1.pure_avg.1), player.1.pure_avg.1, player.1.pure_avg.0);
+        let all_finished = format!("{:>.2} ({:>4} / {:>2})", average_f(player.0.all_finished.0, player.0.all_finished.1), player.0.all_finished.1, player.0.all_finished.0);
+        let all_average = format!("{:>.2} ({:>4} / {:>2})", average_f(player.1.all_avg.0, player.1.all_avg.1), player.1.all_avg.1, player.1.all_avg.0);
+        println!("| {:>n_c$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", player.2.name, pure_finished, pure_average, all_finished, all_average);
+    }
+}
+
+pub struct PlayerAvgStats {
+    pure_avg: (u32, u32),
+    all_avg: (u32, f32),
+}
+
+impl PlayerAvgStats {
+    pub fn new() -> PlayerAvgStats {
+        PlayerAvgStats {
+            pure_avg: (0, 0),
+            all_avg: (0, 0.0),
+        }
+    }
+    pub fn p_avg(&mut self, beers: u32, rounds: u32) {
+        self.pure_avg.0 += beers;
+        self.pure_avg.1 += rounds;
+    }
+    pub fn a_avg(&mut self, beers: u32, rounds: f32) {
+        self.all_avg.0 += beers;
+        self.all_avg.1 += rounds;
+    }
+}
+
+// First is always the amount of beers, second is amound of rounds
+pub struct PlayerFinishedStats {
+    pure_finished: (u32, u32),
+    all_finished: (u32, f32),
+}
+
+impl PlayerFinishedStats {
+    pub fn new() -> PlayerFinishedStats {
+        PlayerFinishedStats {
+            pure_finished: (0, 0),
+            all_finished: (0, 0.0),
+        }
+    }
+    pub fn p_finished(&mut self, beers: u32, rounds: u32) {
+        self.pure_finished.0 += beers;
+        self.pure_finished.1 += rounds;
+    }
+    pub fn a_finished(&mut self, beers: u32, rounds: f32) {
+        self.all_finished.0 += beers;
+        self.all_finished.1 += rounds;
+    }
+}
+
+pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, finished_stats: &PlayerFinishedStats, schluck_effect : f32) -> PlayerAvgStats {
+    let mut avg_stats = PlayerAvgStats::new();
+    for game in games {
+        if !player_in_game(game, player) {
+            continue;
+        }
+        let player_team = team_id_from_player(player.id, teams);
+        let mut tmp_round = 0;
+        let mut tmp_schluck = 0.0;
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let offset = if is_from_first_team { 0 } else { 1 };
+        let mut schluck_happened = false;
+        let mut person_finished = false;
+        for (i, round) in game.rounds.iter().enumerate() {
+            if i % 2 == offset && round.hit { // correct team hitting
+                tmp_round += 1;
+            }
+            for add in &round.additionals {
+                if add.kind == FINISHED && add.source.id == player.id {
+                    if !schluck_happened {
+                        avg_stats.p_avg(1, tmp_round);
+                    }
+                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck);
+                    person_finished = true;
+                    // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
+                }
+                if add.kind == STRAFBIER && add.source.id == player.id {
+                    if !schluck_happened {
+                        avg_stats.p_avg(1, tmp_round + 1);
+                    }
+                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
+                    // continuing in case the strafbier was finished
+                }
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
+                    tmp_schluck += schluck_effect;
+                    schluck_happened = true;
+                }
+            }
+            if i == game.rounds.len() - 1 && !person_finished{
+                if tmp_round >= average(finished_stats.pure_finished.0, finished_stats.pure_finished.1).floor() as u32 {
+                    avg_stats.p_avg(1, tmp_round + 1)
+                }
+                if tmp_round as f32 + tmp_schluck >= average_f(finished_stats.all_finished.0, finished_stats.all_finished.1).floor() {
+                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
+                }
+            }
+        }
+    }
+    avg_stats
+}
+
+pub fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, schluck_effect : f32) -> PlayerFinishedStats {
+    let mut finshed_stats = PlayerFinishedStats::new();
+    for game in games {
+        if !player_in_game(game, player) {
+            continue;
+        }
+        let player_team = team_id_from_player(player.id, teams);
+        let mut tmp_round = 0;
+        let mut tmp_schluck = 0.0;
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let offset = if is_from_first_team { 0 } else { 1 };
+        let mut schluck_happened = false;
+        let mut person_finished = false;
+        for (i, round) in game.rounds.iter().enumerate() {
+            if i % 2 == offset && round.hit { // correct team hitting
+                tmp_round += 1;
+            }
+            for add in &round.additionals {
+                if add.kind == FINISHED && add.source.id == player.id {
+                    if !schluck_happened {
+                        finshed_stats.p_finished(1, tmp_round);
+                    }
+                    finshed_stats.a_finished(1, tmp_round as f32 + tmp_schluck);
+                    person_finished = true;
+                    // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
+                }
+                if add.kind == STRAFBIER && add.source.id == player.id {
+                    if !schluck_happened {
+                        finshed_stats.p_finished(1, tmp_round + 1);
+                    }
+                    finshed_stats.a_finished(1, tmp_round as f32 + tmp_schluck + 1.0);
+                    // continuing in case the strafbier was finished
+                }
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
+                    tmp_schluck += schluck_effect;
+                    schluck_happened = true;
+                }
+            }
+        }
+    }
+    finshed_stats
+}
 
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let mut throws = 0;
