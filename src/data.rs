@@ -53,14 +53,14 @@ pub struct ARC {
 }
 
 impl ARC {
-    pub(crate) fn finish(team_member: TeamMember, round_nr: u32) -> ARC {
-        ARC { additional: Additional::finish(team_member), round_nr }
+    pub(crate) fn finish(team_member: &TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::finish(team_member.clone()), round_nr }
     }
-    pub(crate) fn beer(team_member: TeamMember, round_nr: u32) -> ARC {
-        ARC { additional: Additional::beer(team_member), round_nr }
+    pub(crate) fn beer(team_member: &TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::beer(team_member.clone()), round_nr }
     }
-    pub(crate) fn schluck(team_member: TeamMember, round_nr: u32) -> ARC {
-        ARC { additional: Additional::schluck(team_member), round_nr }
+    pub(crate) fn schluck(team_member: &TeamMember, round_nr: u32) -> ARC {
+        ARC { additional: Additional::schluck(team_member.clone()), round_nr }
     }
 }
 
@@ -180,7 +180,7 @@ pub fn results_from_additionals(additionals: &Vec<ARC>, left_team_first: bool, l
     result
 }
 
-pub fn create_normalized_rounds(first_team_1: TeamMember, first_team_2: TeamMember, second_team_1: TeamMember, second_team_2: TeamMember, throw_order: Vec<bool>) -> Vec<Round> {
+pub fn create_normalized_rounds(first_team_1: &TeamMember, first_team_2: &TeamMember, second_team_1: &TeamMember, second_team_2: &TeamMember, throw_order: Vec<bool>) -> Vec<Round> {
     let mut ret_vector = Vec::new();
     for (ix, value) in throw_order.iter().enumerate() {
         let iteration = ix % 4;
@@ -196,7 +196,7 @@ pub fn create_normalized_rounds(first_team_1: TeamMember, first_team_2: TeamMemb
 }
 
 
-pub fn create_normal_rounds_left_right(left_team_1: TeamMember, left_team_2: TeamMember, right_team_1: TeamMember, right_team_2: TeamMember, throw_order: Vec<bool>, add_round_info: Vec<ARC>, left_began: bool) -> Vec<Round> {
+pub fn create_normal_rounds_left_right(left_team_1: &TeamMember, left_team_2: &TeamMember, right_team_1: &TeamMember, right_team_2: &TeamMember, throw_order: Vec<bool>, add_round_info: Vec<ARC>, left_began: bool) -> Vec<Round> {
     if left_began {
         create_normal_rounds_with_additionals_and_correct_order(left_team_1, left_team_2, right_team_1, right_team_2, throw_order, add_round_info)
     } else {
@@ -204,10 +204,10 @@ pub fn create_normal_rounds_left_right(left_team_1: TeamMember, left_team_2: Tea
     }
 }
 
-pub fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: TeamMember, first_team_2: TeamMember, second_team_1: TeamMember, second_team_2: TeamMember, throw_order: Vec<bool>, additional_round_info: Vec<ARC>) -> Vec<Round> {
+pub fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: &TeamMember, first_team_2: &TeamMember, second_team_1: &TeamMember, second_team_2: &TeamMember, throw_order: Vec<bool>, additional_round_info: Vec<ARC>) -> Vec<Round> {
     let mut ret_vector = Vec::new();
-    let mut first_team: Vec<TeamMember> = vec![first_team_1, first_team_2];
-    let mut second_team: Vec<TeamMember> = vec![second_team_1, second_team_2];
+    let mut first_team: Vec<TeamMember> = vec![first_team_1.clone(), first_team_2.clone()];
+    let mut second_team: Vec<TeamMember> = vec![second_team_1.clone(), second_team_2.clone()];
     for (ix, hit) in throw_order.iter().enumerate() {
         let mut round_additionals: Vec<Additional> = Vec::new();
         for round in &additional_round_info {
