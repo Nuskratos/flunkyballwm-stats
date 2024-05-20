@@ -1,4 +1,3 @@
-// First is always the amount of beers, second is amound of rounds
 pub struct DrinkFinishedStats {
     pub pure_hits: u32,
     pub pure_drinks: u32,

@@ -1,7 +1,4 @@
-use std::cmp::Ordering;
-use std::cmp::Ordering::Equal;
 use std::collections::HashMap;
-use std::iter::Map;
 use crate::calc::chain_data::ChainInformation;
 use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_finished_data::DrinkFinishedStats;
@@ -9,10 +6,8 @@ use crate::calc::drink_total_data::PlayerDrinkingSpeed;
 use crate::calc::penalties_data::Penalties;
 use crate::calc::ppg_data::PpgHolder;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
-use crate::data::{Additional, ARC, Game, Team, TeamMember};
+use crate::data::{ARC, Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
-use crate::team_player_data::*;
-use crate::calc::strafschluck_data::{StrafschluckCounter, StrafschluckData};
 use crate::util::{name_from_id, player_in_team, player_name_from_id, team_from_player, team_id_from_player, team_name_from_id};
 
 pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
@@ -24,7 +19,7 @@ pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / 
 pub fn wrong_way_average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
 
 pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
-    let (team_vec, player_vec) = calculate_amount_of_points_per_game(games, teams, players);
+    let (team_vec, player_vec) = calculate_amount_of_points_per_game(games);
     let width = 9;
     let total_line_width = 55;
     println!("Points per Game:");
@@ -42,7 +37,7 @@ pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, pla
     }
 }
 
-pub fn calculate_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> (Vec<(u32, PpgHolder)>, Vec<(u32, PpgHolder)>) {
+pub fn calculate_amount_of_points_per_game(games: &Vec<Game>) -> (Vec<(u32, PpgHolder)>, Vec<(u32, PpgHolder)>) {
     let mut team_map: HashMap<u32, PpgHolder> = HashMap::new();
     let mut player_map: HashMap<u32, PpgHolder> = HashMap::new();
     for game in games {

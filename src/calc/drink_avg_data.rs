@@ -1,5 +1,3 @@
-use crate::calc::calculation::average;
-// First is always the amount of beers, second is amound of rounds
 pub struct DrinkAvgStats {
     pub pure_drinks : u32,
     pub pure_hits : u32,
