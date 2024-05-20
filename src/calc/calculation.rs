@@ -1,22 +1,14 @@
 use std::collections::HashMap;
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
-use crate::calc::chain_data::ChainInformation;
-use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_calc::{calculate_avg, calculate_finished};
-use crate::calc::drink_finished_data::DrinkFinishedStats;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
-use crate::calc::penalties_data::Penalties;
 use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
-use crate::calc::ppg_data::PpgHolder;
 use crate::calc::side_information_calc::calc_side_information;
-use crate::calc::side_information_data::{SideInformation, SideSplit};
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
-use crate::calc::throw_per_game_data::{ThrowData, ThrowsPerGame};
 use crate::data::{ARC, Game, Team, TeamMember};
-use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 use crate::util::{name_from_id, player_is_in_game, player_in_team, player_name_from_id, print_line_break, team_from_player, team_id_from_player, team_name_from_id};
 use crate::team_player_data::NAME_WIDTH; // Used in printlines
 
