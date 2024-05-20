@@ -1,5 +1,5 @@
 use rand::Rng;
-use crate::calculation::percentage;
+use crate::calc::calculation::percentage;
 
 struct TestGameFirstThrow {
     first_hit: bool,
