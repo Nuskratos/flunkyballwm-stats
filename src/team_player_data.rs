@@ -15,7 +15,7 @@ pub const HANNES: TeamMember = TeamMember { name: "Hannes", id: 11 };
 pub const LAURA: TeamMember = TeamMember { name: "Laura", id: 12 };
 
 
-pub const TEAM_INVALID: Team = Team {name: "Illegales Team", id: 100, member_1:PLAYER_INVALID, member_2: PLAYER_INVALID};
+pub const TEAM_INVALID: Team = Team {name: "Illegal Team", id: 100, member_1:PLAYER_INVALID, member_2: PLAYER_INVALID};
 pub const DA_HAM_SIE: Team = Team { name: "Da ham sie einfach gewonnen", id: 101, member_1: JEROME, member_2: BEEF };
 pub const DOS_BROS: Team = Team { name: "Dos Bros", id: 102, member_1: SEBI, member_2: FLO };
 pub const STRAMMSEIN: Team = Team { name: "Strammsein", id: 103, member_1: JONAS, member_2: SASCHA };

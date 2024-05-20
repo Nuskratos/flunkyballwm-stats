@@ -1,14 +1,24 @@
 use std::collections::HashMap;
+use crate::calc::accuracy_data::{Accuracy, print_accuracy};
+use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::chain_data::ChainInformation;
 use crate::calc::drink_avg_data::DrinkAvgStats;
+use crate::calc::drink_calc::{calculate_avg, calculate_finished};
 use crate::calc::drink_finished_data::DrinkFinishedStats;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
+use crate::calc::penalties_calc::calculate_amount_of_penalties;
 use crate::calc::penalties_data::Penalties;
+use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::ppg_data::PpgHolder;
+use crate::calc::side_information_calc::calc_side_information;
+use crate::calc::side_information_data::{SideInformation, SideSplit};
 use crate::calc::strafschluck_calc::calculate_strafschluck;
+use crate::calc::throw_per_game_calc::calculate_throws_per_game;
+use crate::calc::throw_per_game_data::{ThrowData, ThrowsPerGame};
 use crate::data::{ARC, Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
-use crate::util::{name_from_id, player_in_team, player_name_from_id, team_from_player, team_id_from_player, team_name_from_id};
+use crate::util::{name_from_id, player_is_in_game, player_in_team, player_name_from_id, print_line_break, team_from_player, team_id_from_player, team_name_from_id};
+use crate::team_player_data::NAME_WIDTH; // Used in printlines
 
 pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
 
@@ -37,119 +47,6 @@ pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, pla
     }
 }
 
-pub fn calculate_amount_of_points_per_game(games: &Vec<Game>) -> (Vec<(u32, PpgHolder)>, Vec<(u32, PpgHolder)>) {
-    let mut team_map: HashMap<u32, PpgHolder> = HashMap::new();
-    let mut player_map: HashMap<u32, PpgHolder> = HashMap::new();
-    for game in games {
-        team_map.entry(game.left_team.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        team_map.entry(game.left_team.id).and_modify(|x| x.points += game.result.points_left);
-        team_map.entry(game.right_team.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        team_map.entry(game.right_team.id).and_modify(|x| x.points += game.result.points_right);
-        player_map.entry(game.left_1.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        player_map.entry(game.left_2.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        player_map.entry(game.right_1.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        player_map.entry(game.right_2.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
-        let mut round_left_finished = 0;
-        let mut round_right_finished = 0;
-        let mut left_already_finished = false;
-        let mut right_already_finished = false;
-        let mut points_vec: Vec<u32> = vec![7, 5, 3];
-        for arc in game.additionals_vec() {
-            if arc.additional.kind == FINISHED {
-                player_map.entry(arc.additional.source.id).and_modify(|x| x.points += points_vec.first().unwrap());
-                points_vec.remove(0);
-                // adding points for winning (2 if in the same round as first, so they have the same, 1 to each if in a later round)
-                if player_in_team(arc.additional.source.id, &game.left_team) {
-                    update_player_map(&mut player_map, round_left_finished, left_already_finished, game, true, &arc);
-                } else { // player in right
-                    update_player_map(&mut player_map, round_right_finished, right_already_finished, game, false, &arc);
-                }
-                // Storing the completed round info to know when the next one finishes
-                if player_in_team(arc.additional.source.id, &game.left_team) {
-                    left_already_finished = true;
-                    round_left_finished = arc.round_nr;
-                } else {
-                    right_already_finished = true;
-                    round_right_finished = arc.round_nr;
-                }
-            }
-        }
-    }
-    let mut team_vec: Vec<(u32, PpgHolder)> = Vec::new();
-    for team in team_map {
-        team_vec.push((team.0, team.1));
-    }
-    team_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
-    let mut player_vec: Vec<(u32, PpgHolder)> = Vec::new();
-    for player in player_map {
-        player_vec.push((player.0, player.1));
-    }
-    player_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
-    (team_vec, player_vec)
-}
-
-fn update_player_map(map: &mut HashMap<u32, PpgHolder>, round_finished: u32, partner_finished: bool, game: &Game, left_team: bool, arc: &ARC) {
-    if partner_finished {
-        if arc.round_nr == round_finished {
-            map.entry(arc.additional.source.id).and_modify(|x| x.points += 2);
-        } else {
-            if left_team {
-                map.entry(game.left_1.id).and_modify(|x| x.points += 1);
-                map.entry(game.left_2.id).and_modify(|x| x.points += 1);
-            } else {
-                map.entry(game.right_1.id).and_modify(|x| x.points += 1);
-                map.entry(game.right_2.id).and_modify(|x| x.points += 1);
-            }
-        }
-    }
-}
-
-
-pub fn calculate_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> (Vec<(u32, Penalties)>, Vec<(u32, Penalties)>) {
-    let mut team_map: HashMap<u32, Penalties> = HashMap::new();
-    let mut player_map: HashMap<u32, Penalties> = HashMap::new();
-    // Fill maps in case someone got no penalty
-    for team in teams {
-        team_map.insert(team.id, Default::default());
-    }
-    for player in players {
-        player_map.insert(player.id, Default::default());
-    }
-    for game in games {
-        team_map.entry(game.left_team.id).and_modify(|x| x.games += 1);
-        team_map.entry(game.right_team.id).and_modify(|x| x.games += 1);
-        player_map.entry(game.left_1.id).and_modify(|x| x.games += 1);
-        player_map.entry(game.left_2.id).and_modify(|x| x.games += 1);
-        player_map.entry(game.right_1.id).and_modify(|x| x.games += 1);
-        player_map.entry(game.right_2.id).and_modify(|x| x.games += 1);
-        for round in &game.rounds {
-            for add in &round.additionals {
-                match add.kind {
-                    STRAFSCHLUCK => {
-                        team_map.entry(team_id_from_player(add.source.id, teams)).and_modify(|x| x.schlucke += 1).or_insert(Penalties::create_schluck());
-                        player_map.entry(add.source.id).and_modify(|x| x.schlucke += 1).or_insert(Penalties::create_schluck());
-                    }
-                    STRAFBIER => {
-                        team_map.entry(team_id_from_player(add.source.id, teams)).and_modify(|x| x.beers += 1).or_insert(Penalties::create_beer());
-                        player_map.entry(add.source.id).and_modify(|x| x.beers += 1).or_insert(Penalties::create_beer());
-                    }
-                    _ => {}
-                }
-            }
-        }
-    }
-    let mut team_vec: Vec<(u32, Penalties)> = Vec::new();
-    for team in team_map {
-        team_vec.push((team.0, team.1));
-    }
-    team_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
-    let mut player_vec: Vec<(u32, Penalties)> = Vec::new();
-    for player in player_map {
-        player_vec.push((player.0, player.1));
-    }
-    player_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
-    (team_vec, player_vec)
-}
 
 pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let (team_vec, player_vec) = calculate_amount_of_penalties(games, teams, players);
@@ -176,39 +73,20 @@ pub fn print_strafschluck_effect(games: &Vec<Game>, teams: &Vec<Team>) -> f32 {
     data.effect_of_single_schluck()
 }
 
-pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>) {
-    let mut team_chain: HashMap<&Team, ChainInformation> = HashMap::new();
-    let mut player_chain: HashMap<&TeamMember, ChainInformation> = HashMap::new();
-    for game in games {
-        for round in &game.rounds {
-            let team = team_from_player(round.thrower.id, teams);
-            team_chain.entry(team).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
-            player_chain.entry(&round.thrower).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
-        }
-    }
+
+pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
+    let (team_vec, player_vec) = calculate_hit_and_miss_chains_team_player(games, teams);
     let width = 11;
     let total_line_width = 59;
     println!("Hit and miss chains");
     println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Hit-chain", "Miss-chain");
     print_line_break(total_line_width);
-    let mut team_vec: Vec<(&Team, ChainInformation)> = Vec::new();
-    for team in team_chain {
-        team_vec.push((team.0, team.1));
-    }
-    team_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
     for team in team_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team.0.name, team.1.total_hit, team.1.total_miss);
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team_name_from_id(team.0, teams), team.1.total_hit, team.1.total_miss);
     }
-
-
     print_line_break(total_line_width);
-    let mut player_vec: Vec<(&TeamMember, ChainInformation)> = Vec::new();
-    for player in player_chain {
-        player_vec.push((player.0, player.1));
-    }
-    player_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
     for player in player_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player.0.name, player.1.total_hit, player.1.total_miss);
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player_name_from_id(player.0, players), player.1.total_hit, player.1.total_miss);
     }
 }
 
@@ -235,61 +113,24 @@ pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
     }
 }
 
-pub struct TeamThrowGames {
-    throws: u32,
-    games: u32,
-}
-
-impl TeamThrowGames {
-    pub fn add_throws(&mut self, throws: u32) {
-        self.throws += throws;
-        self.games += 1;
-    }
-    pub fn new(throws: u32) -> TeamThrowGames {
-        TeamThrowGames {
-            throws,
-            games: 1,
-        }
-    }
-}
-
-pub fn print_average_throws(games: &Vec<Game>, teams: &Vec<Team>) {
-    let mut total_throws: u32 = 0;
-    let mut team_throws: HashMap<&Team, TeamThrowGames> = HashMap::new();
-    for game in games {
-        total_throws += game.rounds.len() as u32;
-        let throws_of_second_team = game.rounds.len() as u32 / 2;
-        if game.rounds.len() % 2 == 0 { // Both teams have the same number of throws
-            team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
-            team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
-        } else { // Opening team had more throws
-            let opening_team = team_from_player(game.rounds.first().unwrap().thrower.id, teams);
-            if &game.left_team == opening_team {
-                team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(TeamThrowGames::new(throws_of_second_team + 1));
-                team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
-            } else {
-                team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(TeamThrowGames::new(throws_of_second_team + 1));
-                team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(TeamThrowGames::new(throws_of_second_team));
-            }
-        }
-    }
-    println!("Average throws: Games: {:>3}\tRounds: {:>4}\tAverage: {:>2.2}", games.len(), total_throws, wrong_way_average(games.len() as u32, total_throws));
-    let mut team_vec: Vec<(&Team, TeamThrowGames)> = Vec::new();
-    for team in team_throws {
-        team_vec.push((team.0, team.1));
-    }
-    team_vec.sort_by(|a, b| wrong_way_average(a.1.games, a.1.throws).partial_cmp(&wrong_way_average(b.1.games, b.1.throws)).unwrap());
+pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, players:&Vec<TeamMember>) {
+    let data = calculate_throws_per_game(games, teams);
+    println!("Average throws per game:");
     let width = 10;
+    let total_width = 70;
     println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
-    for team in team_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.games, team.1.throws, wrong_way_average(team.1.games, team.1.throws));
+    print_line_break(total_width);
+    println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", "Total", games.len(), data.total_throws, data.total_throws as f32/games.len() as f32);
+    print_line_break(total_width);
+    for team in data.team {
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team_name_from_id(team.0, teams), team.1.games, team.1.throws, wrong_way_average(team.1.games, team.1.throws));
+    }
+    print_line_break(total_width);
+    for player in data.player{
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.games, player.1.throws, wrong_way_average(player.1.games, player.1.throws));
     }
 }
 
-pub fn player_in_game(game: &Game, player: &TeamMember) -> bool {
-    let player_ids = vec![game.left_1.id, game.left_2.id, game.right_1.id, game.right_2.id];
-    return player_ids.contains(&player.id);
-}
 
 pub fn print_complete_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) {
     println!("Different drinking speed metrics:
@@ -318,106 +159,6 @@ for all above: StrafBeer counts as finished +1");
         let all_average = format!("{:>.2} ({:>4.2} / {:>2})", player.drink_avg.all_speed(), player.drink_avg.all_hits, player.drink_avg.all_drinks);
         println!("| {:>n_c$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", player.player_name, pure_finished, pure_average, all_finished, all_average);
     }
-}
-
-pub fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, finished_stats: &DrinkFinishedStats, schluck_effect: f32) -> DrinkAvgStats {
-    let mut avg_stats = DrinkAvgStats::new();
-    for game in games {
-        if !player_in_game(game, player) {
-            continue;
-        }
-        let player_team = team_id_from_player(player.id, teams);
-        let mut tmp_round = 0;
-        let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
-        let offset = if is_from_first_team { 0 } else { 1 };
-        let mut schluck_happened = false;
-        let mut person_finished = false;
-        for (i, round) in game.rounds.iter().enumerate() {
-            if i % 2 == offset && round.hit { // correct team hitting
-                tmp_round += 1;
-            }
-            for add in &round.additionals {
-                if add.kind == FINISHED && add.source.id == player.id {
-                    if !schluck_happened {
-                        avg_stats.p_avg(1, tmp_round);
-                    }
-                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck);
-                    person_finished = true;
-                    // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
-                }
-                if add.kind == STRAFBIER && add.source.id == player.id {
-                    if !schluck_happened {
-                        avg_stats.p_avg(1, tmp_round + 1);
-                    }
-                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
-                    // continuing in case the strafbier was finished
-                    tmp_schluck = 0.0;
-                    tmp_round = 0;
-                }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
-                    tmp_schluck += schluck_effect;
-                    schluck_happened = true;
-                }
-            }
-            if i == game.rounds.len() - 1 && !person_finished {
-                let pure_finished_average = average(finished_stats.pure_hits, finished_stats.pure_drinks).floor() as u32;
-                if tmp_round >= pure_finished_average && pure_finished_average > 0 {
-                    avg_stats.p_avg(1, tmp_round + 1)
-                }
-                let all_finished_average = (finished_stats.all_hits / finished_stats.all_drinks as f32).floor();
-                if tmp_round as f32 + tmp_schluck >= all_finished_average && all_finished_average > 0.0 {
-                    avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck + 1.0);
-                }
-            }
-        }
-    }
-    avg_stats
-}
-
-pub fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, schluck_effect: f32) -> DrinkFinishedStats {
-    let mut finshed_stats = DrinkFinishedStats::new();
-    for game in games {
-        if !player_in_game(game, player) {
-            continue;
-        }
-        let player_team = team_id_from_player(player.id, teams);
-        let mut tmp_round = 0;
-        let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
-        let offset = if is_from_first_team { 0 } else { 1 };
-        let mut schluck_happened = false;
-        let mut person_finished = false;
-        for (i, round) in game.rounds.iter().enumerate() {
-            if i % 2 == offset && round.hit { // correct team hitting
-                tmp_round += 1;
-            }
-            for add in &round.additionals {
-                if add.kind == FINISHED && add.source.id == player.id {
-                    if !schluck_happened {
-                        finshed_stats.p_finished(1, tmp_round);
-                    }
-                    finshed_stats.a_finished(1, tmp_round as f32 + tmp_schluck);
-                    person_finished = true;
-                    // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
-                }
-                if add.kind == STRAFBIER && add.source.id == player.id {
-                    if !schluck_happened {
-                        finshed_stats.p_finished(1, tmp_round + 1);
-                    }
-                    finshed_stats.a_finished(1, tmp_round as f32 + tmp_schluck + 1.0);
-                    tmp_round = 0;
-                    tmp_schluck = 0.0;
-                    // continuing in case the strafbier was finished
-                }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
-                    tmp_schluck += schluck_effect;
-                    schluck_happened = true;
-                }
-            }
-        }
-    }
-    finshed_stats
 }
 
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
@@ -465,63 +206,12 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     print_line_break(70);
 }
 
-#[derive(Default)]
-pub struct SideInformation {
-    pub wins: u32,
-    pub points: u32,
-    pub hits: u32,
-    pub throws: u32,
-    pub schluck: u32,
-    pub beer: u32,
-}
 
 pub fn print_side_information(games: &Vec<Game>) {
-    let mut left: SideInformation = Default::default();
-    let mut right: SideInformation = Default::default();
-    for game in games {
-        if game.result.points_left > game.result.points_right {
-            left.wins += 1;
-        } else {
-            right.wins += 1;
-        }
-        left.points += game.result.points_left;
-        right.points += game.result.points_right;
-        for round in &game.rounds {
-            if round.thrower.id == game.left_1.id || round.thrower.id == game.left_2.id {
-                left.throws += 1;
-                if round.hit {
-                    left.hits += 1;
-                }
-            } else {
-                right.throws += 1;
-                if round.hit {
-                    right.hits += 1;
-                }
-            }
-            for additional in &round.additionals {
-                match &additional.kind {
-                    STRAFSCHLUCK => {
-                        if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
-                            left.schluck += 1;
-                        } else {
-                            right.schluck += 1;
-                        }
-                    }
-                    STRAFBIER => {
-                        if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
-                            left.beer += 1;
-                        } else {
-                            right.beer += 1;
-                        }
-                    }
-                    _ => {}
-                }
-            }
-        }
-    }
+    let data = calc_side_information(games);
     println!("Seite  | Siege | Punkte | Trefferwahrscheinlichkeit | StrafS | StrafB");
-    println!("Links  | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", left.wins, left.points, left.hits as f32 / left.throws as f32 * 100.0, left.hits, left.throws, left.schluck, left.beer);
-    println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", right.wins, right.points, right.hits as f32 / right.throws as f32 * 100.0, right.hits, right.throws, right.schluck, right.beer);
+    println!("Links  | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.left.wins, data.left.points, data.left.hits as f32 / data.left.throws as f32 * 100.0, data.left.hits, data.left.throws, data.left.schluck, data.left.beer);
+    println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.right.wins, data.right.points, data.right.hits as f32 / data.right.throws as f32 * 100.0, data.right.hits, data.right.throws, data.right.schluck, data.right.beer);
 }
 
 
@@ -586,31 +276,4 @@ pub fn print_first_throw_effect(games: &Vec<Game>) {
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {:.1}%", games.len(), amount_first_throw_win, percentage(amount_first_throw_win, games.len()));
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst getroffen. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_hit, amount_first_hit_win, percentage(amount_first_hit_win, amount_first_hit));
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst verfehlt. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_miss, amount_first_miss_win, percentage(amount_first_miss_win, amount_first_miss));
-}
-
-
-struct Accuracy {
-    name: &'static str,
-    throws: u32,
-    hits: u32,
-}
-
-impl Accuracy {
-    fn percentage(&self) -> f32 {
-        self.hits as f32 / self.throws as f32 * 100.0
-    }
-    fn add_throw(&mut self, hit: bool) {
-        self.throws += 1;
-        if hit {
-            self.hits += 1;
-        }
-    }
-}
-
-fn print_accuracy(accuracy: &Accuracy) {
-    println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage());
-}
-
-fn print_line_break(width: usize) {
-    println!("{:-<width$}", "-")
 }

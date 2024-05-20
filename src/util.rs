@@ -1,4 +1,4 @@
-use crate::data::{Team, TeamMember};
+use crate::data::{Game, Team, TeamMember};
 use crate::team_player_data::TEAM_INVALID;
 
 pub fn player_in_team(player_id: u32, team: &Team) -> bool {
@@ -48,4 +48,12 @@ pub fn name_from_id(id: u32, teams: &Vec<Team>, players: &Vec<TeamMember>) -> &'
         }
     }
     "Name not found"
+}
+pub fn print_line_break(width: usize) {
+    println!("{:-<width$}", "-")
+}
+
+pub fn player_is_in_game(game: &Game, player: &TeamMember) -> bool {
+    let player_ids = vec![game.left_1.id, game.left_2.id, game.right_1.id, game.right_2.id];
+    return player_ids.contains(&player.id);
 }

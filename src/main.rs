@@ -8,7 +8,7 @@ mod util;
 use std::fmt::Debug;
 use data::*;
 use wm24::*;
-use crate::calc::calculation::{print_amount_of_penalties, print_amount_of_points_per_game, print_average_throws, print_complete_drinking_speed, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_strafschluck_effect, print_team_first_throws, print_throwing_accuracy};
+use crate::calc::calculation::{print_amount_of_penalties, print_amount_of_points_per_game, print_average_throws_per_game, print_complete_drinking_speed, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_strafschluck_effect, print_team_first_throws, print_throwing_accuracy};
 use crate::team_player_data::{BEEF, CHRIS, DA_HAM_SIE, DOS_BROS, FLO, GEWERTET, HANNES, JEROME, JONAS, LAURA, LUISE, MALTE, SASCHA, SEBI, STRAMMSEIN, TOBIAS, WEDELMEDEL, WHITE_CLAW};
 use crate::test_stuff::test_first_throw_value;
 
@@ -25,9 +25,9 @@ fn main() {
     //print_team_first_throws(&games24, &all_teams);
     let strafschluck_effect = print_strafschluck_effect(&games24, &all_teams);
     //print_complete_drinking_speed(&games24, &all_players, &all_teams, strafschluck_effect);
-    //print_average_throws(&games24, &all_teams);
+    print_average_throws_per_game(&games24, &all_teams, &all_players);
     //print_enemy_accuracy(&games24, &all_teams);
-    //print_hit_and_miss_chains(&games24, &all_teams);
+    //print_hit_and_miss_chains(&games24, &all_teams, &all_players);
     //print_amount_of_penalties(&games24, &all_teams, &all_players);
     //print_amount_of_points_per_game(&games24, &all_teams, &all_players);
 }
