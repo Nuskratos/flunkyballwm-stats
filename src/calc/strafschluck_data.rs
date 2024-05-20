@@ -35,3 +35,20 @@ impl StrafschluckData {
         }
     }
 }
+
+
+#[derive(Default)]
+pub struct StrafschluckCounter{
+    pub hits : u32,
+    pub schluck_drank : u32,
+    pub clean : bool
+}
+impl StrafschluckCounter{
+    pub fn new() -> StrafschluckCounter{
+        StrafschluckCounter{
+            hits: 0,
+            schluck_drank: 0,
+            clean: true
+        }
+    }
+}

@@ -116,11 +116,15 @@ pub fn game_23(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_te
     Game { result, match_number: 23, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
 }
 
-pub fn game_22(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game { //TODO This needs a manual change for the running, because chris ran twice
+pub fn game_22(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {
     let left_began = true;
     let additionals = vec![ARC::finish(&left_2, 4), ARC::finish(&left_1, 6)];
     let result = results_from_additionals(&additionals, left_began, &left_team);
-    let rounds = create_normal_rounds_left_right(&left_1, &left_2, &right_1, &right_2, bool_vec_from_int(false, vec![2, 1, 1, 3]), additionals, left_began);
+    let mut rounds = create_normal_rounds_left_right(&left_1, &left_2, &right_1, &right_2, bool_vec_from_int(false, vec![2, 1, 1, 3]), additionals, left_began);
+    // Manual change, because Chris ran twice
+    rounds.get_mut(2).unwrap().runner = CHRIS.clone();
+    rounds.get_mut(4).unwrap().runner = MALTE.clone();
+    rounds.get_mut(6).unwrap().runner = MALTE.clone();
     Game { result, match_number: 22, left_team, left_1, left_2, right_team, right_1, right_2, rounds }
 }
 

@@ -3,6 +3,7 @@ mod wm24;
 mod team_player_data;
 mod test_stuff;
 mod calc;
+mod util;
 
 use std::fmt::Debug;
 use data::*;
@@ -22,13 +23,13 @@ fn main() {
     //print_side_information(&games24);
     //print_first_throw_effect(&games24);
     //print_team_first_throws(&games24, &all_teams);
-    //let strafschluck_effect = print_strafschluck_effect(&games24, &all_teams);
+    let strafschluck_effect = print_strafschluck_effect(&games24, &all_teams);
     //print_complete_drinking_speed(&games24, &all_players, &all_teams, strafschluck_effect);
     //print_average_throws(&games24, &all_teams);
     //print_enemy_accuracy(&games24, &all_teams);
     //print_hit_and_miss_chains(&games24, &all_teams);
     //print_amount_of_penalties(&games24, &all_teams, &all_players);
-    print_amount_of_points_per_game(&games24, &all_teams, &all_players);
+    //print_amount_of_points_per_game(&games24, &all_teams, &all_players);
 }
 
 

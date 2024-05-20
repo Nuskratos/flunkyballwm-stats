@@ -6,3 +6,4 @@ mod drink_finished_data;
 mod drink_total_data;
 mod penalties_data;
 mod ppg_data;
+mod strafschluck_calc;
