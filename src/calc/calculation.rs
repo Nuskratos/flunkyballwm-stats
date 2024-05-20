@@ -1,12 +1,14 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 use std::collections::HashMap;
+use std::iter::Map;
 use crate::calc::chain_data::ChainInformation;
 use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_finished_data::DrinkFinishedStats;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
 use crate::calc::penalties_data::Penalties;
-use crate::data::{Game, Team, TeamMember};
+use crate::calc::ppg_data::PpgHolder;
+use crate::data::{ARC, Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 use crate::team_player_data::*;
 use crate::calc::strafschluck_data::StrafschluckData;
@@ -19,24 +21,110 @@ pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / 
 
 pub fn wrong_way_average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
 
+pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
+    let (team_vec, player_vec) = calculate_amount_of_points_per_game(games, teams, players);
+    let width = 9;
+    let total_line_width = 55;
+    println!("Points per Game:");
+    println!("While the points per Game for a team are being a solid representation, the PpG for a Person should be taken with a grain of salt!\n\
+    It is calculated, that the points are split if both finished in the same round, and that they split the 2 points for a win if they finish in different rounds.\n\
+    Being in a Team with a fast drinker will significantly reduce this metric, and throwing accuracy is completely ignored!");
+    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Points", "PpG");
+    print_line_break(total_line_width);
+    for team in team_vec {
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", team_name_from_id(team.0, teams), team.1.points, team.1.ppg());
+    }
+    print_line_break(total_line_width);
+    for player in player_vec {
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.points, player.1.ppg());
+    }
+}
 
-pub fn calculcate_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players : &Vec<TeamMember>) -> (Vec<(u32, Penalties)>, Vec<(u32, Penalties)>){
+pub fn calculate_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> (Vec<(u32, PpgHolder)>, Vec<(u32, PpgHolder)>) {
+    let mut team_map: HashMap<u32, PpgHolder> = HashMap::new();
+    let mut player_map: HashMap<u32, PpgHolder> = HashMap::new();
+    for game in games {
+        team_map.entry(game.left_team.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        team_map.entry(game.left_team.id).and_modify(|x| x.points += game.result.points_left);
+        team_map.entry(game.right_team.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        team_map.entry(game.right_team.id).and_modify(|x| x.points += game.result.points_right);
+        player_map.entry(game.left_1.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        player_map.entry(game.left_2.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        player_map.entry(game.right_1.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        player_map.entry(game.right_2.id).and_modify(|x| x.games += 1).or_insert(PpgHolder::new());
+        let mut round_left_finished = 0;
+        let mut round_right_finished = 0;
+        let mut left_already_finished = false;
+        let mut right_already_finished = false;
+        let mut points_vec: Vec<u32> = vec![7, 5, 3];
+        for arc in game.additionals_vec() {
+            if arc.additional.kind == FINISHED {
+                player_map.entry(arc.additional.source.id).and_modify(|x| x.points += points_vec.first().unwrap());
+                points_vec.remove(0);
+                // adding points for winning (2 if in the same round as first, so they have the same, 1 to each if in a later round)
+                if player_in_team(arc.additional.source.id, &game.left_team) { // TODO extract into a mutable function
+                    update_player_map(&mut player_map, round_left_finished, left_already_finished, game, true, &arc);
+                } else { // player in right
+                    update_player_map(&mut player_map, round_right_finished, right_already_finished, game, false, &arc);
+                }
+                // Storing the completed round info to know when the next one finishes
+                if player_in_team(arc.additional.source.id, &game.left_team) {
+                    left_already_finished = true;
+                    round_left_finished = arc.round_nr;
+                } else {
+                    right_already_finished = true;
+                    round_right_finished = arc.round_nr;
+                }
+            }
+        }
+    }
+    let mut team_vec: Vec<(u32, PpgHolder)> = Vec::new();
+    for team in team_map {
+        team_vec.push((team.0, team.1));
+    }
+    team_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
+    let mut player_vec: Vec<(u32, PpgHolder)> = Vec::new();
+    for player in player_map {
+        player_vec.push((player.0, player.1));
+    }
+    player_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
+    (team_vec, player_vec)
+}
+
+fn update_player_map(map: &mut HashMap<u32, PpgHolder>, round_finished: u32, partner_finished: bool, game: &Game, left_team: bool, arc: &ARC) {
+    if partner_finished {
+        if arc.round_nr == round_finished {
+            map.entry(arc.additional.source.id).and_modify(|x| x.points += 2);
+        } else {
+            if left_team {
+                map.entry(game.left_1.id).and_modify(|x| x.points += 1);
+                map.entry(game.left_2.id).and_modify(|x| x.points += 1);
+            } else {
+                map.entry(game.right_1.id).and_modify(|x| x.points += 1);
+                map.entry(game.right_2.id).and_modify(|x| x.points += 1);
+            }
+        }
+    }
+}
+
+
+pub fn calculate_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> (Vec<(u32, Penalties)>, Vec<(u32, Penalties)>) {
     let mut team_map: HashMap<u32, Penalties> = HashMap::new();
     let mut player_map: HashMap<u32, Penalties> = HashMap::new();
     // Fill maps in case someone got no penalty
     for team in teams {
         team_map.insert(team.id, Default::default());
     }
-    for player in players{
+    for player in players {
         player_map.insert(player.id, Default::default());
     }
     for game in games {
-        team_map.entry(game.left_team.id).and_modify(|x| x.games +=1);
-        team_map.entry(game.right_team.id).and_modify(|x| x.games +=1);
-        player_map.entry(game.left_1.id).and_modify(|x| x.games +=1);
-        player_map.entry(game.left_2.id).and_modify(|x| x.games +=1);
-        player_map.entry(game.right_1.id).and_modify(|x| x.games +=1);
-        player_map.entry(game.right_2.id).and_modify(|x| x.games +=1);
+        team_map.entry(game.left_team.id).and_modify(|x| x.games += 1);
+        team_map.entry(game.right_team.id).and_modify(|x| x.games += 1);
+        player_map.entry(game.left_1.id).and_modify(|x| x.games += 1);
+        player_map.entry(game.left_2.id).and_modify(|x| x.games += 1);
+        player_map.entry(game.right_1.id).and_modify(|x| x.games += 1);
+        player_map.entry(game.right_2.id).and_modify(|x| x.games += 1);
         for round in &game.rounds {
             for add in &round.additionals {
                 match add.kind {
@@ -53,21 +141,21 @@ pub fn calculcate_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, play
             }
         }
     }
-    let mut team_vec : Vec<(u32, Penalties)> = Vec::new();
+    let mut team_vec: Vec<(u32, Penalties)> = Vec::new();
     for team in team_map {
         team_vec.push((team.0, team.1));
     }
     team_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
-    let mut player_vec : Vec<(u32, Penalties)> = Vec::new();
+    let mut player_vec: Vec<(u32, Penalties)> = Vec::new();
     for player in player_map {
         player_vec.push((player.0, player.1));
     }
-    player_vec.sort_by(|a,b| a.1.custom_cmp(&b.1).unwrap());
+    player_vec.sort_by(|a, b| a.1.custom_cmp(&b.1).unwrap());
     (team_vec, player_vec)
 }
 
-pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players : &Vec<TeamMember>) {
-    let (team_vec, player_vec) = calculcate_amount_of_penalties(games, teams, players);
+pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
+    let (team_vec, player_vec) = calculate_amount_of_penalties(games, teams, players);
     let width = 12;
     let total_line_width = 91;
     println!("Penalties:");
@@ -625,6 +713,7 @@ fn team_name_from_id(team_id: u32, teams: &Vec<Team>) -> &str {
     }
     "Not Found"
 }
+
 fn player_name_from_id(player_id: u32, players: &Vec<TeamMember>) -> &str {
     for player in players {
         if player.id == player_id {

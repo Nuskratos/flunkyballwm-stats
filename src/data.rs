@@ -92,6 +92,15 @@ pub struct Game {
 }
 
 impl Game {
+    pub fn additionals_vec(&self) -> Vec<ARC>{
+        let mut ret :Vec<ARC> = Vec::new();
+        for round in &self.rounds {
+            for (ix, add) in round.additionals.iter().enumerate(){
+                ret.push(ARC{additional: add.clone(), round_nr: ix as u32});
+            }
+        }
+        return ret;
+    }
     pub fn print(&self) {
         println!("Spielnr: {}", self.match_number);
         println!("Team: {0:<16.16} | Team: {1:<16.16}", self.left_team.name, self.right_team.name);
