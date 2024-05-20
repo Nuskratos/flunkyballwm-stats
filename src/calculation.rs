@@ -12,17 +12,14 @@ pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / 
 pub fn wrong_way_average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
 
 
+
+
 pub fn print_strafschluck_effect(games: &Vec<Game>, teams: &Vec<Team>) {
     let data = calculate_strafschluck(games, teams);
-    let clean_average = average(data.clean_hits, data.clean_drinks);
-    let straf_average = average(data.straf_hits, data.straf_drinks);
-    let diff_average = clean_average - straf_average;
-    let straf_per_finished = data.straf_schluecke as f32 / data.straf_drinks as f32;
     println!("Calculated Strafschluck Data:");
-    println!("Clean: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.clean_drinks, data.clean_hits, clean_average);
-    println!("Straf: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.straf_drinks, data.straf_hits, straf_average);
-    println!("Effect of {} Strafschlucke: {:.3}\tNormalized for 1 Strafschluck per finished drink {:.3}", data.straf_schluecke, diff_average, diff_average / straf_per_finished);
-    // Strafschluecke should be calculated as per drink finished ( 3 Strafschluecke on 2 drinks -> 1.5 to check for the average effect of a single one
+    println!("Clean: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.clean_drinks, data.clean_hits, data.clean_average());
+    println!("Straf: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.straf_drinks, data.straf_hits, data.straf_average());
+    println!("Effect of {} Strafschlucke: {:.3}\tNormalized for 1 Strafschluck per finished drink {:.3}", data.straf_schluecke, data.diff_average(), data.effect_of_single_schluck());
 }
 
 #[derive(Default)]
@@ -32,6 +29,23 @@ struct StrafschluckData {
     straf_hits: u32,
     straf_drinks: u32,
     straf_schluecke: u32,
+}
+impl StrafschluckData {
+    pub fn clean_average(&self) -> f32{
+        average(self.clean_hits, self.clean_drinks)
+    }
+    pub fn straf_average(&self) -> f32 {
+        average(self.straf_hits, self.straf_drinks)
+    }
+    pub fn diff_average(&self) -> f32 {
+        self.clean_average() - self.straf_average()
+    }
+    pub fn straf_per_finished(&self) -> f32 {
+        average(self.straf_schluecke, self.straf_drinks)
+    }
+    pub fn effect_of_single_schluck(&self) -> f32 {
+        self.diff_average() / self.straf_per_finished()
+    }
 }
 
 fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> StrafschluckData {
