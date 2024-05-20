@@ -1,3 +1,6 @@
+use std::cmp::Ordering;
+use std::cmp::Ordering::Equal;
+
 #[derive(Default)]
 pub struct ChainInformation {
     pub current_hit: u32,
@@ -7,6 +10,13 @@ pub struct ChainInformation {
 }
 
 impl ChainInformation {
+    pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
+        let mut ord = other.total_hit.partial_cmp(&self.total_hit);
+        if ord.is_some() && ord.unwrap() == Equal {
+            return self.total_miss.partial_cmp(&other.total_miss);
+        }
+        return ord;
+    }
     pub fn create(hit: bool) -> ChainInformation {
         let mut ret: ChainInformation = Default::default();
         ret.throw(hit);
