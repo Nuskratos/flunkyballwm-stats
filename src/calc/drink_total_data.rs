@@ -10,12 +10,16 @@ pub struct PlayerDrinkingSpeed {
 }
 
 impl PlayerDrinkingSpeed {
-    pub fn invalid_drinking_speed() -> PlayerDrinkingSpeed{
-        PlayerDrinkingSpeed{
-            drink_finished: DrinkFinishedStats{all_drinks:1, all_hits:4.0, pure_drinks:1, pure_hits:4},
-            drink_avg: DrinkAvgStats{pure_hits:4, pure_drinks:1, all_hits:4.0, all_drinks:1},
-            player_name : String::from("Couldn't calculate speed")
-        }
+    pub fn set_to_5_speed(&mut self){
+        self.drink_finished.all_drinks = 1;
+        self.drink_finished.all_hits = 5.0;
+        self.drink_finished.pure_drinks = 1;
+        self.drink_finished.pure_hits = 5;
+        self.drink_avg.all_drinks = 1;
+        self.drink_avg.all_hits = 5.0;
+        self.drink_avg.pure_drinks = 1;
+        self.drink_avg.pure_hits = 5;
+
     }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
         let mut ord = self.drink_avg.all_speed().partial_cmp(&other.drink_avg.all_speed());

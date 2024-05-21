@@ -18,11 +18,8 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Less));
     for speed in &mut playerspeeds{
-        if f32::is_nan(speed.drink_avg.all_speed()){
-            speed.drink_finished.all_drinks = 1;
-            speed.drink_finished.all_hits = 5.0;
-            speed.drink_avg.all_drinks = 1;
-            speed.drink_avg.all_hits = 5.0;
+        if f32::is_nan(speed.drink_avg.all_speed()) || f32::is_nan(speed.drink_finished.pure_speed()){
+            speed.set_to_5_speed();
         }
     }
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }
