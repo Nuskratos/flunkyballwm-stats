@@ -16,5 +16,5 @@ pub mod throw_per_game_calc;
 pub mod drink_calc;
 pub mod side_information_data;
 pub mod side_information_calc;
-mod running_calc;
+pub mod running_calc;
 mod running_data;

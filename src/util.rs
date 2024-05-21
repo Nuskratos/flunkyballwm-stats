@@ -25,7 +25,7 @@ pub fn teams_from_games(games : &Vec<Game>)-> Vec<Team>{
         set.insert(game.left_team.clone());
         set.insert(game.right_team.clone());
     }
-    set.iter().collect()
+    set.iter().cloned().collect()
 }
 pub fn players_from_games(games : &Vec<Game>)-> Vec<TeamMember>{
     let mut set : HashSet<TeamMember> = HashSet::new();
@@ -35,7 +35,7 @@ pub fn players_from_games(games : &Vec<Game>)-> Vec<TeamMember>{
         set.insert(game.right_1.clone());
         set.insert(game.right_2.clone());
     }
-    set.iter().collect()
+    set.iter().cloned().collect()
 }
 
 pub fn team_name_from_id(team_id: u32, teams: &Vec<Team>) -> &str {

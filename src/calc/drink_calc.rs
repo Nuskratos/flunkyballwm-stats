@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use crate::calc::calculation::average;
 use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_finished_data::DrinkFinishedStats;
@@ -15,7 +16,15 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
         let averages = calculate_avg(&filtered_games, player, teams, &finished, schluck_effect);
         playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name) });
     }
-    playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap());
+    playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Less));
+    for speed in &mut playerspeeds{
+        if f32::is_nan(speed.drink_avg.all_speed()){
+            speed.drink_finished.all_drinks = 1;
+            speed.drink_finished.all_hits = 5.0;
+            speed.drink_avg.all_drinks = 1;
+            speed.drink_avg.all_hits = 5.0;
+        }
+    }
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }
 }
 
@@ -132,23 +141,26 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
 }
 
 #[cfg(test)]
-mod test{
+mod test {
     use float_cmp::approx_eq;
     use crate::calc::drink_calc::{calculate_drinking_speed, calculate_drinking_speed_without_team};
     use crate::team_player_data::{TEST_PLAYER1, TEST_PLAYER2, TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
     use crate::util::test::{game_2nd_finish, game_3rd_finish};
 
     #[test]
-    fn culled_team_calculation_works(){
-        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2),game_3rd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM1, TEST_TEAM3)];
+    fn culled_team_calculation_works() {
+        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM1, TEST_TEAM3)];
         let players = vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
         let culled_data = calculate_drinking_speed_without_team(&games, &players, &teams, 0.5, &TEST_TEAM3);
-        let first_culled_speed = culled_data.speeds.iter().find(|x|x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
+        let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_culled_speed, 2.5));
 
         let total_data = calculate_drinking_speed(&games, &players, &teams, 0.5);
-        let first_total_speed = total_data.speeds.iter().find(|x|x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
+        let first_total_speed = total_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_total_speed,  8f32 / 3f32 ));
     }
+
+    #[test]
+    fn check_for_nan() {}
 }
