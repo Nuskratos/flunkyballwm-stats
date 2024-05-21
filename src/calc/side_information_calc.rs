@@ -48,3 +48,29 @@ pub fn calc_side_information(games: &Vec<Game>) -> SideSplit {
     }
     SideSplit{left, right}
 }
+
+#[cfg(test)]
+mod test{
+    use crate::calc::side_information_calc::calc_side_information;
+    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
+    use crate::util::test::{game_1st_finish_2straf, game_2nd_finish, game_2nd_finish_enemy_miss, game_3rd_finish};
+
+    #[test]
+    fn basic(){
+        let games = vec![game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM2, TEST_TEAM3), game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2)];
+        let data = calc_side_information(&games);
+        assert_eq!(data.left.schluck, 0);
+        assert_eq!(data.left.beer, 0);
+        assert_eq!(data.left.throws, 6);
+        assert_eq!(data.left.hits, 6);
+        assert_eq!(data.left.wins, 3);
+        assert_eq!(data.left.points, 42);
+
+        assert_eq!(data.right.schluck, 2);
+        assert_eq!(data.right.beer, 0);
+        assert_eq!(data.right.throws, 4);
+        assert_eq!(data.right.hits, 3);
+        assert_eq!(data.right.wins, 0);
+        assert_eq!(data.right.points, 0);
+    }
+}

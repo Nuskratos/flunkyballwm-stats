@@ -37,20 +37,24 @@ fn add_game_count_to_maps(game: &Game, team_map: &mut HashMap<u32, ThrowsPerGame
     player_map.entry(game.right_2.id).and_modify(|x|x.games+=1).or_insert(ThrowsPerGame::new());
 }
 
-/*fn old_team_calc() {
-    let throws_of_second_team = game.rounds.len() as u32 / 2;
-    if game.rounds.len() % 2 == 0 { // Both teams have the same number of throws
-        team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(ThrowsPerGame::new(throws_of_second_team));
-        team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(ThrowsPerGame::new(throws_of_second_team));
-    } else { // Opening team had more throws
-        let opening_team = team_from_player(game.rounds.first().unwrap().thrower.id, teams);
-        if &game.left_team == opening_team {
-            team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(ThrowsPerGame::new(throws_of_second_team + 1));
-            team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(ThrowsPerGame::new(throws_of_second_team));
-        } else {
-            team_throws.entry(&game.right_team).and_modify(|x| x.add_throws(throws_of_second_team + 1)).or_insert(ThrowsPerGame::new(throws_of_second_team + 1));
-            team_throws.entry(&game.left_team).and_modify(|x| x.add_throws(throws_of_second_team)).or_insert(ThrowsPerGame::new(throws_of_second_team));
-        }
+#[cfg(test)]
+mod test{
+    use float_cmp::approx_eq;
+    use crate::calc::throw_per_game_calc::calculate_throws_per_game;
+    use crate::team_player_data::{TEAM_INVALID, TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
+    use crate::util::test::{game_2nd_finish, game_3rd_finish};
+
+    #[test]
+    fn basic_games(){
+        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM3, TEST_TEAM2)];
+        let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
+        let data = calculate_throws_per_game(&games,&teams);
+        assert_eq!(data.total_throws, 8);
+        let first_avg =data.team.iter().find(|x|x.0 == TEST_TEAM1.id).unwrap().1.average();
+        let second_avg =data.team.iter().find(|x|x.0 == TEST_TEAM2.id).unwrap().1.average();
+        let third_avg =data.team.iter().find(|x|x.0 == TEST_TEAM3.id).unwrap().1.average();
+        assert!(approx_eq!(f32, first_avg, 2.0));
+        assert!(approx_eq!(f32, second_avg, 1.5));
+        assert!(approx_eq!(f32, third_avg, 3.0));
     }
 }
-*/

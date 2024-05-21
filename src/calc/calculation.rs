@@ -8,8 +8,8 @@ use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
-use crate::data::{ARC, Game, Team, TeamMember};
-use crate::util::{name_from_id, player_is_in_game, player_in_team, player_name_from_id, print_line_break, team_from_player, team_id_from_player, team_name_from_id};
+use crate::data::{Game, Team, TeamMember};
+use crate::util::{name_from_id, player_name_from_id, print_line_break, team_from_player, team_id_from_player, team_name_from_id};
 use crate::team_player_data::NAME_WIDTH; // Used in printlines
 
 pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
@@ -55,16 +55,6 @@ pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: 
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.schlucke, player.1.beers, player.1.spg(), player.1.bpg());
     }
 }
-
-pub fn print_strafschluck_effect(games: &Vec<Game>, teams: &Vec<Team>) -> f32 {
-    let data = calculate_strafschluck(games, teams);
-    println!("Calculated Strafschluck Data:");
-    println!("Clean: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.clean_drinks, data.clean_hits, data.clean_average());
-    println!("Straf: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", data.straf_drinks, data.straf_hits, data.straf_average());
-    println!("Effect of {} Strafschlucke: {:.3}\tNormalized for 1 Strafschluck per finished drink {:.3}", data.straf_schluecke, data.diff_average(), data.effect_of_single_schluck());
-    data.effect_of_single_schluck()
-}
-
 
 pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let (team_vec, player_vec) = calculate_hit_and_miss_chains_team_player(games, teams);

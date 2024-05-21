@@ -24,7 +24,7 @@ pub fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> Strafschl
                 match add.kind {
                     STRAFSCHLUCK => {
                         store_strafschluck(&add, first_team, &mut first_counter, &mut second_counter);
-                    },
+                    }
                     STRAFBIER => {
                         add_completed_beer(&mut data, &add, first_team, &mut strafbeer_hit, &mut strafbeer_schluck, &first_counter, &second_counter, 1);
                         store_strafbeer_stats(&add, first_team, &mut strafbeer_hit, &mut strafbeer_schluck, &first_counter, &second_counter);
@@ -39,7 +39,7 @@ pub fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> Strafschl
     data
 }
 
-fn store_strafschluck(add: &Additional, first_team: &Team, first: &mut StrafschluckCounter, second: &mut StrafschluckCounter){
+fn store_strafschluck(add: &Additional, first_team: &Team, first: &mut StrafschluckCounter, second: &mut StrafschluckCounter) {
     if player_in_team(add.source.id, first_team) {
         second.schluck_drank += 1;
         second.clean = false;
@@ -47,7 +47,6 @@ fn store_strafschluck(add: &Additional, first_team: &Team, first: &mut Strafschl
         first.schluck_drank += 1;
         first.clean = false;
     }
-
 }
 
 fn store_strafbeer_stats(add: &Additional, first_team: &Team, strafbeer_hit: &mut HashMap<u32, u32>, strafbeer_schluck: &mut HashMap<u32, u32>, first: &StrafschluckCounter, second: &StrafschluckCounter) {
@@ -87,5 +86,33 @@ fn schlucke_used_for_this_beer(strafbeer_schlucke: &HashMap<u32, u32>, schlucke_
         schlucke_amount - strafbeer_schlucke.get(key).unwrap()
     } else {
         schlucke_amount
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use float_cmp::approx_eq;
+    use super::*;
+    use crate::team_player_data::*;
+    use crate::util::test::{game_1st_finish_2straf, game_2nd_finish, game_3rd_finish};
+
+
+    #[test]
+    fn test_strafschluck_0_point_five() {
+        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2)];
+        let teams = vec![TEST_TEAM1, TEST_TEAM2];
+        let data = calculate_strafschluck(&games, &teams);
+        data.print();
+        let strafschluck_effect = data.effect_of_single_schluck();
+        assert!(approx_eq!(f32, strafschluck_effect, 0.5, ulps=2));
+    }
+    #[test]
+    fn test_strafschluck_0_point_75() {
+        let games = vec![game_3rd_finish(TEST_TEAM1, TEST_TEAM2), game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2), game_2nd_finish(TEST_TEAM1, TEST_TEAM2)];
+        let teams = vec![TEST_TEAM1, TEST_TEAM2];
+        let data = calculate_strafschluck(&games, &teams);
+        data.print();
+        let strafschluck_effect = data.effect_of_single_schluck();
+        assert!(approx_eq!(f32, strafschluck_effect, 0.75, ulps=2));
     }
 }

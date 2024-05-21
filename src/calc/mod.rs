@@ -1,12 +1,12 @@
 pub mod calculation;
-mod strafschluck_data;
+pub mod strafschluck_data;
 mod chain_data;
 mod drink_avg_data;
 mod drink_finished_data;
 mod drink_total_data;
 mod penalties_data;
 mod ppg_data;
-mod strafschluck_calc;
+pub mod strafschluck_calc;
 mod accuracy_data;
 mod ppg_calc;
 mod penalties_calc;
