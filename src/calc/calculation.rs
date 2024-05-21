@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
-use crate::calc::drink_calc::{calculate_avg, calculate_finished};
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
 use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
@@ -113,35 +112,6 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
     }
 }
 
-
-pub fn print_complete_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) {
-    println!("Different drinking speed metrics:
-Pure finished: Finished drinks without StrafSchluck
-Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (rounds+1) - no StrafSchluck
-All finished: Finished drinks with Strafschluck
-All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
-for all above: StrafBeer counts as finished +1");
-    println!("Selected Strafschluck effect: {:.2} rounds", schluck_effect);
-    let mut playerspeeds: Vec<PlayerDrinkingSpeed> = Vec::new();
-    for player in players {
-        let finished = calculate_finished(games, player, teams, schluck_effect);
-        let averages = calculate_avg(games, player, teams, &finished, schluck_effect);
-        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name) });
-    }
-    playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap());
-    let n_c = 10;
-    let width = 17;
-    println!("{:-<94}", "-");
-    println!("| {:^n_c$} | {:^width$} | {:^width$} | {:^width$} | {:^width$} |", "Player", "Pure finished", "Pure average", "All finished", "All average");
-    println!("{:-<94}", "-");
-    for player in playerspeeds {
-        let pure_finished = format!("{:>.2} ({:>4.2} / {:>2})", player.drink_finished.pure_speed(), player.drink_finished.pure_hits, player.drink_finished.pure_drinks);
-        let pure_average = format!("{:>.2} ({:>4.2} / {:>2})", player.drink_avg.pure_speed(), player.drink_avg.pure_hits, player.drink_avg.pure_drinks);
-        let all_finished = format!("{:>.2} ({:>4.2} / {:>2})", player.drink_finished.all_speed(), player.drink_finished.all_hits, player.drink_finished.all_drinks);
-        let all_average = format!("{:>.2} ({:>4.2} / {:>2})", player.drink_avg.all_speed(), player.drink_avg.all_hits, player.drink_avg.all_drinks);
-        println!("| {:>n_c$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", player.player_name, pure_finished, pure_average, all_finished, all_average);
-    }
-}
 
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let mut throws = 0;

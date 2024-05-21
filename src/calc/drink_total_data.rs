@@ -17,4 +17,35 @@ impl PlayerDrinkingSpeed {
         }
         return ord;
     }
+    pub fn print(&self, name_width: usize, width:usize) {
+        let pure_finished = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.pure_speed(), self.drink_finished.pure_hits, self.drink_finished.pure_drinks);
+        let pure_average = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.pure_speed(), self.drink_avg.pure_hits, self.drink_avg.pure_drinks);
+        let all_finished = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.all_speed(), self.drink_finished.all_hits, self.drink_finished.all_drinks);
+        let all_average = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.all_speed(), self.drink_avg.all_hits, self.drink_avg.all_drinks);
+        println!("| {:>name_width$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", self.player_name, pure_finished, pure_average, all_finished, all_average);
+    }
+}
+
+pub struct DrinkingSpeedVec {
+    pub speeds: Vec<PlayerDrinkingSpeed>,
+    pub schluck_effect: f32
+}
+impl DrinkingSpeedVec{
+    pub fn print(&self) {
+        println!("Different drinking speed metrics:
+Pure finished: Finished drinks without StrafSchluck
+Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (rounds+1) - no StrafSchluck
+All finished: Finished drinks with Strafschluck
+All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
+for all above: StrafBeer counts as finished +1");
+        println!("Selected Strafschluck effect: {:.2} rounds", self.schluck_effect);
+        let n_c = 10;
+        let width = 17;
+        println!("{:-<94}", "-");
+        println!("| {:^n_c$} | {:^width$} | {:^width$} | {:^width$} | {:^width$} |", "Player", "Pure finished", "Pure average", "All finished", "All average");
+        println!("{:-<94}", "-");
+        for player in &self.speeds {
+            player.print(n_c, width);
+        }
+    }
 }

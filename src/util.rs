@@ -1,3 +1,4 @@
+use std::collections::HashSet;
 use crate::data::{Game, Team, TeamMember};
 use crate::team_player_data::TEAM_INVALID;
 
@@ -16,6 +17,25 @@ pub fn team_from_player(player_id: u32, teams: &Vec<Team>) -> &Team {
 
 pub fn team_id_from_player(player_id: u32, teams: &Vec<Team>) -> u32 {
     team_from_player(player_id, teams).id
+}
+
+pub fn teams_from_games(games : &Vec<Game>)-> Vec<Team>{
+    let mut set : HashSet<Team> = HashSet::new();
+    for game in games{
+        set.insert(game.left_team.clone());
+        set.insert(game.right_team.clone());
+    }
+    set.iter().collect()
+}
+pub fn players_from_games(games : &Vec<Game>)-> Vec<TeamMember>{
+    let mut set : HashSet<TeamMember> = HashSet::new();
+    for game in games{
+        set.insert(game.left_1.clone());
+        set.insert(game.left_2.clone());
+        set.insert(game.right_1.clone());
+        set.insert(game.right_2.clone());
+    }
+    set.iter().collect()
 }
 
 pub fn team_name_from_id(team_id: u32, teams: &Vec<Team>) -> &str {
@@ -56,6 +76,10 @@ pub fn print_line_break(width: usize) {
 pub fn player_is_in_game(game: &Game, player: &TeamMember) -> bool {
     let player_ids = vec![game.left_1.id, game.left_2.id, game.right_1.id, game.right_2.id];
     return player_ids.contains(&player.id);
+}
+pub fn team_is_in_game(game: &Game, team: &Team) -> bool {
+    let team_ids = vec![game.left_team.id, game.right_team.id];
+    return team_ids.contains(&team.id);
 }
 
 #[cfg(test)]

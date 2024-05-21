@@ -2,6 +2,11 @@ use crate::{create_normal_rounds_left_right};
 use crate::data::{ARC, bool_vec_from_int, Game, results_from_additionals, Team, TeamMember};
 use crate::team_player_data::*;
 
+pub fn print_specials_2024(){
+    println!("Special things happened in WM 2024:");
+    println!("{} finished his beer without having a normal drink round in Game 17.", FLO.name);
+    println!("{} finished his beer without throwing in game 16.", TOBIAS.name);
+}
 pub fn create_all_games_wm_2024() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();
     ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
