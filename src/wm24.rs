@@ -7,6 +7,32 @@ pub fn print_specials_2024(){
     println!("{} finished his beer without having a normal drink round in Game 17.", FLO.name);
     println!("{} finished his beer without throwing in game 16.", TOBIAS.name);
 }
+pub fn create_no_gewertet() -> Vec<Game> {
+    let mut ret_vec: Vec<Game> = Vec::new();
+    ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
+    ret_vec.push(game_3(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_4(DOS_BROS.clone(), SEBI.clone(), FLO.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
+    ret_vec.push(game_5(WEDELMEDEL.clone(), MALTE.clone(), CHRIS.clone(), STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone()));
+    ret_vec.push(game_7(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
+    ret_vec.push(game_8(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
+    ret_vec.push(game_11(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_12(DOS_BROS.clone(), FLO.clone(), SEBI.clone(), STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone()));
+    ret_vec.push(game_14(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
+    ret_vec.push(game_15(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
+    ret_vec.push(game_16(WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone(), STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone()));
+    ret_vec.push(game_18(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
+    ret_vec.push(game_19(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
+    ret_vec.push(game_20(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_22(DOS_BROS.clone(), SEBI.clone(), FLO.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec.push(game_23(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone()));
+    ret_vec.push(game_26(WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone(), WHITE_CLAW.clone(), LUISE.clone(), TOBIAS.clone()));
+    ret_vec.push(game_27(STRAMMSEIN.clone(), JONAS.clone(), SASCHA.clone(), DOS_BROS.clone(), FLO.clone(), SEBI.clone()));
+    ret_vec.push(game_29(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone()));
+    ret_vec.push(game_30(DOS_BROS.clone(), FLO.clone(), SEBI.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
+    ret_vec.push(game_31(WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));
+    ret_vec
+}
+
 pub fn create_all_games_wm_2024() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();
     ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));

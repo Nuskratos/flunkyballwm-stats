@@ -16,6 +16,7 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             if !team_is_in_game(game, team) {
                 continue;
             }
+            let mut straf_beer_map : HashMap<u32, f32> = HashMap::new();
             let mut current_diff = RunningDiff::create();
             let mut current_run = 0.0;
             // Calculating speeds of enemy team
@@ -31,16 +32,17 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
                     current_run += current_diff.baseline;
                 }
                 for add in &round.additionals {
+                    let this_run = running_amount_for_this_beer(&straf_beer_map, add.source.id, current_run);
                     match &add.kind {
                         FINISHED => {
                             if add.source.id == enemy_team.member_1.id {
-                                current_diff.diff_to_expected += team_1_drink_speed - current_run;
-                                current_diff.run_amount += current_run;
+                                current_diff.diff_to_expected += team_1_drink_speed - this_run;
+                                current_diff.run_amount += this_run;
                                 team1_finished = true;
                             }
                             if add.source.id == enemy_team.member_2.id {
-                                current_diff.diff_to_expected += team_2_drink_speed - current_run;
-                                current_diff.run_amount += current_run;
+                                current_diff.diff_to_expected += team_2_drink_speed - this_run;
+                                current_diff.run_amount += this_run;
                                 team2_finished = true;
                             }
                         }
@@ -51,13 +53,14 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
                         }
                         STRAFBIER => {
                             if add.source.id == enemy_team.member_1.id {
-                                current_diff.diff_to_expected += team_1_drink_speed - current_run - 1.0;
-                                current_diff.run_amount += current_run;
+                                current_diff.diff_to_expected += team_1_drink_speed - this_run - 1.0;
+                                current_diff.run_amount += this_run;
                             }
                             if add.source.id == enemy_team.member_2.id {
-                                current_diff.diff_to_expected += team_2_drink_speed - current_run - 1.0;
-                                current_diff.run_amount += current_run;
+                                current_diff.diff_to_expected += team_2_drink_speed - this_run - 1.0;
+                                current_diff.run_amount += this_run;
                             }
+                            straf_beer_map.insert(add.source.id, current_run);
                         }
                     }
                 }
@@ -81,11 +84,18 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
     TeamRunningStatistics { speeds: ret_vec, schluck_effect }
 }
 
+fn running_amount_for_this_beer(map : & HashMap<u32, f32>, id: u32, hit_amount: f32) -> f32{
+    if map.get(&id).is_some(){
+        return hit_amount - map.get(&id).unwrap();
+    }
+    hit_amount
+}
+
 #[cfg(test)]
 mod test {
     use float_cmp::approx_eq;
     use crate::calc::running_calc::calculate_running_speeds;
-    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
+    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3, TEST_TEAM4};
     use crate::util::{players_from_games, teams_from_games};
     use crate::util::test::{game_1st_finish_2straf, game_2nd_finish, game_3rd_finish};
 
@@ -98,20 +108,24 @@ mod test {
         let data = calculate_running_speeds(&games, &players, &teams, 0.8);
         data.print();
         let speed_team_1 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM1.id).unwrap().1.round_length();
+        let speed_team_3 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM3.id).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 2.0/3.0));
+        assert!(approx_eq!(f32, speed_team_3, 1.5));
     }
 
     // team in 2 wasnt finished in 3
     #[test]
     fn team_in_2_wasnt_done_in_2() {
-        let games = vec![game_2nd_finish(TEST_TEAM2, TEST_TEAM3), game_3rd_finish(TEST_TEAM1, TEST_TEAM2)];
+        let games = vec![game_2nd_finish(TEST_TEAM2, TEST_TEAM3), game_3rd_finish(TEST_TEAM1, TEST_TEAM2),game_2nd_finish(TEST_TEAM2, TEST_TEAM4)];
         let teams = teams_from_games(&games);
         let players = players_from_games(&games);
 
         let data = calculate_running_speeds(&games, &players, &teams, 0.8);
         data.print();
         let speed_team_1 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM1.id).unwrap().1.round_length();
+        let speed_team_3 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM3.id).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 2.0/3.0));
+        assert!(approx_eq!(f32, speed_team_3, 1.25));
     }
 
     #[test]
@@ -126,6 +140,5 @@ mod test {
         assert!(approx_eq!(f32, speed_team_1, 1.0- 0.6/2.6));
     }
 
-
-    // team in 2 was only finished after strafschluck
+    // TODO Test this with simulated data to see if any metric is close to the +- 0
 }

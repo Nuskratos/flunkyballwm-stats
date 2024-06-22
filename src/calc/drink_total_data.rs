@@ -48,8 +48,8 @@ Pure finished: Finished drinks without StrafSchluck
 Pure average: Finished drinks, not-finished rounds with >=flat(Pure) count as (rounds+1) - no StrafSchluck
 All finished: Finished drinks with Strafschluck
 All average: Finished drinks, not-finished with (rounds >=flat(All finished)) count as (rounds+1) including Strafschlucks
-for all above: StrafBeer counts as finished +1");
-        println!("Selected Strafschluck effect: {:.2} rounds", self.schluck_effect);
+for all above: StrafBeer counts as finished in +1 rounds");
+        println!("Selected Strafschluck effect: {:.3} rounds", self.schluck_effect);
         let n_c = 10;
         let width = 17;
         println!("{:-<94}", "-");

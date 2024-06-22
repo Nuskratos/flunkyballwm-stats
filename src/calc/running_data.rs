@@ -7,16 +7,16 @@ pub struct TeamRunningStatistics {
 impl TeamRunningStatistics {
     pub fn print(&self){
         println!("Estimated Running Speeds:");
-        println!("Speeds pretty experimental and most likely a poor substitution for an actual stopwatch.");
+        println!("Speeds  are pretty experimental and most likely a poor substitution for an actual stopwatch.");
         println!("They are calculated, by counting the amount of times ran vs. the rounds where \n\
         enemies finished their drink in relation to their average vs the other teams. (similar to \n\
         the normal drinking speed calculation");
-        println!("Strafschluck Effect used in this calculation: {}", self.schluck_effect);
+        println!("Strafschluck Effect used in this calculation: {:.3}", self.schluck_effect);
         let name_width = 27;
         let width = 15;
-        println!("| {:^name_width$} | {:^width$} | ", "Name", "Round length");
+        println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} | ", "Name", "Round length", "Round", "Diff");
         for (team, diff) in &self.speeds{
-            println!("| {:>name_width$} | {:>width$.3} |", team.name, diff.round_length())
+            println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name, diff.round_length(), diff.run_amount, diff.diff_to_expected)
         }
     }
 }
@@ -36,6 +36,9 @@ impl RunningDiff {
         self.diff_to_expected += other.diff_to_expected;
     }
     pub fn round_length(&self) -> f32{
+        if self.run_amount == 0.0 {
+            return 1.0;
+        }
         self.baseline + (self.diff_to_expected / self.run_amount)
     }
 }
