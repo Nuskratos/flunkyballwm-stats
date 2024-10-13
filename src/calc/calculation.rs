@@ -36,6 +36,7 @@ pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, pla
     for player in player_vec {
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.points, player.1.ppg());
     }
+    println!();
 }
 
 
@@ -53,6 +54,7 @@ pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: 
     for player in player_vec {
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.schlucke, player.1.beers, player.1.spg(), player.1.bpg());
     }
+    println!();
 }
 
 pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
@@ -69,6 +71,7 @@ pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: 
     for player in player_vec {
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player_name_from_id(player.0, players), player.1.total_hit, player.1.total_miss);
     }
+    println!();
 }
 
 pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
@@ -92,6 +95,7 @@ pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
     for team in acc_vec {
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.throws, team.1.hits, team.1.percentage());
     }
+    println!();
 }
 
 pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, players:&Vec<TeamMember>) {
@@ -110,6 +114,7 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
     for player in data.player{
         println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.games, player.1.throws, wrong_way_average(player.1.games, player.1.throws));
     }
+    println!();
 }
 
 
@@ -156,6 +161,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
         print_accuracy(accuracy);
     }
     print_line_break(70);
+    println!();
 }
 
 
@@ -164,6 +170,7 @@ pub fn print_side_information(games: &Vec<Game>) {
     println!("Seite  | Siege | Punkte | Trefferwahrscheinlichkeit | StrafS | StrafB");
     println!("Links  | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.left.wins, data.left.points, data.left.hits as f32 / data.left.throws as f32 * 100.0, data.left.hits, data.left.throws, data.left.schluck, data.left.beer);
     println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.right.wins, data.right.points, data.right.hits as f32 / data.right.throws as f32 * 100.0, data.right.hits, data.right.throws, data.right.schluck, data.right.beer);
+    println!();
 }
 
 
@@ -197,6 +204,7 @@ pub fn print_team_first_throws(games: &Vec<Game>, teams: &Vec<Team>) {
     for elem in result_team_vec {
         println!("{:<27} | {:<11} | {:<12} | {:<12} | {:<8}", team_name_from_id(elem.0, teams), elem.1.0, elem.1.1, elem.1.2, elem.1.3);
     }
+    println!();
 }
 
 pub fn print_first_throw_effect(games: &Vec<Game>) {
@@ -228,4 +236,5 @@ pub fn print_first_throw_effect(games: &Vec<Game>) {
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {:.1}%", games.len(), amount_first_throw_win, percentage(amount_first_throw_win, games.len()));
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst getroffen. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_hit, amount_first_hit_win, percentage(amount_first_hit_win, amount_first_hit));
     println!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst verfehlt. Dabei {} mal gewonnen. Das sind {:.1}%", amount_first_miss, amount_first_miss_win, percentage(amount_first_miss_win, amount_first_miss));
+    println!();
 }

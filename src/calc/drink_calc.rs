@@ -32,7 +32,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, te
         let averages = calculate_avg(games, player, teams, &finished, schluck_effect);
         playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name) });
     }
-    playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap());
+    playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Equal));
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }
 }
 

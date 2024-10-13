@@ -22,9 +22,16 @@ impl PlayerDrinkingSpeed {
 
     }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
+        if self.drink_finished.all_drinks == 0 {
+            return Option::Some(Ordering::Greater);
+        }else if other.drink_finished.all_drinks == 0 {
+            return Some(Ordering::Less);
+        }
         let mut ord = self.drink_avg.all_speed().partial_cmp(&other.drink_avg.all_speed());
         if ord.is_some() && ord.unwrap() == Equal {
             return self.drink_finished.pure_speed().partial_cmp(&other.drink_finished.pure_speed());
+        }else if ord.is_none() {
+            return Option::Some(Ordering::Equal);
         }
         return ord;
     }
@@ -58,5 +65,6 @@ for all above: StrafBeer counts as finished in +1 rounds");
         for player in &self.speeds {
             player.print(n_c, width);
         }
+        println!();
     }
 }

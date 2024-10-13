@@ -42,6 +42,7 @@ impl StrafschluckData {
         println!("Clean: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", self.clean_drinks, self.clean_hits, self.clean_average());
         println!("Straf: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", self.straf_drinks, self.straf_hits, self.straf_average());
         println!("Effect of {} Strafschlucke: {:.3}\tNormalized for 1 Strafschluck per finished drink {:.3}", self.straf_schluecke, self.diff_average(), self.effect_of_single_schluck());
+        println!();
     }
 }
 
