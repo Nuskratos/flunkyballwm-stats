@@ -28,7 +28,7 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             let mut team1_finished = false;
             let mut team2_finished = false;
             for round in &game.rounds {
-                if team_id_from_player(round.runner.id, teams) == team.id && round.hit {
+                if team_id_from_player(round.runner.id, game) == team.id && round.hit {
                     current_run += current_diff.baseline;
                 }
                 for add in &round.additionals {
@@ -47,7 +47,7 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
                             }
                         }
                         STRAFSCHLUCK => {
-                            if team_from_player(add.source.id, teams) == team {
+                            if team_from_player(add.source.id, game) == team {
                                 current_run += schluck_effect;
                             }
                         }
@@ -73,6 +73,8 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
                 current_diff.diff_to_expected += team_2_drink_speed - current_run - 1.0;
                 current_diff.run_amount += current_run + current_diff.baseline;
             }
+            current_diff.run_amount = current_diff.run_amount / 2.0;
+            current_diff.diff_to_expected = current_diff.diff_to_expected / 2.0;
             team_diff_map.entry(team.id).and_modify(|x| x.add(&current_diff)).or_insert(current_diff);
         }
     }

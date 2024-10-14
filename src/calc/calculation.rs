@@ -77,7 +77,7 @@ pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: 
 pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
     let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
     for game in games {
-        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id, game);
         let second_enemy_stats = if &game.left_team == first_enemy_stats { &game.right_team } else { &game.left_team };
         for (ix, round) in game.rounds.iter().enumerate() {
             let passive_team = if ix % 2 == 0 { second_enemy_stats } else { first_enemy_stats };
@@ -127,7 +127,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     for game in games {
         for round in &game.rounds {
             let (player_throws, player_hits) = player_scores.entry(round.thrower.id).or_insert((0, 0));
-            let (team_throws, team_hits) = team_scores.entry(team_id_from_player(round.thrower.id, teams)).or_insert((0, 0));
+            let (team_throws, team_hits) = team_scores.entry(team_id_from_player(round.thrower.id, game)).or_insert((0, 0));
             throws = throws + 1;
             *player_throws += 1;
             *team_throws += 1;
@@ -178,7 +178,7 @@ pub fn print_team_first_throws(games: &Vec<Game>, teams: &Vec<Team>) {
     // Times going first, times won going first, times going second, times won going second
     let mut first_throws: HashMap<u32, (u32, u32, u32, u32)> = HashMap::new();
     for game in games {
-        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
         let (ffirst, fwon, _, _) = first_throws.entry(team_id_going_first).or_insert((0, 0, 0, 0));
         *ffirst += 1;
         if team_id_going_first == game.winning_team_id() {
@@ -186,7 +186,7 @@ pub fn print_team_first_throws(games: &Vec<Game>, teams: &Vec<Team>) {
         } else {}
     }
     for game in games { // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
-        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, teams);
+        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, game);
         let (_, _, ssecond, sw_second) = first_throws.entry(team_id_going_second).or_insert((0, 0, 0, 0));
         *ssecond += 1;
         if team_id_going_second == game.winning_team_id() {

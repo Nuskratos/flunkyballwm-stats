@@ -8,7 +8,7 @@ pub fn calculate_hit_and_miss_chains_team_player(games:&Vec<Game>, teams:&Vec<Te
     let mut player_chain: HashMap<&TeamMember, ChainInformation> = HashMap::new();
     for game in games {
         for round in &game.rounds {
-            let team = team_from_player(round.thrower.id, teams);
+            let team = team_from_player(round.thrower.id, game);
             team_chain.entry(team).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
             player_chain.entry(&round.thrower).and_modify(|x| x.throw(round.hit)).or_insert(ChainInformation::create(round.hit));
         }

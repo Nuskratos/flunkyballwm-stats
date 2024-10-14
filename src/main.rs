@@ -19,8 +19,7 @@ use crate::team_player_data::{BEEF, CHRIS, DA_HAM_SIE, DOS_BROS, FLO, GEWERTET, 
 use crate::test_stuff::test_first_throw_value;
 use crate::util::{players_from_games, teams_from_games};
 
-fn print_all_wm24(){
-    let games = create_no_gewertet();
+fn print_all_calcs(games : &Vec<Game>){
     let all_players = players_from_games(&games);
     let all_teams = teams_from_games(&games);
     // Checking single game games.iter().find(|x| x.match_number == 21).unwrap().print();
@@ -43,25 +42,23 @@ fn print_all_wm24(){
     running_speeds.print();
 }
 
-fn main() {
+fn print_wm24(){
+    let games = create_no_gewertet();
+    print_all_calcs(&games);
+}
+fn print_hamburg_24(){
     let games = create_spassturnier_24();
-    let all_players = players_from_games(&games);
-    let all_teams = teams_from_games(&games);
-    print_throwing_accuracy(&games, &all_teams, &all_players);
-    print_side_information(&games);
-    print_first_throw_effect(&games);
-    print_team_first_throws(&games, &all_teams);
-    let strafschluck_data = calculate_strafschluck(&games, &all_teams);
-    strafschluck_data.print();
-    calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
-    print_average_throws_per_game(&games, &all_teams, &all_players);
-    print_enemy_accuracy(&games, &all_teams);
-    print_hit_and_miss_chains(&games, &all_teams, &all_players);
-    print_amount_of_penalties(&games, &all_teams, &all_players);
-    print_amount_of_points_per_game(&games, &all_teams, &all_players);
-    // This one seems to be a bit faulty calculated
-    let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
-    running_speeds.print();
+    print_all_calcs(&games);
+}
+
+fn print_total_stats(){
+    let mut games = create_no_gewertet();
+    games.append(&mut create_spassturnier_24());
+    print_all_calcs(&games);
+}
+
+fn main() {
+    print_total_stats();
 }
 
 

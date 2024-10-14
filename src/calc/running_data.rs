@@ -13,8 +13,8 @@ impl TeamRunningStatistics {
         the normal drinking speed calculation");
         println!("Strafschluck Effect used in this calculation: {:.3}", self.schluck_effect);
         let name_width = 27;
-        let width = 15;
-        println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} | ", "Name", "Round length", "Round", "Diff");
+        let width = 16;
+        println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} | ", "Name", "Round length", "Rounds ran", "Diff to expected");
         for (team, diff) in &self.speeds{
             println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name, diff.round_length(), diff.run_amount, diff.diff_to_expected)
         }

@@ -12,7 +12,7 @@ pub fn calculate_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>) -> ThrowD
         total_throws += game.rounds.len() as u32;
         for round in &game.rounds {
             player_throws.entry(round.thrower.id).and_modify(|x| x.throws += 1);
-            team_throws.entry(team_id_from_player(round.thrower.id, teams)).and_modify(|x| x.throws +=1);
+            team_throws.entry(team_id_from_player(round.thrower.id, game)).and_modify(|x| x.throws +=1);
         }
     }
     let mut team_vec: Vec<(u32, ThrowsPerGame)> = Vec::new();

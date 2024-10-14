@@ -6,7 +6,8 @@ pub fn player_in_team(player_id: u32, team: &Team) -> bool {
     return team.member_1.id == player_id || team.member_2.id == player_id;
 }
 
-pub fn team_from_player(player_id: u32, teams: &Vec<Team>) -> &Team {
+pub fn team_from_player(player_id: u32, game: &Game) -> &Team {
+    let teams = vec![&game.left_team, &game.right_team];
     for team in teams {
         if team.member_1.id == player_id || team.member_2.id == player_id {
             return team;
@@ -15,8 +16,8 @@ pub fn team_from_player(player_id: u32, teams: &Vec<Team>) -> &Team {
     &TEAM_INVALID
 }
 
-pub fn team_id_from_player(player_id: u32, teams: &Vec<Team>) -> u32 {
-    team_from_player(player_id, teams).id
+pub fn team_id_from_player(player_id: u32, game: &Game) -> u32 {
+    team_from_player(player_id, game).id
 }
 
 pub fn teams_from_games(games : &Vec<Game>)-> Vec<Team>{

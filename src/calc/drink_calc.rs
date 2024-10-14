@@ -43,10 +43,10 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
         if !player_is_in_game(game, player) {
             continue;
         }
-        let player_team = team_id_from_player(player.id, teams);
+        let player_team = team_id_from_player(player.id, game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
@@ -72,7 +72,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
                     tmp_schluck = 0.0;
                     tmp_round = 0;
                 }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, game) != player_team {
                     tmp_schluck += schluck_effect;
                     schluck_happened = true;
                 }
@@ -98,10 +98,10 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
         if !player_is_in_game(game, player) {
             continue;
         }
-        let player_team = team_id_from_player(player.id, teams);
+        let player_team = team_id_from_player(player.id, game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, teams);
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
@@ -127,7 +127,7 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
                     tmp_schluck = 0.0;
                     // continuing in case the strafbier was finished
                 }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, teams) != player_team {
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, game) != player_team {
                     tmp_schluck += schluck_effect;
                     schluck_happened = true;
                 }

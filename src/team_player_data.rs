@@ -50,7 +50,7 @@ pub const NAME_WIDTH: usize = 27;
 #[cfg(test)]
 pub mod test {
     use crate::calc::accuracy_data::Accuracy;
-    use crate::data::TeamMember;
+    use crate::data::*;
     use crate::team_player_data::{BEEF, CHRIS, FLO, JEROME, JONAS, LUISE, MALTE, SASCHA, SEBI, TOBIAS};
 
     pub struct PlayerStats {
@@ -63,16 +63,16 @@ pub mod test {
     }
 
     // Calculated from the wm2024 without gewertet. The running round duration is simply estimated and used here to check if my method for calculating the running speed is accurate
-    pub const JEROME_STATS: PlayerStats = PlayerStats { member: JEROME.clone(), accuracy: 71.43, drinking_speed: 2.22, running_round_duration: 0.9, strafschluck_per_game: 0.12, strafbeer_per_game: 0.0 };
-    pub const BEEF_STATS: PlayerStats = PlayerStats { member: BEEF.clone(), accuracy: 66.67, drinking_speed: 2.96, running_round_duration: 1.1, strafschluck_per_game: 0.12, strafbeer_per_game: 0.12 };
-    pub const SEBI_STATS: PlayerStats = PlayerStats { member: SEBI.clone(), accuracy: 66.67, drinking_speed: 3.71, running_round_duration: 1.1, strafschluck_per_game: 0.0, strafbeer_per_game: 0.0 };
-    pub const FLO_STATS: PlayerStats = PlayerStats { member: FLO.clone(), accuracy: 52.94, drinking_speed: 2.5, running_round_duration: 0.9, strafschluck_per_game: 0.25, strafbeer_per_game: 0.0 };
-    pub const LUISE_STATS: PlayerStats = PlayerStats { member: LUISE.clone(), accuracy: 33.33, drinking_speed: 3.72, running_round_duration: 1.1, strafschluck_per_game: 0.33, strafbeer_per_game: 0.0 };
-    pub const TOBIAS_STATS: PlayerStats = PlayerStats { member: TOBIAS.clone(), accuracy: 30.77, drinking_speed: 2.6, running_round_duration: 1.0, strafschluck_per_game: 0.0, strafbeer_per_game: 0.11 };
-    pub const CHRIS_STATS: PlayerStats = PlayerStats { member: CHRIS.clone(), accuracy: 47.62, drinking_speed: 3.27, running_round_duration: 1.0, strafschluck_per_game: 0.00, strafbeer_per_game: 0.00 };
-    pub const MALTE_STATS: PlayerStats = PlayerStats { member: MALTE.clone(), accuracy: 27.27, drinking_speed: 3.25, running_round_duration: 1.0, strafschluck_per_game: 0.22, strafbeer_per_game: 0.00 };
-    pub const SASCHA_STATS: PlayerStats = PlayerStats { member: SASCHA.clone(), accuracy: 50.0, drinking_speed: 2.8, running_round_duration: 0.9, strafschluck_per_game: 0.12, strafbeer_per_game: 0.12 };
-    pub const JONAS_STATS: PlayerStats = PlayerStats { member: JONAS.clone(), accuracy: 36.84, drinking_speed: 3.0, running_round_duration: 1.0, strafschluck_per_game: 0.38, strafbeer_per_game: 0.00 };
+    pub const JEROME_STATS: PlayerStats = PlayerStats { member: JEROME, accuracy: 71.43, drinking_speed: 2.22, running_round_duration: 0.9, strafschluck_per_game: 0.12, strafbeer_per_game: 0.0 };
+    pub const BEEF_STATS: PlayerStats = PlayerStats { member: BEEF, accuracy: 66.67, drinking_speed: 2.96, running_round_duration: 1.1, strafschluck_per_game: 0.12, strafbeer_per_game: 0.12 };
+    pub const SEBI_STATS: PlayerStats = PlayerStats { member: SEBI, accuracy: 66.67, drinking_speed: 3.71, running_round_duration: 1.1, strafschluck_per_game: 0.0, strafbeer_per_game: 0.0 };
+    pub const FLO_STATS: PlayerStats = PlayerStats { member: FLO, accuracy: 52.94, drinking_speed: 2.5, running_round_duration: 0.9, strafschluck_per_game: 0.25, strafbeer_per_game: 0.0 };
+    pub const LUISE_STATS: PlayerStats = PlayerStats { member: LUISE, accuracy: 33.33, drinking_speed: 3.72, running_round_duration: 1.1, strafschluck_per_game: 0.33, strafbeer_per_game: 0.0 };
+    pub const TOBIAS_STATS: PlayerStats = PlayerStats { member: TOBIAS, accuracy: 30.77, drinking_speed: 2.6, running_round_duration: 1.0, strafschluck_per_game: 0.0, strafbeer_per_game: 0.11 };
+    pub const CHRIS_STATS: PlayerStats = PlayerStats { member: CHRIS, accuracy: 47.62, drinking_speed: 3.27, running_round_duration: 1.0, strafschluck_per_game: 0.00, strafbeer_per_game: 0.00 };
+    pub const MALTE_STATS: PlayerStats = PlayerStats { member: MALTE, accuracy: 27.27, drinking_speed: 3.25, running_round_duration: 1.0, strafschluck_per_game: 0.22, strafbeer_per_game: 0.00 };
+    pub const SASCHA_STATS: PlayerStats = PlayerStats { member: SASCHA, accuracy: 50.0, drinking_speed: 2.8, running_round_duration: 0.9, strafschluck_per_game: 0.12, strafbeer_per_game: 0.12 };
+    pub const JONAS_STATS: PlayerStats = PlayerStats { member: JONAS, accuracy: 36.84, drinking_speed: 3.0, running_round_duration: 1.0, strafschluck_per_game: 0.38, strafbeer_per_game: 0.00 };
 
     pub struct TeamStats {
         pub first: PlayerStats,
