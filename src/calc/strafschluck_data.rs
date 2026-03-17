@@ -1,6 +1,4 @@
 use crate::calc::calculation::average;
-use crate::calc::strafschluck_calc::calculate_strafschluck;
-use crate::data::{Game, Team};
 
 #[derive(Default)]
 pub struct StrafschluckData {

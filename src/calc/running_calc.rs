@@ -1,13 +1,11 @@
 use std::cmp::Ordering;
 use std::collections::HashMap;
-use std::env::current_exe;
+
 use crate::calc::drink_calc::calculate_drinking_speed_without_team;
 use crate::calc::running_data::{RunningDiff, TeamRunningStatistics};
 use crate::data::{Game, Team, TeamMember};
-use crate::util::{player_is_in_game, team_from_player, team_id_from_player, team_is_in_game};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
-use crate::team_player_data::WHITE_CLAW;
-
+use crate::util::{team_from_player, team_id_from_player, team_is_in_game};
 
 pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) -> TeamRunningStatistics {
     let mut team_diff_map: HashMap<u32, RunningDiff> = HashMap::new();
@@ -96,6 +94,7 @@ fn running_amount_for_this_beer(map : & HashMap<u32, f32>, id: u32, hit_amount: 
 #[cfg(test)]
 mod test {
     use float_cmp::approx_eq;
+
     use crate::calc::running_calc::calculate_running_speeds;
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3, TEST_TEAM4};
     use crate::util::{players_from_games, teams_from_games};

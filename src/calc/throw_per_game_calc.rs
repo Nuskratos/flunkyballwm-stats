@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use crate::calc::throw_per_game_data::{ThrowData, ThrowsPerGame};
-use crate::data::{Game, Team};
-use crate::util::{team_from_player, team_id_from_player};
 
-pub fn calculate_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>) -> ThrowData {
+use crate::calc::throw_per_game_data::{ThrowData, ThrowsPerGame};
+use crate::data::Game;
+use crate::util::team_id_from_player;
+
+pub fn calculate_throws_per_game(games: &Vec<Game>) -> ThrowData {
     let mut total_throws: u32 = 0;
     let mut team_throws: HashMap<u32, ThrowsPerGame> = HashMap::new();
     let mut player_throws: HashMap<u32, ThrowsPerGame> = HashMap::new();
@@ -40,15 +41,16 @@ fn add_game_count_to_maps(game: &Game, team_map: &mut HashMap<u32, ThrowsPerGame
 #[cfg(test)]
 mod test{
     use float_cmp::approx_eq;
+
     use crate::calc::throw_per_game_calc::calculate_throws_per_game;
-    use crate::team_player_data::{TEAM_INVALID, TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
+    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
     use crate::util::test::{game_2nd_finish, game_3rd_finish};
 
     #[test]
     fn basic_games(){
         let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM3, TEST_TEAM2)];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
-        let data = calculate_throws_per_game(&games,&teams);
+        let data = calculate_throws_per_game(&games);
         assert_eq!(data.total_throws, 8);
         let first_avg =data.team.iter().find(|x|x.0 == TEST_TEAM1.id).unwrap().1.average();
         let second_avg =data.team.iter().find(|x|x.0 == TEST_TEAM2.id).unwrap().1.average();

@@ -17,8 +17,6 @@ pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend a
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
-pub fn wrong_way_average_f(divisor: u32, dividend: f32) -> f32 { dividend / divisor as f32 }
-
 pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let (team_vec, player_vec) = calculate_amount_of_points_per_game(games);
     let width = 9;
@@ -74,7 +72,7 @@ pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: 
     println!();
 }
 
-pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
+pub fn print_enemy_accuracy(games: &Vec<Game>) {
     let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
     for game in games {
         let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id, game);
@@ -99,7 +97,7 @@ pub fn print_enemy_accuracy(games: &Vec<Game>, teams: &Vec<Team>) {
 }
 
 pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, players:&Vec<TeamMember>) {
-    let data = calculate_throws_per_game(games, teams);
+    let data = calculate_throws_per_game(games);
     println!("Average throws per game:");
     let width = 10;
     let total_width = 70;
@@ -138,6 +136,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
             }
         }
     }
+    println!("Throwing accuracy:");
     println!("{:<30} threw: {} and hit: {} which is {:4.2}%", "Overall", throws, hits, hits as f32 / throws as f32 * 100.0);
     print_line_break(70);
 

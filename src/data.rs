@@ -94,8 +94,8 @@ pub struct Game {
 impl Game {
     pub fn additionals_vec(&self) -> Vec<ARC>{
         let mut ret :Vec<ARC> = Vec::new();
-        for round in &self.rounds {
-            for (ix, add) in round.additionals.iter().enumerate(){
+        for (ix,round) in self.rounds.iter().enumerate() {
+            for add in round.additionals.iter(){
                 ret.push(ARC{additional: add.clone(), round_nr: ix as u32});
             }
         }
@@ -163,13 +163,9 @@ pub fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) 
     }
 }
 
-pub fn results_from_additionals(additionals: &Vec<ARC>, left_team_first: bool, left_team: &Team) -> Result {
+pub fn results_from_additionals(additionals: &Vec<ARC>, left_team: &Team) -> Result {
     let mut result: Result = Result { points_left: 0, points_right: 0 };
     let mut result_values: Vec<u32> = vec![7, 5, 3];
-    let mut round_checker_offset = 0;
-    if !left_team_first {
-        round_checker_offset = 1;
-    }
     for additional_round in additionals {
         if additional_round.additional.kind == FINISHED {
             if additional_round.additional.source.id == left_team.member_2.id || additional_round.additional.source.id == left_team.member_1.id {
