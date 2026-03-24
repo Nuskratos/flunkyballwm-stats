@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::{error::Error, io, process};
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
@@ -115,8 +116,7 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
     println!();
 }
 
-
-pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
+pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> ((i32, i32),Vec<Accuracy>, Vec<Accuracy>){
     let mut throws = 0;
     let mut hits = 0;
     let mut player_scores = HashMap::new();
@@ -136,9 +136,6 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
             }
         }
     }
-    println!("Throwing accuracy:");
-    println!("{:<30} threw: {} and hit: {} which is {:4.2}%", "Overall", throws, hits, hits as f32 / throws as f32 * 100.0);
-    print_line_break(70);
 
     let mut result_team_vec: Vec<Accuracy> = Vec::new();
     for score in team_scores {
@@ -146,22 +143,44 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     }
     result_team_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_team_vec.reverse();
-    for accuracy in &result_team_vec {
-        print_accuracy(accuracy);
-    }
-    print_line_break(70);
     let mut result_vec: Vec<Accuracy> = Vec::new();
     for score in player_scores {
         result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
     }
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_vec.reverse();
-    for accuracy in &result_vec {
+    return ((throws, hits),result_team_vec, result_vec);
+}
+
+pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
+    let ((throws, hits), result_team_vec, result_player_vec) = calculate_throwing_accuracy(games, teams, players);
+    println!("Throwing accuracy:");
+    println!("{:<30} threw: {} and hit: {} which is {:4.2}%", "Overall", throws, hits, hits as f32 / throws as f32 * 100.0);
+    print_line_break(70);
+    for accuracy in &result_team_vec {
+        print_accuracy(accuracy);
+    }
+    print_line_break(70);
+    for accuracy in &result_player_vec {
         print_accuracy(accuracy);
     }
     print_line_break(70);
     println!();
 }
+pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>, fileprefix : String){
+    let ((throws, hits), result_team_vec, result_player_vec) = calculate_throwing_accuracy(games, teams, players);
+    let mut wtr = csv::Writer::from_path(fileprefix.to_owned() +"throwing_accuracy.csv").unwrap();
+    wtr.write_record(&["Name", "Throws", "Hits", "Accuracy"]);
+    wtr.serialize(("Overall", throws, hits, hits as f32 / throws as f32 * 100.0));
+    for accuracy in &result_team_vec {
+        wtr.serialize((accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage()));
+    }
+    for accuracy in &result_player_vec {
+        wtr.serialize((accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage()));
+    }
+    wtr.flush();
+}
+
 
 
 pub fn print_side_information(games: &Vec<Game>) {

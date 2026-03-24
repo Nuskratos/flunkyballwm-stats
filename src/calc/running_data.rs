@@ -7,7 +7,7 @@ pub struct TeamRunningStatistics {
 impl TeamRunningStatistics {
     pub fn print(&self){
         println!("Estimated Running Speeds:");
-        println!("Speeds  are pretty experimental and most likely a poor substitution for an actual stopwatch.");
+        println!("Speeds are pretty experimental and most likely a poor substitution for an actual stopwatch.");
         println!("They are calculated, by counting the amount of times ran vs. the rounds where \n\
         enemies finished their drink in relation to their average vs the other teams. (similar to \n\
         the normal drinking speed calculation");
