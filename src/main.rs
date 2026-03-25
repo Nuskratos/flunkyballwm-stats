@@ -4,7 +4,7 @@ use chrono::Local;
 use data::*;
 use wm24::*;
 
-use crate::calc::calculation::{csv_throwing_accuracy, print_amount_of_penalties, print_amount_of_points_per_game, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_team_first_throws, print_throwing_accuracy};
+use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_amount_of_penalties, print_amount_of_points_per_game, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_team_first_throws, print_throwing_accuracy};
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
@@ -44,8 +44,8 @@ fn print_all_calcs(games : &Vec<Game>){
 fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     let all_players = players_from_games(&games);
     let all_teams = teams_from_games(&games);
-    csv_throwing_accuracy(&games, &all_teams, &all_players, fileprefix, date); // TODO
-//    print_side_information(&games);// TODO
+    csv_throwing_accuracy(&games, &all_teams, &all_players, &fileprefix, &date);
+    csv_side_information(&games, &fileprefix, &date);
     print_first_throw_effect(&games);// TODO
     print_team_first_throws(&games, &all_teams);// TODO
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);

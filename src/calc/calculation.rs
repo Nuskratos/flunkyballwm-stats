@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 use std::{error::Error, io, process};
-use std::fs::OpenOptions;
+use std::fs::{File, OpenOptions};
 use std::path::Path;
+use csv::Writer;
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
@@ -162,9 +163,8 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     print_line_break(70);
     println!();
 }
-pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>, fileprefix : String, date : String){
-    let result_vec = calculate_throwing_accuracy(games, teams, players);
-    let filename = format!("{}_throwing_accuracy.csv", date);
+
+pub fn open_writer(filename : String) -> (Writer<File>, bool){
     let path = Path::new(&filename);
     let file_exists = path.exists();
     let file = OpenOptions::new()
@@ -174,7 +174,12 @@ pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec
         .open(path)
         .expect("Couldn't open file");
     let mut wtr = csv::Writer::from_writer(file);
+    (wtr, file_exists)
+}
 
+pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>, fileprefix : &String, date : &String){
+    let result_vec = calculate_throwing_accuracy(games, teams, players);
+    let (mut wtr, file_exists) = open_writer(date.to_string()+"throwing_accuracy.csv");
     if !file_exists{
         wtr.write_record(&["HiddenPrefix", "Name", "Throws", "Hits", "Accuracy"]);
     }
@@ -192,6 +197,14 @@ pub fn print_side_information(games: &Vec<Game>) {
     println!("Links  | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.left.wins, data.left.points, data.left.hits as f32 / data.left.throws as f32 * 100.0, data.left.hits, data.left.throws, data.left.schluck, data.left.beer);
     println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", data.right.wins, data.right.points, data.right.hits as f32 / data.right.throws as f32 * 100.0, data.right.hits, data.right.throws, data.right.schluck, data.right.beer);
     println!();
+}
+pub fn csv_side_information(games: &Vec<Game>, file_prefix: &String, date :&String){
+    let data = calc_side_information(games);
+    let (mut wtr, file_exists) = open_writer(date.to_string()+"side_information.csv");
+    if !file_exists{
+        wtr.write_record(&["HiddenPrefix", "Side", "Wins", "Points", "Hits", "Throws", "Percentage", "Strafschluck", "Strafbier"]);
+    }
+    data.serialize(&mut wtr, file_prefix);
 }
 
 
