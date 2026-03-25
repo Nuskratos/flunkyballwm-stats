@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 use std::{error::Error, io, process};
+use std::fs::OpenOptions;
+use std::path::Path;
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
@@ -116,7 +118,7 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
     println!();
 }
 
-pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> ((i32, i32),Vec<Accuracy>, Vec<Accuracy>){
+pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> Vec<Accuracy>{
     let mut throws = 0;
     let mut hits = 0;
     let mut player_scores = HashMap::new();
@@ -137,46 +139,47 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players
         }
     }
 
-    let mut result_team_vec: Vec<Accuracy> = Vec::new();
-    for score in team_scores {
-        result_team_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
-    }
-    result_team_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
-    result_team_vec.reverse();
     let mut result_vec: Vec<Accuracy> = Vec::new();
+    for score in team_scores {
+        result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
+    }
     for score in player_scores {
         result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
     }
+    result_vec.push(Accuracy{throws:throws, hits:hits, name:"Average" });
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_vec.reverse();
-    return ((throws, hits),result_team_vec, result_vec);
+    return result_vec;
 }
 
 pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
-    let ((throws, hits), result_team_vec, result_player_vec) = calculate_throwing_accuracy(games, teams, players);
+    let result_vec = calculate_throwing_accuracy(games, teams, players);
     println!("Throwing accuracy:");
-    println!("{:<30} threw: {} and hit: {} which is {:4.2}%", "Overall", throws, hits, hits as f32 / throws as f32 * 100.0);
     print_line_break(70);
-    for accuracy in &result_team_vec {
-        print_accuracy(accuracy);
-    }
-    print_line_break(70);
-    for accuracy in &result_player_vec {
+    for accuracy in &result_vec {
         print_accuracy(accuracy);
     }
     print_line_break(70);
     println!();
 }
-pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>, fileprefix : String){
-    let ((throws, hits), result_team_vec, result_player_vec) = calculate_throwing_accuracy(games, teams, players);
-    let mut wtr = csv::Writer::from_path(fileprefix.to_owned() +"throwing_accuracy.csv").unwrap();
-    wtr.write_record(&["Name", "Throws", "Hits", "Accuracy"]);
-    wtr.serialize(("Overall", throws, hits, hits as f32 / throws as f32 * 100.0));
-    for accuracy in &result_team_vec {
-        wtr.serialize((accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage()));
+pub fn csv_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>, fileprefix : String, date : String){
+    let result_vec = calculate_throwing_accuracy(games, teams, players);
+    let filename = format!("{}_throwing_accuracy.csv", date);
+    let path = Path::new(&filename);
+    let file_exists = path.exists();
+    let file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open(path)
+        .expect("Couldn't open file");
+    let mut wtr = csv::Writer::from_writer(file);
+
+    if !file_exists{
+        wtr.write_record(&["HiddenPrefix", "Name", "Throws", "Hits", "Accuracy"]);
     }
-    for accuracy in &result_player_vec {
-        wtr.serialize((accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage()));
+    for accuracy in &result_vec {
+        accuracy.serialize(&mut wtr, &fileprefix);
     }
     wtr.flush();
 }

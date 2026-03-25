@@ -41,10 +41,10 @@ fn print_all_calcs(games : &Vec<Game>){
     let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
     running_speeds.print();
 }
-fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String){
+fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     let all_players = players_from_games(&games);
     let all_teams = teams_from_games(&games);
-    csv_throwing_accuracy(&games, &all_teams, &all_players, fileprefix); // TODO
+    csv_throwing_accuracy(&games, &all_teams, &all_players, fileprefix, date); // TODO
 //    print_side_information(&games);// TODO
     print_first_throw_effect(&games);// TODO
     print_team_first_throws(&games, &all_teams);// TODO
@@ -98,7 +98,7 @@ fn create_csv_of_statistics(){
     let date = Local::now().format("%Y-%m-%d").to_string();
     // All games
     let all_games = total_stats();
-    create_csv_for_calcs(&all_games, date+"_all_games_");
+    create_csv_for_calcs(&all_games, "all_games".to_string(), date);
     // AlL WM
 
     // All non VM

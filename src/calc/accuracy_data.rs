@@ -1,3 +1,5 @@
+use std::fs::File;
+use csv::Writer;
 pub struct Accuracy {
     pub name: &'static str,
     pub throws: u32,
@@ -13,6 +15,9 @@ impl Accuracy {
         if hit {
             self.hits += 1;
         }
+    }
+    pub fn serialize(&self, writer: &mut Writer<File>, file_prefix: &String){
+        writer.write_record(&[file_prefix, &self.name.to_string(), &self.throws.to_string(), &self.hits.to_string(), &format!("{:.2}%", self.percentage())]);
     }
 }
 
