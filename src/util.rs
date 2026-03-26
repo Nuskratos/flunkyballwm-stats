@@ -83,6 +83,13 @@ pub fn team_is_in_game(game: &Game, team: &Team) -> bool {
     return team_ids.contains(&team.id);
 }
 
+pub fn as_percentage(input : f32)->String{
+    format!("{:.2}%", input)
+}
+pub fn as_string(input : f32)->String{
+    format!("{:.2}", input)
+}
+
 #[cfg(test)]
 pub mod test{
     use crate::data::{ARC, bool_vec_from_int, create_normal_rounds_left_right, Game, results_from_additionals, Team};

@@ -58,7 +58,7 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     print_amount_of_points_per_game(&games, &all_teams, &all_players);// TODO
     // TODO print_rock_paper_scissorvalues(&games, &all_teams, &all_players); // Generelles und beste/schlechteste matchups
     let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
-    running_speeds.print();// TODO
+    running_speeds.serialize(&fileprefix, &date);
 }
 
 

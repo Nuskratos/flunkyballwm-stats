@@ -1,4 +1,8 @@
+use std::fs::File;
+use csv::Writer;
+use crate::calc::calculation::open_writer;
 use crate::data::Team;
+use crate::util::{as_percentage, as_string};
 
 pub struct TeamRunningStatistics {
     pub speeds: Vec<(Team, RunningDiff)>,
@@ -17,6 +21,15 @@ impl TeamRunningStatistics {
         println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} | ", "Name", "Round length", "Rounds ran", "Diff to expected");
         for (team, diff) in &self.speeds{
             println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name, diff.round_length(), diff.run_amount, diff.diff_to_expected)
+        }
+    }
+    pub fn serialize(&self, file_prefix: &String, date : &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"running_statistics.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix", "Name", "Round length", "Rounds ran", "Diff to expected"]);
+        }
+        for (team, diff) in &self.speeds{
+            writer.write_record(&[file_prefix, team.name, &as_string(diff.round_length()), &as_string(diff.run_amount), &as_string(diff.diff_to_expected)]);
         }
     }
 }
