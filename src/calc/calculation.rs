@@ -21,26 +21,6 @@ pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend a
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
-pub fn print_amount_of_points_per_game(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
-    let (team_vec, player_vec) = calculate_amount_of_points_per_game(games);
-    let width = 9;
-    let total_line_width = 55;
-    println!("Points per Game:");
-    println!("While the points per Game for a team are being a solid representation, the PpG for a Person should be taken with a grain of salt!\n\
-    It is calculated, that the points are split if both finished in the same round, and that they split the 2 points for a win if they finish in different rounds.\n\
-    Being in a Team with a fast drinker will significantly reduce this metric, and throwing accuracy is completely ignored!");
-    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Points", "PpG");
-    print_line_break(total_line_width);
-    for team in team_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", team_name_from_id(team.0, teams), team.1.points, team.1.ppg());
-    }
-    print_line_break(total_line_width);
-    for player in player_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.points, player.1.ppg());
-    }
-    println!();
-}
-
 
 pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let (team_vec, player_vec) = calculate_amount_of_penalties(games, teams, players);

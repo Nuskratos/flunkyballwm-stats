@@ -2,7 +2,6 @@ use std::fs::File;
 use csv::Writer;
 use crate::calc::calculation::open_writer;
 use crate::data::Team;
-use crate::util::{as_percentage, as_string};
 
 pub struct TeamRunningStatistics {
     pub speeds: Vec<(Team, RunningDiff)>,
@@ -29,7 +28,7 @@ impl TeamRunningStatistics {
             writer.write_record(&["HiddenPrefix", "Name", "Round length", "Rounds ran", "Diff to expected"]);
         }
         for (team, diff) in &self.speeds{
-            writer.write_record(&[file_prefix, team.name, &as_string(diff.round_length()), &as_string(diff.run_amount), &as_string(diff.diff_to_expected)]);
+            writer.write_record(&[file_prefix, team.name, &format!("{:.3}",diff.round_length()), &format!("{:.3}",diff.run_amount), &format!("{:.3}",diff.diff_to_expected)]);
         }
     }
 }
