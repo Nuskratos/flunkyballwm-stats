@@ -21,23 +21,6 @@ pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend a
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
-pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
-    let (team_vec, player_vec) = calculate_hit_and_miss_chains_team_player(games, teams);
-    let width = 11;
-    let total_line_width = 59;
-    println!("Hit and miss chains");
-    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Hit-chain", "Miss-chain");
-    print_line_break(total_line_width);
-    for team in team_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team_name_from_id(team.0, teams), team.1.total_hit, team.1.total_miss);
-    }
-    print_line_break(total_line_width);
-    for player in player_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player_name_from_id(player.0, players), player.1.total_hit, player.1.total_miss);
-    }
-    println!();
-}
-
 pub fn print_enemy_accuracy(games: &Vec<Game>) {
     let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
     for game in games {
