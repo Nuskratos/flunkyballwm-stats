@@ -21,24 +21,6 @@ pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend a
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
-
-pub fn print_amount_of_penalties(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
-    let (team_vec, player_vec) = calculate_amount_of_penalties(games, teams, players);
-    let width = 12;
-    let total_line_width = 91;
-    println!("Penalties:");
-    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} | {:^width$} |", "Name", "Strafschluck", "Strafbeer", "SpG", "BpG");
-    print_line_break(total_line_width);
-    for team in team_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", team_name_from_id(team.0, teams), team.1.schlucke, team.1.beers, team.1.spg(), team.1.bpg());
-    }
-    print_line_break(total_line_width);
-    for player in player_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.schlucke, player.1.beers, player.1.spg(), player.1.bpg());
-    }
-    println!();
-}
-
 pub fn print_hit_and_miss_chains(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) {
     let (team_vec, player_vec) = calculate_hit_and_miss_chains_team_player(games, teams);
     let width = 11;

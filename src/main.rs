@@ -4,8 +4,9 @@ use chrono::Local;
 use data::*;
 use wm24::*;
 
-use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_amount_of_penalties, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_team_first_throws, print_throwing_accuracy};
+use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_hit_and_miss_chains, print_side_information, print_team_first_throws, print_throwing_accuracy};
 use crate::calc::drink_calc::calculate_drinking_speed;
+use crate::calc::penalties_calc::calculate_amount_of_penalties;
 use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
@@ -36,7 +37,9 @@ fn print_all_calcs(games : &Vec<Game>){
     print_average_throws_per_game(&games, &all_teams, &all_players);
     print_enemy_accuracy(&games);
     print_hit_and_miss_chains(&games, &all_teams, &all_players);
-    print_amount_of_penalties(&games, &all_teams, &all_players);
+    //print_amount_of_penalties(&games, &all_teams, &all_players);
+    let penalties_stats = calculate_amount_of_penalties(&games);
+    penalties_stats.print();
     let ppg_stats = calculate_amount_of_points_per_game(&games);
     ppg_stats.print();
     // TODO print_rock_paper_scissorvalues(&games, &all_teams, &all_players); // Generelles und beste/schlechteste matchups
@@ -57,9 +60,13 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     print_enemy_accuracy(&games);// TODO
     print_hit_and_miss_chains(&games, &all_teams, &all_players);// TODO
 
-    print_amount_of_penalties(&games, &all_teams, &all_players);// TODO
+
+    let penalties = calculate_amount_of_penalties(&games);
+    penalties.serialize(&fileprefix, &date);
+
     let ppg_stats = calculate_amount_of_points_per_game(&games);
     ppg_stats.serialize(&fileprefix, &date);
+
     // TODO print_rock_paper_scissorvalues(&games, &all_teams, &all_players); // Generelles und beste/schlechteste matchups
     let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
     running_speeds.serialize(&fileprefix, &date);
@@ -112,7 +119,7 @@ fn create_csv_of_statistics(){
 
 }
 fn main() {
-//    print_wm_stats()
+    print_total_stats();
     create_csv_of_statistics()
 }
 
