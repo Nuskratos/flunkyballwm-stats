@@ -1,4 +1,157 @@
 use crate::data::AdditionalType::*;
+pub const GOTHIC_CHARACTERS: [&str; 100] = [
+    "Diego",
+    "Xardas",
+    "Milten",
+    "Gorn",
+    "Lester",
+    "Lee",
+    "Mud",
+    "Cor Angar",
+    "Thorus",
+    "Lares",
+    "Gomez",
+    "Saturas",
+    "Cor Kalom",
+    "Y'Berion",
+    "Raven",
+    "Riordian",
+    "Cronos",
+    "Myxir",
+    "Nefarius",
+    "Corristo",
+    "Wolf",
+    "Torlof",
+    "Cipher",
+    "Scar",
+    "Arto",
+    "Bartholo",
+    "Bullit",
+    "Bloodwyn",
+    "Jackal",
+    "Fletcher",
+    "Cavalorn",
+    "Scatty",
+    "Kirgo",
+    "Kharim",
+    "Gor Na Toth",
+    "Gor Na Bar",
+    "Gor Na Drak",
+    "Cord",
+    "Jarvis",
+    "Mordrag",
+    "Baal Lukor",
+    "Baal Oran",
+    "Baal Tami",
+    "Baal Namib",
+    "Baal Tyon",
+    "Baal Kagan",
+    "Baal Isidro",
+    "Baal Parvez",
+    "Fortuno",
+    "Joru",
+    "Harlok",
+    "Shrat",
+    "Melvin",
+    "Dusty",
+    "Gor Na Ran",
+    "Fisk",
+    "Dexter",
+    "Sly",
+    "Fingers",
+    "Whistler",
+    "Huno",
+    "Graham",
+    "Snarf",
+    "Ratford",
+    "Drax",
+    "Nek",
+    "Kirgo",
+    "Cutter",
+    "Stone",
+    "Skip",
+    "Sharky",
+    "Roscoe",
+    "Buster",
+    "Wedge",
+    "Butch",
+    "Silas",
+    "Swiney",
+    "Okyl",
+    "Baloro",
+    "Pacho",
+    "Grim",
+    "Herek",
+    "Jesse",
+    "Kyle",
+    "Gilbert",
+    "Damarok",
+    "Drago",
+    "Rodriguez",
+    "Torrez",
+    "Scorpio",
+    "Cavalorn",
+    "Aidan",
+    "Santino",
+    "Alberto",
+    "Quentin",
+    "Inextremo",
+    "Ur-Shak",
+    "Tarrok",
+    "Aleph",
+    "Glen",
+];
+
+pub const POE_LEAGUES: [&str; 47] = [
+    "Onslaught",   // 0.11.0
+    "Anarchy",     // 0.11.0
+    "Domination",  // 1.0.0
+    "Nemesis",     // 1.0.0
+    "Invasion",    // 1.1.0
+    "Ambush",      // 1.1.0
+    "Beyond",      // 1.2.0
+    "Rampage",     // 1.2.0
+    "Bloodlines",  // 1.3.0
+    "Torment",     // 1.3.0
+    "Tempest",     // 2.0.0
+    "Warbands",    // 2.0.0
+    "Talisman",    // 2.1.0
+    "Perandus",    // 2.2.0
+    "Prophecy",    // 2.3.0
+    "Essence",     // 2.4.0
+    "Breach",      // 2.5.0
+    "Legacy",      // 2.6.0
+    "Harbinger",   // 3.0.0
+    "Abyss",       // 3.1.0
+    "Bestiary",    // 3.2.0
+    "Incursion",   // 3.3.0
+    "Delve",       // 3.4.0
+    "Betrayal",    // 3.5.0
+    "Synthesis",   // 3.6.0
+    "Legion",      // 3.7.0
+    "Blight",      // 3.8.0
+    "Metamorph",   // 3.9.0
+    "Delirium",    // 3.10.0
+    "Harvest",     // 3.11.0
+    "Heist",       // 3.12.0
+    "Ritual",      // 3.13.0
+    "Ultimatum",   // 3.14.0
+    "Expedition",  // 3.15.0
+    "Scourge",     // 3.16.0
+    "Archnemesis", // 3.17.0
+    "Sentinel",    // 3.18.0
+    "Kalandra",    // 3.19.0
+    "Sanctum",     // 3.20.0
+    "Crucible",    // 3.21.0
+    "Ancestor",    // 3.22.0
+    "Affliction",  // 3.23.0
+    "Necropolis",  // 3.24.0
+    "Settlers",    // 3.25.0
+    "Mercenaries", // 3.26.0
+    "Keepers",     // 3.27.0
+    "Mirage",      // 3.28.0 (Aktuell)
+];
+
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum AdditionalType {
@@ -8,17 +161,59 @@ pub enum AdditionalType {
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub struct NamedEntity {
+    pub(crate) name :&'static str,
+    pub(crate) alias: &'static str,
+    pub(crate) id: u32
+}
+
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct TeamMember {
-    pub(crate) name: &'static str,
-    pub(crate) id: u32,
+    pub(crate) named_entity: NamedEntity,
+}
+
+impl TeamMember{
+    pub const fn create(name: &'static str, id: u32)->TeamMember{
+        let mut alias = name;
+        if id < GOTHIC_CHARACTERS.len() as u32{
+            alias = GOTHIC_CHARACTERS[id as usize];
+        }
+        TeamMember{named_entity:NamedEntity{name:name,alias:alias,id:id}}
+    }
+    pub fn name(&self) -> &str{
+        self.named_entity.name
+    }
+    pub fn alias(&self) -> &str{
+        self.named_entity.alias
+    }
+    pub fn id(&self) -> u32{
+        self.named_entity.id
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash)]
 pub struct Team {
-    pub(crate) name: &'static str,
-    pub(crate) id: u32,
+    pub(crate) named_entity: NamedEntity,
     pub(crate) member_1: TeamMember,
     pub(crate) member_2: TeamMember,
+}
+impl Team{
+    pub const fn create(name:&'static str, id:u32, member1: TeamMember, member2:TeamMember) -> Team{
+        let mut alias = name;
+        if id-1000 < POE_LEAGUES.len() as u32{
+            alias = POE_LEAGUES[(id-1000) as usize];
+        }
+        Team{named_entity:NamedEntity{name:name, alias:alias, id}, member_1:member1, member_2:member2}
+    }
+    pub fn name(&self) -> &str{
+        self.named_entity.name
+    }
+    pub fn alias(&self) -> &str{
+        self.named_entity.alias
+    }
+    pub fn id(&self) -> u32{
+        self.named_entity.id
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -103,9 +298,9 @@ impl Game {
     }
     pub fn print(&self) {
         println!("Spielnr: {}", self.match_number);
-        println!("Team: {0:<16.16} | Team: {1:<16.16}", self.left_team.name, self.right_team.name);
-        println!("Spieler1: {0:<12.12} | Spieler1: {1:<12.12}", self.left_1.name, self.right_1.name);
-        println!("Spieler2: {0:<12.12} | Spieler2: {1:<12.12}", self.left_2.name, self.right_2.name);
+        println!("Team: {0:<16.16} | Team: {1:<16.16}", self.left_team.named_entity.name, self.right_team.named_entity.name);
+        println!("Spieler1: {0:<12.12} | Spieler1: {1:<12.12}", self.left_1.named_entity.name, self.right_1.named_entity.name);
+        println!("Spieler2: {0:<12.12} | Spieler2: {1:<12.12}", self.left_2.named_entity.name, self.right_2.named_entity.name);
         for round in &self.rounds {
             let left1 = player_round_string(&self.left_1, &round, true);
             let left2 = player_round_string(&self.left_2, &round, true);
@@ -117,9 +312,16 @@ impl Game {
     }
     pub fn winning_team_id(&self) -> u32 {
         if self.result.points_left > self.result.points_right {
-            self.left_team.id
+            self.left_team.named_entity.id
         } else {
-            self.right_team.id
+            self.right_team.named_entity.id
+        }
+    }
+    pub fn winning_team(&self)->Team{
+        if self.result.points_left > self.result.points_right{
+            self.left_team.to_owned()
+        }else{
+            self.right_team.to_owned()
         }
     }
 }
@@ -139,17 +341,17 @@ pub fn bool_vec_from_int(first_value: bool, int_vec: Vec<u32>) -> Vec<bool> {
 pub fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) -> (String, String) {
     let mut add_string: String = String::new();
     let mut round_string: String = String::new();
-    for additionals in round.additionals.iter().filter(|x| x.source.id == player.id) {
+    for additionals in round.additionals.iter().filter(|x| x.source.named_entity.id == player.id()) {
         match &additionals.kind {
             FINISHED => add_string.push('\u{2713}'),
             STRAFSCHLUCK => add_string.push('S'),
             STRAFBIER => add_string.push('B')
         }
     }
-    if round.runner.id == player.id {
+    if round.runner.named_entity.id == player.named_entity.id {
         round_string.push('*');
     }
-    if round.thrower.id == player.id {
+    if round.thrower.named_entity.id == player.named_entity.id {
         if round.hit {
             round_string.push('X');
         } else {
@@ -168,7 +370,7 @@ pub fn results_from_additionals(additionals: &Vec<ARC>, left_team: &Team) -> Res
     let mut result_values: Vec<u32> = vec![7, 5, 3];
     for additional_round in additionals {
         if additional_round.additional.kind == FINISHED {
-            if additional_round.additional.source.id == left_team.member_2.id || additional_round.additional.source.id == left_team.member_1.id {
+            if additional_round.additional.source.named_entity.id == left_team.member_2.named_entity.id || additional_round.additional.source.named_entity.id == left_team.member_1.named_entity.id {
                 result.points_left = result.points_left + result_values.first().unwrap();
             } else {
                 result.points_right = result.points_right + result_values.first().unwrap();
@@ -225,8 +427,8 @@ pub fn create_normal_rounds_with_additionals_and_correct_order(first_team_1: &Te
         for round in &additional_round_info {
             if round.round_nr == ix as u32 { // Remove done drinkers. Can't be together with the loop above because otherwise the Roundcreation fails (because I'm still new at Rust)
                 if round.additional.kind == FINISHED {
-                    first_team.retain(|x| x.id != round.additional.source.id);
-                    second_team.retain(|x| x.id != round.additional.source.id);
+                    first_team.retain(|x| x.named_entity.id != round.additional.source.id());
+                    second_team.retain(|x| x.named_entity.id != round.additional.source.id());
                 }
             }
         }

@@ -6,7 +6,7 @@ pub fn print_specials_2025(){
     println!("Special things happened in WM 2025:");
     // TODO Links begann wie häufig?
     // TODO Stats für wer wie oft Schnucken gewonnen hat
-    println!("{} NIX WICHTIGES", FLO.name);
+    println!("{} NIX WICHTIGES", FLO.name());
 }
 pub fn create_all_games_wm_2025() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();

@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
 use crate::calc::calculation::open_writer;
 use crate::data::{Team, TeamMember};
-use crate::util::{player_name_from_id, print_line_break, team_name_from_id};
+use crate::util::{print_line_break};
 use crate::team_player_data::NAME_WIDTH;
 
 pub struct PpgHolder {
@@ -46,11 +46,11 @@ impl PpgStatistics{
         println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Points", "PpG");
         print_line_break(total_line_width);
         for team in &self.teams {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", team.team.name, team.stats.points, team.stats.ppg());
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", team.team.name(), team.stats.points, team.stats.ppg());
         }
         print_line_break(total_line_width);
         for player in &self.players {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", player.player.name, player.stats.points, player.stats.ppg());
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$.2} |", player.player.name(), player.stats.points, player.stats.ppg());
         }
         println!();
     }
@@ -60,10 +60,10 @@ impl PpgStatistics{
             writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Points", "PpG"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, "Team", team.team.name, &team.stats.points.to_string(), &team.stats.ppg().to_string()]);
+            writer.write_record(&[file_prefix, "Team", team.team.name(), &team.stats.points.to_string(), &team.stats.ppg().to_string()]);
         }
         for player in &self.players{
-            writer.write_record(&[file_prefix, "Player", player.player.name, &player.stats.points.to_string(), &player.stats.ppg().to_string()]);
+            writer.write_record(&[file_prefix, "Player", player.player.name(), &player.stats.points.to_string(), &player.stats.ppg().to_string()]);
         }
 
     }

@@ -19,7 +19,7 @@ impl TeamRunningStatistics {
         let width = 16;
         println!("| {:^name_width$} | {:^width$} | {:^width$} | {:^width$} | ", "Name", "Round length", "Rounds ran", "Diff to expected");
         for (team, diff) in &self.speeds{
-            println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name, diff.round_length(), diff.run_amount, diff.diff_to_expected)
+            println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name(), diff.round_length(), diff.run_amount, diff.diff_to_expected)
         }
     }
     pub fn serialize(&self, file_prefix: &String, date : &String){
@@ -28,7 +28,7 @@ impl TeamRunningStatistics {
             writer.write_record(&["HiddenPrefix", "Name", "Round length", "Rounds ran", "Diff to expected"]);
         }
         for (team, diff) in &self.speeds{
-            writer.write_record(&[file_prefix, team.name, &format!("{:.3}",diff.round_length()), &format!("{:.3}",diff.run_amount), &format!("{:.3}",diff.diff_to_expected)]);
+            writer.write_record(&[file_prefix, team.name(), &format!("{:.3}",diff.round_length()), &format!("{:.3}",diff.run_amount), &format!("{:.3}",diff.diff_to_expected)]);
         }
     }
 }

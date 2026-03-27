@@ -18,11 +18,11 @@ pub fn calculate_amount_of_penalties(games: &Vec<Game>) -> PenaltiesStatistics {
             for add in &round.additionals {
                 match add.kind {
                     STRAFSCHLUCK => {
-                        team_map.entry(team_from_player(add.source.id, game).to_owned()).and_modify(|x| x.schlucke += 1).or_insert(Penalties::create_schluck());
+                        team_map.entry(team_from_player(add.source.id(), game).to_owned()).and_modify(|x| x.schlucke += 1).or_insert(Penalties::create_schluck());
                         player_map.entry(add.source.to_owned()).and_modify(|x| x.schlucke += 1).or_insert(Penalties::create_schluck());
                     }
                     STRAFBIER => {
-                        team_map.entry(team_from_player(add.source.id, game).to_owned()).and_modify(|x| x.beers += 1).or_insert(Penalties::create_beer());
+                        team_map.entry(team_from_player(add.source.id(), game).to_owned()).and_modify(|x| x.beers += 1).or_insert(Penalties::create_beer());
                         player_map.entry(add.source.to_owned()).and_modify(|x| x.beers += 1).or_insert(Penalties::create_beer());
                     }
                     _ => {}

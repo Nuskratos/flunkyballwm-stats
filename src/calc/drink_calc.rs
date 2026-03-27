@@ -14,7 +14,7 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
         filtered_games.retain(|x| !team_is_in_game(x, team_to_be_removed));
         let finished = calculate_finished(&filtered_games, player, teams, schluck_effect);
         let averages = calculate_avg(&filtered_games, player, teams, &finished, schluck_effect);
-        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name) });
+        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name()) });
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Less));
     for speed in &mut playerspeeds{
@@ -30,7 +30,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, te
     for player in players {
         let finished = calculate_finished(games, player, teams, schluck_effect);
         let averages = calculate_avg(games, player, teams, &finished, schluck_effect);
-        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name) });
+        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name()) });
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Equal));
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }
@@ -43,10 +43,10 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
         if !player_is_in_game(game, player) {
             continue;
         }
-        let player_team = team_id_from_player(player.id, game);
+        let player_team = team_id_from_player(player.id(), game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id(), game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
@@ -55,7 +55,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
                 tmp_round += 1;
             }
             for add in &round.additionals {
-                if add.kind == FINISHED && add.source.id == player.id {
+                if add.kind == FINISHED && add.source.id() == player.id() {
                     if !schluck_happened {
                         avg_stats.p_avg(1, tmp_round);
                     }
@@ -63,7 +63,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
                     person_finished = true;
                     // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
                 }
-                if add.kind == STRAFBIER && add.source.id == player.id {
+                if add.kind == STRAFBIER && add.source.id() == player.id() {
                     if !schluck_happened {
                         avg_stats.p_avg(1, tmp_round + 1);
                     }
@@ -72,7 +72,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
                     tmp_schluck = 0.0;
                     tmp_round = 0;
                 }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, game) != player_team {
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id(), game) != player_team {
                     tmp_schluck += schluck_effect;
                     schluck_happened = true;
                 }
@@ -98,10 +98,10 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
         if !player_is_in_game(game, player) {
             continue;
         }
-        let player_team = team_id_from_player(player.id, game);
+        let player_team = team_id_from_player(player.id(), game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
+        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id(), game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
@@ -110,7 +110,7 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
                 tmp_round += 1;
             }
             for add in &round.additionals {
-                if add.kind == FINISHED && add.source.id == player.id {
+                if add.kind == FINISHED && add.source.id() == player.id() {
                     if !schluck_happened {
                         finshed_stats.p_finished(1, tmp_round);
                     }
@@ -118,7 +118,7 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
                     person_finished = true;
                     // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
                 }
-                if add.kind == STRAFBIER && add.source.id == player.id {
+                if add.kind == STRAFBIER && add.source.id() == player.id() {
                     if !schluck_happened {
                         finshed_stats.p_finished(1, tmp_round + 1);
                     }
@@ -127,7 +127,7 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>,
                     tmp_schluck = 0.0;
                     // continuing in case the strafbier was finished
                 }
-                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id, game) != player_team {
+                if add.kind == STRAFSCHLUCK && team_id_from_player(add.source.id(), game) != player_team {
                     tmp_schluck += schluck_effect;
                     schluck_happened = true;
                 }
@@ -150,11 +150,11 @@ mod test {
         let players = vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
         let culled_data = calculate_drinking_speed_without_team(&games, &players, &teams, 0.5, &TEST_TEAM3);
-        let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
+        let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_culled_speed, 2.5));
 
         let total_data = calculate_drinking_speed(&games, &players, &teams, 0.5);
-        let first_total_speed = total_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name).unwrap().drink_avg.all_speed();
+        let first_total_speed = total_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_total_speed,  8f32 / 3f32 ));
     }
 

@@ -9,7 +9,7 @@ pub fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> Strafschl
     for game in games {
         let mut first_counter: StrafschluckCounter = StrafschluckCounter::new();
         let mut second_counter: StrafschluckCounter = StrafschluckCounter::new();
-        let first_team = team_from_player(game.rounds.first().unwrap().thrower.id, game);
+        let first_team = team_from_player(game.rounds.first().unwrap().thrower.id(), game);
         let mut strafbeer_hit: HashMap<u32, u32> = HashMap::new();
         let mut strafbeer_schluck: HashMap<u32, u32> = HashMap::new();
         for (ix, round) in game.rounds.iter().enumerate() {
@@ -40,7 +40,7 @@ pub fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> Strafschl
 }
 
 fn store_strafschluck(add: &Additional, first_team: &Team, first: &mut StrafschluckCounter, second: &mut StrafschluckCounter) {
-    if player_in_team(add.source.id, first_team) {
+    if player_in_team(add.source.id(), first_team) {
         second.schluck_drank += 1;
         second.clean = false;
     } else {
@@ -50,21 +50,21 @@ fn store_strafschluck(add: &Additional, first_team: &Team, first: &mut Strafschl
 }
 
 fn store_strafbeer_stats(add: &Additional, first_team: &Team, strafbeer_hit: &mut HashMap<u32, u32>, strafbeer_schluck: &mut HashMap<u32, u32>, first: &StrafschluckCounter, second: &StrafschluckCounter) {
-    if player_in_team(add.source.id, first_team) {
-        strafbeer_hit.entry(add.source.id).and_modify(|x| *x = first.hits).or_insert(first.hits);
-        strafbeer_schluck.entry(add.source.id).and_modify(|x| *x = first.schluck_drank).or_insert(first.schluck_drank);
+    if player_in_team(add.source.id(), first_team) {
+        strafbeer_hit.entry(add.source.id()).and_modify(|x| *x = first.hits).or_insert(first.hits);
+        strafbeer_schluck.entry(add.source.id()).and_modify(|x| *x = first.schluck_drank).or_insert(first.schluck_drank);
     } else {
-        strafbeer_hit.entry(add.source.id).and_modify(|x| *x = second.hits).or_insert(second.hits);
-        strafbeer_schluck.entry(add.source.id).and_modify(|x| *x = second.schluck_drank).or_insert(second.schluck_drank);
+        strafbeer_hit.entry(add.source.id()).and_modify(|x| *x = second.hits).or_insert(second.hits);
+        strafbeer_schluck.entry(add.source.id()).and_modify(|x| *x = second.schluck_drank).or_insert(second.schluck_drank);
     }
 }
 
 fn add_completed_beer(data: &mut StrafschluckData, add: &Additional, first_team: &Team, strafbeer_hit: &mut HashMap<u32, u32>, strafbeer_schluck: &mut HashMap<u32, u32>, first: &StrafschluckCounter, second: &StrafschluckCounter, additional_hit_from_strafbeer: u32) {
-    if player_in_team(add.source.id, first_team) {
-        let (hits_for_this_beer, schlucke_for_this_beer) = hits_and_schlucke_for_this_beer(&strafbeer_hit, first.hits, &strafbeer_schluck, first.schluck_drank, &add.source.id);
+    if player_in_team(add.source.id(), first_team) {
+        let (hits_for_this_beer, schlucke_for_this_beer) = hits_and_schlucke_for_this_beer(&strafbeer_hit, first.hits, &strafbeer_schluck, first.schluck_drank, &add.source.id());
         data.add_finished_beer(first.clean, hits_for_this_beer, schlucke_for_this_beer, additional_hit_from_strafbeer);
     } else {
-        let (hits_for_this_beer, schlucke_for_this_beer) = hits_and_schlucke_for_this_beer(&strafbeer_hit, second.hits, &strafbeer_schluck, second.schluck_drank, &add.source.id);
+        let (hits_for_this_beer, schlucke_for_this_beer) = hits_and_schlucke_for_this_beer(&strafbeer_hit, second.hits, &strafbeer_schluck, second.schluck_drank, &add.source.id());
         data.add_finished_beer(second.clean, hits_for_this_beer, schlucke_for_this_beer, additional_hit_from_strafbeer);
     }
 }

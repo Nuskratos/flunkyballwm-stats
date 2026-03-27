@@ -60,11 +60,11 @@ impl PenaltiesStatistics{
         println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} | {:^width$} |", "Name", "Strafschluck", "Strafbeer", "SpG", "BpG");
         print_line_break(total_line_width);
         for team in &self.teams {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", team.team.name , team.stats.schlucke, team.stats.beers, team.stats.spg(), team.stats.bpg());
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", team.team.name(), team.stats.schlucke, team.stats.beers, team.stats.spg(), team.stats.bpg());
         }
         print_line_break(total_line_width);
         for player in &self.players {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", player.player.name, player.stats.schlucke, player.stats.beers, player.stats.spg(), player.stats.bpg());
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} | {:>width$.2} |", player.player.name(), player.stats.schlucke, player.stats.beers, player.stats.spg(), player.stats.bpg());
         }
         println!();
     }
@@ -74,10 +74,10 @@ impl PenaltiesStatistics{
             writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Strafschluck", "Strafbeer", "SpG", "BpG"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, "Team", team.team.name, &team.stats.schlucke.to_string(), &team.stats.beers.to_string(), &format!("{:.2}",team.stats.spg()), &format!("{:.2}",team.stats.bpg())]);
+            writer.write_record(&[file_prefix, "Team", team.team.name(), &team.stats.schlucke.to_string(), &team.stats.beers.to_string(), &format!("{:.2}",team.stats.spg()), &format!("{:.2}",team.stats.bpg())]);
         }
         for player in &self.players{
-            writer.write_record(&[file_prefix, "Player", player.player.name, &player.stats.schlucke.to_string(), &player.stats.beers.to_string(), &format!("{:.2}",player.stats.spg()), &format!("{:.2}",player.stats.bpg())]);
+            writer.write_record(&[file_prefix, "Player", player.player.name(), &player.stats.schlucke.to_string(), &player.stats.beers.to_string(), &format!("{:.2}",player.stats.spg()), &format!("{:.2}",player.stats.bpg())]);
         }
     }
 }

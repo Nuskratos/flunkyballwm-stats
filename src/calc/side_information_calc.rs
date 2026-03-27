@@ -14,7 +14,7 @@ pub fn calc_side_information(games: &Vec<Game>) -> SideSplit {
         left.points += game.result.points_left;
         right.points += game.result.points_right;
         for round in &game.rounds {
-            if round.thrower.id == game.left_1.id || round.thrower.id == game.left_2.id {
+            if round.thrower.id() == game.left_1.id() || round.thrower.id() == game.left_2.id() {
                 left.throws += 1;
                 if round.hit {
                     left.hits += 1;
@@ -28,14 +28,14 @@ pub fn calc_side_information(games: &Vec<Game>) -> SideSplit {
             for additional in &round.additionals {
                 match &additional.kind {
                     STRAFSCHLUCK => {
-                        if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
+                        if additional.source.id() == game.left_1.id() || additional.source.id() == game.left_2.id() {
                             left.schluck += 1;
                         } else {
                             right.schluck += 1;
                         }
                     }
                     STRAFBIER => {
-                        if additional.source.id == game.left_1.id || additional.source.id == game.left_2.id {
+                        if additional.source.id() == game.left_1.id() || additional.source.id() == game.left_2.id() {
                             left.beer += 1;
                         } else {
                             right.beer += 1;

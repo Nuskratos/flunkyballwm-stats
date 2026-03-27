@@ -1,7 +1,9 @@
 use std::fs::File;
 use csv::Writer;
+use crate::data::NamedEntity;
+
 pub struct Accuracy {
-    pub name: &'static str,
+    pub named_entity: NamedEntity,
     pub throws: u32,
     pub hits: u32,
 }
@@ -17,10 +19,10 @@ impl Accuracy {
         }
     }
     pub fn serialize(&self, writer: &mut Writer<File>, file_prefix: &String){
-        writer.write_record(&[file_prefix, &self.name.to_string(), &self.throws.to_string(), &self.hits.to_string(), &format!("{:.2}%", self.percentage())]);
+        writer.write_record(&[file_prefix, &self.named_entity.name.to_string(), &self.throws.to_string(), &self.hits.to_string(), &format!("{:.2}%", self.percentage())]);
     }
 }
 
 pub fn print_accuracy(accuracy: &Accuracy) {
-    println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", accuracy.name, accuracy.throws, accuracy.hits, accuracy.percentage());
+    println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", accuracy.named_entity.name, accuracy.throws, accuracy.hits, accuracy.percentage());
 }

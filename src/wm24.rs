@@ -4,8 +4,8 @@ use crate::team_player_data::*;
 
 pub fn print_specials_2024(){
     println!("Special things happened in WM 2024:");
-    println!("{} finished his beer without having a normal drink round in Game 17.", FLO.name);
-    println!("{} finished his beer without throwing in game 16.", TOBIAS.name);
+    println!("{} finished his beer without having a normal drink round in Game 17.", FLO.named_entity.name);
+    println!("{} finished his beer without throwing in game 16.", TOBIAS.named_entity.name);
 }
 pub fn create_no_gewertet() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();

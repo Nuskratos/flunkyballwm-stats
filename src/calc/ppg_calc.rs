@@ -26,13 +26,13 @@ pub fn calculate_amount_of_points_per_game(games: &Vec<Game>) -> PpgStatistics {
                 player_map.entry(arc.additional.source.to_owned()).and_modify(|x| x.points += points_vec.first().unwrap());
                 points_vec.remove(0);
                 // adding points for winning (2 if in the same round as first, so they have the same, 1 to each if in a later round)
-                if player_in_team(arc.additional.source.id, &game.left_team) {
+                if player_in_team(arc.additional.source.id(), &game.left_team) {
                     update_player_map(&mut player_map, round_left_finished, left_already_finished, game, true, &arc);
                 } else { // player in right
                     update_player_map(&mut player_map, round_right_finished, right_already_finished, game, false, &arc);
                 }
                 // Storing the completed round info to know when the next one finishes
-                if player_in_team(arc.additional.source.id, &game.left_team) {
+                if player_in_team(arc.additional.source.id(), &game.left_team) {
                     left_already_finished = true;
                     round_left_finished = arc.round_nr;
                 } else {

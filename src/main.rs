@@ -4,13 +4,14 @@ use chrono::Local;
 use data::*;
 use wm24::*;
 
-use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_side_information, print_team_first_throws, print_throwing_accuracy};
+use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_side_information, print_throwing_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
 use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
+use crate::calc::first_throw_calc::calc_team_first_throws;
 use crate::hamburg24::create_spassturnier_24;
 use crate::util::{players_from_games, teams_from_games};
 use crate::wm25::create_all_games_wm_2025;
@@ -31,7 +32,7 @@ fn print_all_calcs(games : &Vec<Game>){
     print_throwing_accuracy(&games, &all_teams, &all_players);
     print_side_information(&games);
     print_first_throw_effect(&games);
-    print_team_first_throws(&games, &all_teams);
+    calc_team_first_throws(&games).print();
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);
     strafschluck_data.print();
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
@@ -53,7 +54,7 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     csv_throwing_accuracy(&games, &all_teams, &all_players, &fileprefix, &date);
     csv_side_information(&games, &fileprefix, &date);
     print_first_throw_effect(&games);// TODO
-    print_team_first_throws(&games, &all_teams);// TODO
+    calc_team_first_throws(&games).serialize(&fileprefix,&date);
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);
     strafschluck_data.print();// TODO
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();// TODO

@@ -21,44 +21,44 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             let enemy_team = if &game.left_team == team { &game.right_team } else { &game.left_team };
             let enemy_vec = vec![enemy_team.clone()];
             let other_speeds = calculate_drinking_speed_without_team(games, players, &enemy_vec, schluck_effect, team);
-            let team_1_drink_speed = other_speeds.speeds.iter().find(|x| x.player_name == enemy_team.member_1.name).unwrap().drink_avg.all_speed();
-            let team_2_drink_speed = other_speeds.speeds.iter().find(|x| x.player_name == enemy_team.member_2.name).unwrap().drink_avg.all_speed();
+            let team_1_drink_speed = other_speeds.speeds.iter().find(|x| x.player_name == enemy_team.member_1.name()).unwrap().drink_avg.all_speed();
+            let team_2_drink_speed = other_speeds.speeds.iter().find(|x| x.player_name == enemy_team.member_2.name()).unwrap().drink_avg.all_speed();
             let mut team1_finished = false;
             let mut team2_finished = false;
             for round in &game.rounds {
-                if team_id_from_player(round.runner.id, game) == team.id && round.hit {
+                if team_id_from_player(round.runner.id(), game) == team.id() && round.hit {
                     current_run += current_diff.baseline;
                 }
                 for add in &round.additionals {
-                    let this_run = running_amount_for_this_beer(&straf_beer_map, add.source.id, current_run);
+                    let this_run = running_amount_for_this_beer(&straf_beer_map, add.source.id(), current_run);
                     match &add.kind {
                         FINISHED => {
-                            if add.source.id == enemy_team.member_1.id {
+                            if add.source.id() == enemy_team.member_1.id() {
                                 current_diff.diff_to_expected += team_1_drink_speed - this_run;
                                 current_diff.run_amount += this_run;
                                 team1_finished = true;
                             }
-                            if add.source.id == enemy_team.member_2.id {
+                            if add.source.id() == enemy_team.member_2.id() {
                                 current_diff.diff_to_expected += team_2_drink_speed - this_run;
                                 current_diff.run_amount += this_run;
                                 team2_finished = true;
                             }
                         }
                         STRAFSCHLUCK => {
-                            if team_from_player(add.source.id, game) == team {
+                            if team_from_player(add.source.id(), game) == team {
                                 current_run += schluck_effect;
                             }
                         }
                         STRAFBIER => {
-                            if add.source.id == enemy_team.member_1.id {
+                            if add.source.id() == enemy_team.member_1.id() {
                                 current_diff.diff_to_expected += team_1_drink_speed - this_run - 1.0;
                                 current_diff.run_amount += this_run;
                             }
-                            if add.source.id == enemy_team.member_2.id {
+                            if add.source.id() == enemy_team.member_2.id() {
                                 current_diff.diff_to_expected += team_2_drink_speed - this_run - 1.0;
                                 current_diff.run_amount += this_run;
                             }
-                            straf_beer_map.insert(add.source.id, current_run);
+                            straf_beer_map.insert(add.source.id(), current_run);
                         }
                     }
                 }
@@ -73,12 +73,12 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             }
             current_diff.run_amount = current_diff.run_amount / 2.0;
             current_diff.diff_to_expected = current_diff.diff_to_expected / 2.0;
-            team_diff_map.entry(team.id).and_modify(|x| x.add(&current_diff)).or_insert(current_diff);
+            team_diff_map.entry(team.id()).and_modify(|x| x.add(&current_diff)).or_insert(current_diff);
         }
     }
     let mut ret_vec: Vec<(Team, RunningDiff)> = Vec::new();
     for team in team_diff_map {
-        ret_vec.push((teams.iter().find(|x| x.id == team.0).unwrap().clone(), team.1));
+        ret_vec.push((teams.iter().find(|x| x.id() == team.0).unwrap().clone(), team.1));
     }
     ret_vec.sort_by(|a, b| a.1.round_length().partial_cmp(&b.1.round_length()).unwrap_or(Ordering::Less));
     TeamRunningStatistics { speeds: ret_vec, schluck_effect }
@@ -108,8 +108,8 @@ mod test {
 
         let data = calculate_running_speeds(&games, &players, &teams, 0.8);
         data.print();
-        let speed_team_1 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM1.id).unwrap().1.round_length();
-        let speed_team_3 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM3.id).unwrap().1.round_length();
+        let speed_team_1 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM1.id()).unwrap().1.round_length();
+        let speed_team_3 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM3.id()).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 2.0/3.0));
         assert!(approx_eq!(f32, speed_team_3, 1.5));
     }
@@ -123,8 +123,8 @@ mod test {
 
         let data = calculate_running_speeds(&games, &players, &teams, 0.8);
         data.print();
-        let speed_team_1 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM1.id).unwrap().1.round_length();
-        let speed_team_3 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM3.id).unwrap().1.round_length();
+        let speed_team_1 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM1.id()).unwrap().1.round_length();
+        let speed_team_3 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM3.id()).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 2.0/3.0));
         assert!(approx_eq!(f32, speed_team_3, 1.25));
     }
@@ -137,7 +137,7 @@ mod test {
 
         let data = calculate_running_speeds(&games, &players, &teams, 0.8);
         data.print();
-        let speed_team_1 = data.speeds.iter().find(|x| x.0.id == TEST_TEAM1.id).unwrap().1.round_length();
+        let speed_team_1 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM1.id()).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 1.0- 0.6/2.6));
     }
 

@@ -3,7 +3,7 @@ use std::cmp::Ordering::Equal;
 use crate::team_player_data::NAME_WIDTH;
 use crate::calc::calculation::open_writer;
 use crate::data::{Team, TeamMember};
-use crate::util::{player_name_from_id, print_line_break};
+use crate::util::{ print_line_break};
 
 #[derive(Default)]
 pub struct ChainInformation {
@@ -72,11 +72,11 @@ impl ChainStatistics{
         println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} |", "Name", "Hit-chain", "Miss-chain");
         print_line_break(total_line_width);
         for team in &self.teams {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team.team.name, team.stats.total_hit, team.stats.total_miss);
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", team.team.name(), team.stats.total_hit, team.stats.total_miss);
         }
         print_line_break(total_line_width);
         for player in &self.players {
-            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player.player.name, player.stats.total_hit, player.stats.total_miss);
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} |", player.player.name(), player.stats.total_hit, player.stats.total_miss);
         }
         println!();
 
@@ -87,10 +87,10 @@ impl ChainStatistics{
             writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Hit-chain", "Miss-chain"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, "Team", team.team.name, &team.stats.total_hit.to_string(), &team.stats.total_miss.to_string()]);
+            writer.write_record(&[file_prefix, "Team", team.team.name(), &team.stats.total_hit.to_string(), &team.stats.total_miss.to_string()]);
         }
         for player in &self.players{
-            writer.write_record(&[file_prefix, "Player", player.player.name, &player.stats.total_hit.to_string(), &player.stats.total_miss.to_string()]);
+            writer.write_record(&[file_prefix, "Player", player.player.name(), &player.stats.total_hit.to_string(), &player.stats.total_miss.to_string()]);
         }
     }
 }

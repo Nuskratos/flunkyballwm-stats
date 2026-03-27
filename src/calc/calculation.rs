@@ -6,13 +6,14 @@ use csv::Writer;
 use crate::calc::accuracy_data::{Accuracy, print_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
+use crate::calc::first_throw_data::FirstThrows;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
 use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
-use crate::data::{Game, Team, TeamMember};
-use crate::util::{name_from_id, player_name_from_id, print_line_break, team_from_player, team_id_from_player, team_name_from_id};
+use crate::data::{Game, NamedEntity, Team, TeamMember};
+use crate::util::{print_line_break, team_from_player, team_id_from_player, team_name_from_id};
 use crate::team_player_data::NAME_WIDTH; // Used in printlines
 
 pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / divident as f32 * 100.0 }
@@ -24,11 +25,11 @@ pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / 
 pub fn print_enemy_accuracy(games: &Vec<Game>) {
     let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
     for game in games {
-        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id, game);
+        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id(), game);
         let second_enemy_stats = if &game.left_team == first_enemy_stats { &game.right_team } else { &game.left_team };
         for (ix, round) in game.rounds.iter().enumerate() {
             let passive_team = if ix % 2 == 0 { second_enemy_stats } else { first_enemy_stats };
-            enemy_accuracy.entry(passive_team).and_modify(|x| x.add_throw(round.hit)).or_insert(Accuracy { name: passive_team.name, hits: if round.hit { 1 } else { 0 }, throws: 1 });
+            enemy_accuracy.entry(passive_team).and_modify(|x| x.add_throw(round.hit)).or_insert(Accuracy { named_entity: passive_team.named_entity.to_owned(), hits: if round.hit { 1 } else { 0 }, throws: 1 });
         }
     }
     let mut acc_vec: Vec<(&Team, Accuracy)> = Vec::new();
@@ -40,7 +41,7 @@ pub fn print_enemy_accuracy(games: &Vec<Game>) {
     let width = 10;
     println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Teamname", "Throws", "Hits", "Percentage");
     for team in acc_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name, team.1.throws, team.1.hits, team.1.percentage());
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name(), team.1.throws, team.1.hits, team.1.percentage());
     }
     println!();
 }
@@ -54,12 +55,12 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
     print_line_break(total_width);
     println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", "Total", games.len(), data.total_throws, data.total_throws as f32/games.len() as f32);
     print_line_break(total_width);
-    for team in data.team {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team_name_from_id(team.0, teams), team.1.games, team.1.throws, wrong_way_average(team.1.games, team.1.throws));
+    for team_throws_per_game in data.team {
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team_throws_per_game.named_entity.name, team_throws_per_game.games, team_throws_per_game.throws, wrong_way_average(team_throws_per_game.games, team_throws_per_game.throws));
     }
     print_line_break(total_width);
-    for player in data.player{
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_name_from_id(player.0, players), player.1.games, player.1.throws, wrong_way_average(player.1.games, player.1.throws));
+    for player_throws_per_game in data.player{
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_throws_per_game.named_entity.name, player_throws_per_game.games, player_throws_per_game.throws, wrong_way_average(player_throws_per_game.games, player_throws_per_game.throws));
     }
     println!();
 }
@@ -67,32 +68,33 @@ pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, playe
 pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> Vec<Accuracy>{
     let mut throws = 0;
     let mut hits = 0;
-    let mut player_scores = HashMap::new();
-    let mut team_scores = HashMap::new();
+    let mut player_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
+    let mut team_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
 
     for game in games {
         for round in &game.rounds {
-            let (player_throws, player_hits) = player_scores.entry(round.thrower.id).or_insert((0, 0));
-            let (team_throws, team_hits) = team_scores.entry(team_id_from_player(round.thrower.id, game)).or_insert((0, 0));
+            let team_entity_from_player = team_from_player(round.thrower.id(), game).named_entity.to_owned();
+            let player_accuracy = player_scores.entry(round.thrower.named_entity.to_owned()).or_insert(Accuracy{named_entity: round.thrower.named_entity.to_owned(), hits:0, throws:0});
+            let team_accuracy = team_scores.entry(team_entity_from_player.to_owned()).or_insert(Accuracy{named_entity: team_entity_from_player, hits:0, throws:0});
             throws = throws + 1;
-            *player_throws += 1;
-            *team_throws += 1;
+            player_accuracy.throws += 1;
+            team_accuracy.throws +=1;
             if round.hit {
                 hits = hits + 1;
-                *player_hits += 1;
-                *team_hits += 1;
+                player_accuracy.hits += 1;
+                team_accuracy.hits +=1;
             }
         }
     }
 
     let mut result_vec: Vec<Accuracy> = Vec::new();
     for score in team_scores {
-        result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
+        result_vec.push(score.1);
     }
     for score in player_scores {
-        result_vec.push(Accuracy { throws: score.1.0, hits: score.1.1, name: name_from_id(score.0, teams, players) });
+        result_vec.push(score.1);
     }
-    result_vec.push(Accuracy{throws:throws, hits:hits, name:"Average" });
+    result_vec.push(Accuracy{throws:throws, hits:hits, named_entity: NamedEntity{name:"Average", alias:"Average", id:999 }});
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_vec.reverse();
     return result_vec;
@@ -153,38 +155,6 @@ pub fn csv_side_information(games: &Vec<Game>, file_prefix: &String, date :&Stri
 }
 
 
-pub fn print_team_first_throws(games: &Vec<Game>, teams: &Vec<Team>) {
-    // Times going first, times won going first, times going second, times won going second
-    let mut first_throws: HashMap<u32, (u32, u32, u32, u32)> = HashMap::new();
-    for game in games {
-        let team_id_going_first = team_id_from_player(game.rounds.first().unwrap().thrower.id, game);
-        let (ffirst, fwon, _, _) = first_throws.entry(team_id_going_first).or_insert((0, 0, 0, 0));
-        *ffirst += 1;
-        if team_id_going_first == game.winning_team_id() {
-            *fwon += 1;
-        } else {}
-    }
-    for game in games { // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
-        let team_id_going_second = team_id_from_player(game.rounds.first().unwrap().runner.id, game);
-        let (_, _, ssecond, sw_second) = first_throws.entry(team_id_going_second).or_insert((0, 0, 0, 0));
-        *ssecond += 1;
-        if team_id_going_second == game.winning_team_id() {
-            *sw_second += 1;
-        }
-    }
-
-    let mut result_team_vec: Vec<(u32, (u32, u32, u32, u32))> = Vec::new();
-    for team_info in first_throws {
-        result_team_vec.push(team_info);
-    }
-    result_team_vec.sort_by(|a, b| a.1.0.cmp(&b.1.0));
-    result_team_vec.reverse();
-    println!("Teamname:                   | Going first | Won as first | Going Second | Won as Second");
-    for elem in result_team_vec {
-        println!("{:<27} | {:<11} | {:<12} | {:<12} | {:<8}", team_name_from_id(elem.0, teams), elem.1.0, elem.1.1, elem.1.2, elem.1.3);
-    }
-    println!();
-}
 
 pub fn print_first_throw_effect(games: &Vec<Game>) {
     let mut amount_first_throw_win = 0;
@@ -198,11 +168,11 @@ pub fn print_first_throw_effect(games: &Vec<Game>) {
         }
         let mut winning_ids = (0, 0);
         if game.result.points_left > game.result.points_right {
-            winning_ids = (game.left_1.id, game.left_2.id);
+            winning_ids = (game.left_1.id(), game.left_2.id());
         } else {
-            winning_ids = (game.right_1.id, game.right_2.id);
+            winning_ids = (game.right_1.id(), game.right_2.id());
         }
-        let thrower_id = game.rounds.first().unwrap().thrower.id;
+        let thrower_id = game.rounds.first().unwrap().thrower.id();
         if thrower_id == winning_ids.0 || thrower_id == winning_ids.1 {
             amount_first_throw_win += 1;
             if first_hit {
