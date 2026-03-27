@@ -3,7 +3,7 @@ use std::{error::Error, io, process};
 use std::fs::{File, OpenOptions};
 use std::path::Path;
 use csv::Writer;
-use crate::calc::accuracy_data::{Accuracy, print_accuracy};
+use crate::calc::accuracy_data::{Accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_total_data::PlayerDrinkingSpeed;
 use crate::calc::first_throw_data::FirstThrows;
@@ -21,30 +21,6 @@ pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / div
 pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend as f32 }
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
-
-pub fn print_enemy_accuracy(games: &Vec<Game>) {
-    let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
-    for game in games {
-        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id(), game);
-        let second_enemy_stats = if &game.left_team == first_enemy_stats { &game.right_team } else { &game.left_team };
-        for (ix, round) in game.rounds.iter().enumerate() {
-            let passive_team = if ix % 2 == 0 { second_enemy_stats } else { first_enemy_stats };
-            enemy_accuracy.entry(passive_team).and_modify(|x| x.add_throw(round.hit)).or_insert(Accuracy { named_entity: passive_team.named_entity.to_owned(), hits: if round.hit { 1 } else { 0 }, throws: 1 });
-        }
-    }
-    let mut acc_vec: Vec<(&Team, Accuracy)> = Vec::new();
-    for team in enemy_accuracy {
-        acc_vec.push((team.0, team.1));
-    }
-    acc_vec.sort_by(|a, b| a.1.percentage().partial_cmp(&b.1.percentage()).unwrap());
-    println!("Enemy Accuracy:");
-    let width = 10;
-    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Teamname", "Throws", "Hits", "Percentage");
-    for team in acc_vec {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.0.name(), team.1.throws, team.1.hits, team.1.percentage());
-    }
-    println!();
-}
 
 pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, players:&Vec<TeamMember>) {
     let data = calculate_throws_per_game(games);
@@ -105,7 +81,7 @@ pub fn print_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &V
     println!("Throwing accuracy:");
     print_line_break(70);
     for accuracy in &result_vec {
-        print_accuracy(accuracy);
+        accuracy.print();
     }
     print_line_break(70);
     println!();

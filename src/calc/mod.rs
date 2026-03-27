@@ -20,3 +20,4 @@ pub mod running_calc;
 mod running_data;
 mod first_throw_data;
 pub(crate) mod first_throw_calc;
+pub mod accuracy_calc;

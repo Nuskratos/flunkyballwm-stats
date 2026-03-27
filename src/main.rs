@@ -3,8 +3,8 @@ use chrono::Local;
 
 use data::*;
 use wm24::*;
-
-use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_enemy_accuracy, print_first_throw_effect, print_side_information, print_throwing_accuracy};
+use crate::calc::accuracy_calc::calc_enemy_accuracy;
+use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_first_throw_effect, print_side_information, print_throwing_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
@@ -37,7 +37,7 @@ fn print_all_calcs(games : &Vec<Game>){
     strafschluck_data.print();
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
     print_average_throws_per_game(&games, &all_teams, &all_players);
-    print_enemy_accuracy(&games);
+    calc_enemy_accuracy(&games).print();
     calculate_hit_and_miss_chains_team_player(&games).print();
     //print_amount_of_penalties(&games, &all_teams, &all_players);
     let penalties_stats = calculate_amount_of_penalties(&games);
@@ -59,8 +59,7 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     strafschluck_data.print();// TODO
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();// TODO
     print_average_throws_per_game(&games, &all_teams, &all_players);// TODO
-    print_enemy_accuracy(&games);// TODO
-
+    calc_enemy_accuracy(&games).serialize(&fileprefix,&date);
     calculate_hit_and_miss_chains_team_player(&games).serialize(&fileprefix, &date);
     calculate_amount_of_penalties(&games).serialize(&fileprefix, &date);
     calculate_amount_of_points_per_game(&games).serialize(&fileprefix, &date);
