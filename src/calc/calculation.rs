@@ -22,25 +22,6 @@ pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend a
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
 
-pub fn print_average_throws_per_game(games: &Vec<Game>, teams: &Vec<Team>, players:&Vec<TeamMember>) {
-    let data = calculate_throws_per_game(games);
-    println!("Average throws per game:");
-    let width = 10;
-    let total_width = 70;
-    println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
-    print_line_break(total_width);
-    println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", "Total", games.len(), data.total_throws, data.total_throws as f32/games.len() as f32);
-    print_line_break(total_width);
-    for team_throws_per_game in data.team {
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team_throws_per_game.named_entity.name, team_throws_per_game.games, team_throws_per_game.throws, wrong_way_average(team_throws_per_game.games, team_throws_per_game.throws));
-    }
-    print_line_break(total_width);
-    for player_throws_per_game in data.player{
-        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_throws_per_game.named_entity.name, player_throws_per_game.games, player_throws_per_game.throws, wrong_way_average(player_throws_per_game.games, player_throws_per_game.throws));
-    }
-    println!();
-}
-
 pub fn calculate_throwing_accuracy(games: &Vec<Game>, teams: &Vec<Team>, players: &Vec<TeamMember>) -> Vec<Accuracy>{
     let mut throws = 0;
     let mut hits = 0;

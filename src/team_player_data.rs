@@ -1,3 +1,4 @@
+use std::borrow::ToOwned;
 use crate::data::*;
 pub const PLAYER_INVALID: TeamMember = TeamMember {
     named_entity: NamedEntity {
@@ -28,14 +29,16 @@ pub const PATRICK: TeamMember = TeamMember::create("Patrick", 19);
 pub const MARCEL: TeamMember = TeamMember::create("Marcel", 20);
 pub const JAN_W: TeamMember = TeamMember::create("Jan W.", 21);
 pub const LENA: TeamMember = TeamMember::create("Lena", 22);
-pub const TEST_PLAYER1: TeamMember = TeamMember::create("Test1", 991);
-pub const TEST_PLAYER2: TeamMember = TeamMember::create("Test2", 992);
-pub const TEST_PLAYER3: TeamMember = TeamMember::create("Test3", 993);
-pub const TEST_PLAYER4: TeamMember = TeamMember::create("Test4", 994);
-pub const TEST_PLAYER5: TeamMember = TeamMember::create("Test5", 995);
-pub const TEST_PLAYER6: TeamMember = TeamMember::create("Test6", 996);
-pub const TEST_PLAYER7: TeamMember = TeamMember::create("Test7", 997);
-pub const TEST_PLAYER8: TeamMember = TeamMember::create("Test8", 998);
+pub const TEST_PLAYER1: TeamMember = TeamMember::create("Test1", 901);
+pub const TEST_PLAYER2: TeamMember = TeamMember::create("Test2", 902);
+pub const TEST_PLAYER3: TeamMember = TeamMember::create("Test3", 903);
+pub const TEST_PLAYER4: TeamMember = TeamMember::create("Test4", 904);
+pub const TEST_PLAYER5: TeamMember = TeamMember::create("Test5", 905);
+pub const TEST_PLAYER6: TeamMember = TeamMember::create("Test6", 906);
+pub const TEST_PLAYER7: TeamMember = TeamMember::create("Test7", 907);
+pub const TEST_PLAYER8: TeamMember = TeamMember::create("Test8", 908);
+pub const AVERAGE_ENTITY: NamedEntity = NamedEntity{name:"Average", alias:"Average", id:999};
+pub const AVERAGE_PLAYER: TeamMember = TeamMember{named_entity:AVERAGE_ENTITY};
 
 
 pub const TEAM_INVALID: Team = Team::create("Illegal Team", 1000, PLAYER_INVALID, PLAYER_INVALID);
@@ -59,6 +62,7 @@ pub const TEST_TEAM1: Team = Team::create("TestTeam1", 9801, TEST_PLAYER1, TEST_
 pub const TEST_TEAM2: Team = Team::create("TestTeam2", 9802, TEST_PLAYER3, TEST_PLAYER4);
 pub const TEST_TEAM3: Team = Team::create("TestTeam3", 9803, TEST_PLAYER5, TEST_PLAYER6);
 pub const TEST_TEAM4: Team = Team::create("TestTeam4", 9804, TEST_PLAYER7, TEST_PLAYER8);
+pub const AVERAGE_TEAM: Team = Team{named_entity:AVERAGE_ENTITY, member_1:AVERAGE_PLAYER, member_2:AVERAGE_PLAYER};
 
 pub const NAME_WIDTH: usize = 27;
 

@@ -4,7 +4,7 @@ use chrono::Local;
 use data::*;
 use wm24::*;
 use crate::calc::accuracy_calc::calc_enemy_accuracy;
-use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_average_throws_per_game, print_first_throw_effect, print_side_information, print_throwing_accuracy};
+use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_first_throw_effect, print_side_information, print_throwing_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
@@ -12,13 +12,14 @@ use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::first_throw_calc::calc_team_first_throws;
+use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
 use crate::util::{players_from_games, teams_from_games};
 use crate::wm25::create_all_games_wm_2025;
 
 mod data;
 mod wm24;
-mod team_player_data;
+pub mod team_player_data;
 mod test_stuff;
 mod calc;
 mod util;
@@ -36,7 +37,7 @@ fn print_all_calcs(games : &Vec<Game>){
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);
     strafschluck_data.print();
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
-    print_average_throws_per_game(&games, &all_teams, &all_players);
+    calculate_throws_per_game(&games).print();
     calc_enemy_accuracy(&games).print();
     calculate_hit_and_miss_chains_team_player(&games).print();
     //print_amount_of_penalties(&games, &all_teams, &all_players);
@@ -58,7 +59,7 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);
     strafschluck_data.print();// TODO
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();// TODO
-    print_average_throws_per_game(&games, &all_teams, &all_players);// TODO
+    calculate_throws_per_game(&games).serialize(&fileprefix,&date);// TODO
     calc_enemy_accuracy(&games).serialize(&fileprefix,&date);
     calculate_hit_and_miss_chains_team_player(&games).serialize(&fileprefix, &date);
     calculate_amount_of_penalties(&games).serialize(&fileprefix, &date);

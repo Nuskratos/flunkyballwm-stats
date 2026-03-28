@@ -1,11 +1,49 @@
 use std::cmp::Ordering;
+use crate::calc::calculation::{open_writer, wrong_way_average};
 use crate::data::{NamedEntity, TeamMember};
+use crate::util::print_line_break;
+use crate::team_player_data::NAME_WIDTH;
 
 pub struct ThrowData {
     pub team: Vec<ThrowsPerGame>,
     pub player: Vec<ThrowsPerGame>,
-    pub total_throws: u32
+    pub average: ThrowsPerGame
 }
+
+impl ThrowData{
+
+    pub fn print(&self){
+        println!("Average throws per game:");
+        let width = 10;
+        let total_width = 70;
+        println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Team", "Games", "Throws", "Average");
+        print_line_break(total_width);
+        println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", "Total", self.average.games, self.average.throws, self.average.average());
+        print_line_break(total_width);
+        for team_throws_per_game in &self.team {
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team_throws_per_game.named_entity.name, team_throws_per_game.games, team_throws_per_game.throws, wrong_way_average(team_throws_per_game.games, team_throws_per_game.throws));
+        }
+        print_line_break(total_width);
+        for player_throws_per_game in &self.player{
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", player_throws_per_game.named_entity.name, player_throws_per_game.games, player_throws_per_game.throws, wrong_way_average(player_throws_per_game.games, player_throws_per_game.throws));
+        }
+        println!();
+    }
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"throws_per_game.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Games", "Throws", "Average"]);
+        }
+        writer.write_record(&[file_prefix, "Average", &self.average.named_entity.name, &self.average.games.to_string(), &self.average.throws.to_string(), &self.average.average_str()]);
+        for team in &self.team{
+            writer.write_record(&[file_prefix, "Team", team.named_entity.name, &team.games.to_string(), &team.throws.to_string(), &team.average_str()]);
+        }
+        for player in &self.player{
+            writer.write_record(&[file_prefix, "Player", player.named_entity.name, &player.games.to_string(), &player.throws.to_string(), &player.average_str()]);
+        }
+    }
+}
+
 pub struct ThrowsPerGame {
     pub named_entity: NamedEntity,
     pub throws: u32,
@@ -27,8 +65,10 @@ impl ThrowsPerGame {
     pub fn average(&self) -> f32 {
         self.throws as f32 / self.games as f32
     }
+    pub fn average_str(&self)->String{
+        format!("{:.3}", self.average())
+    }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
         self.average().partial_cmp(&other.average())
     }
-
 }

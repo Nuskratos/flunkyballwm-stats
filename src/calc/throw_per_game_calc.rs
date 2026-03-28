@@ -1,7 +1,8 @@
 use std::collections::HashMap;
-
+use crate::calc::accuracy_data::Accuracy;
 use crate::calc::throw_per_game_data::{ThrowData, ThrowsPerGame};
 use crate::data::{Game, NamedEntity};
+use crate::team_player_data::AVERAGE_ENTITY;
 use crate::util::{team_from_player, team_id_from_player};
 
 pub fn calculate_throws_per_game(games: &Vec<Game>) -> ThrowData {
@@ -26,7 +27,7 @@ pub fn calculate_throws_per_game(games: &Vec<Game>) -> ThrowData {
         player_vec.push(tpg);
     }
     player_vec.sort_by(|a, b| a.custom_cmp(&b).unwrap());
-    ThrowData { team: team_vec, total_throws, player: player_vec }
+    ThrowData { team: team_vec, player: player_vec, average:ThrowsPerGame{named_entity:AVERAGE_ENTITY, throws:total_throws,games:games.len() as u32}}
 }
 
 fn add_game_count_to_maps(game: &Game, team_map: &mut HashMap<NamedEntity, ThrowsPerGame>, player_map: &mut HashMap<NamedEntity, ThrowsPerGame>) {
