@@ -14,7 +14,7 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
         filtered_games.retain(|x| !team_is_in_game(x, team_to_be_removed));
         let finished = calculate_finished(&filtered_games, player, teams, schluck_effect);
         let averages = calculate_avg(&filtered_games, player, teams, &finished, schluck_effect);
-        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name()) });
+        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_entity:player.named_entity.to_owned()});
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Less));
     for speed in &mut playerspeeds{
@@ -30,7 +30,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, te
     for player in players {
         let finished = calculate_finished(games, player, teams, schluck_effect);
         let averages = calculate_avg(games, player, teams, &finished, schluck_effect);
-        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_name: String::from(player.name()) });
+        playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_entity:player.named_entity.to_owned() });
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Equal));
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }

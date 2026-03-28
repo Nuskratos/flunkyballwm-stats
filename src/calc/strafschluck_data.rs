@@ -1,4 +1,4 @@
-use crate::calc::calculation::average;
+use crate::calc::calculation::{average, open_writer};
 
 #[derive(Default)]
 pub struct StrafschluckData {
@@ -35,12 +35,28 @@ impl StrafschluckData {
             self.straf_schluecke += strafschluck_drank;
         }
     }
+    pub fn straf_information(&self) ->String{
+        format!("Effect of {} Strafschlucke: {:.3}", self.straf_schluecke, self.diff_average())
+    }
+    pub fn straf_normalized(&self)->String{
+        format!("Effect of 1 Strafschluck to a finished drink {:.3}", self.effect_of_single_schluck())
+    }
     pub fn print(&self) {
         println!("Calculated Strafschluck Data:");
         println!("Clean: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", self.clean_drinks, self.clean_hits, self.clean_average());
         println!("Straf: Drinks finished: {}\tHits required: {}\tAverage: {:.3}", self.straf_drinks, self.straf_hits, self.straf_average());
-        println!("Effect of {} Strafschlucke: {:.3}\tNormalized for 1 Strafschluck per finished drink {:.3}", self.straf_schluecke, self.diff_average(), self.effect_of_single_schluck());
+        print!("{}", self.straf_information());
+        print!("{}", self.straf_normalized());
         println!();
+    }
+
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"strafschluck.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix",  "Drinks finished", "Hits required", "Average","Information"]);
+        }
+        writer.write_record(&[file_prefix, &self.clean_drinks.to_string(), &self.clean_hits.to_string(), &self.clean_average().to_string(), &self.straf_information()]);
+        writer.write_record(&[file_prefix, &self.straf_drinks.to_string(), &self.straf_hits.to_string(), &self.straf_average().to_string(), &self.straf_normalized()]);
     }
 }
 

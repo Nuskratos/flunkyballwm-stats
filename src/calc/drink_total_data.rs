@@ -1,12 +1,14 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
+use crate::calc::calculation::open_writer;
 use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_finished_data::DrinkFinishedStats;
+use crate::data::NamedEntity;
 
 pub struct PlayerDrinkingSpeed {
     pub drink_finished: DrinkFinishedStats,
     pub drink_avg: DrinkAvgStats,
-    pub player_name: String,
+    pub player_entity: NamedEntity,
 }
 
 impl PlayerDrinkingSpeed {
@@ -35,12 +37,24 @@ impl PlayerDrinkingSpeed {
         }
         return ord;
     }
+    pub fn pure_finished(&self)->String{
+        format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.pure_speed(), self.drink_finished.pure_hits, self.drink_finished.pure_drinks)
+    }
+    pub fn pure_average(&self) ->String{
+        format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.pure_speed(), self.drink_avg.pure_hits, self.drink_avg.pure_drinks)
+    }
+    pub fn all_finished(&self)->String{
+        format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.all_speed(), self.drink_finished.all_hits, self.drink_finished.all_drinks)
+    }
+    pub fn all_average(&self)->String{
+        format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.all_speed(), self.drink_avg.all_hits, self.drink_avg.all_drinks)
+    }
     pub fn print(&self, name_width: usize, width:usize) {
-        let pure_finished = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.pure_speed(), self.drink_finished.pure_hits, self.drink_finished.pure_drinks);
-        let pure_average = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.pure_speed(), self.drink_avg.pure_hits, self.drink_avg.pure_drinks);
-        let all_finished = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.all_speed(), self.drink_finished.all_hits, self.drink_finished.all_drinks);
-        let all_average = format!("{:>.2} ({:>4.2} / {:>2})", self.drink_avg.all_speed(), self.drink_avg.all_hits, self.drink_avg.all_drinks);
-        println!("| {:>name_width$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", self.player_name, pure_finished, pure_average, all_finished, all_average);
+        let pure_finished = self.pure_finished();
+        let pure_average = self.pure_finished();
+        let all_finished = self.all_finished();
+        let all_average = self.all_average();
+        println!("| {:>name_width$} | {:>width$} | {:>width$} | {:>width$} | {:>width$} |", self.player_entity.name, pure_finished, pure_average, all_finished, all_average);
     }
 }
 
@@ -66,5 +80,15 @@ for all above: StrafBeer counts as finished in +1 rounds");
             player.print(n_c, width);
         }
         println!();
+    }
+
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"drinking_speed.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix", "Player", "Pure finished", "Pure average", "All finished", "All average"]);
+        }
+        for playerdrink_speed in &self.speeds{
+            writer.write_record(&[file_prefix, playerdrink_speed.player_entity.name, &playerdrink_speed.pure_finished(), &playerdrink_speed.pure_average(), &playerdrink_speed.all_finished(), &playerdrink_speed.all_average()]);
+        }
     }
 }

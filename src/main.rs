@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 use chrono::Local;
-
+use serde::Serialize;
 use data::*;
 use wm24::*;
 use crate::calc::accuracy_calc::calc_enemy_accuracy;
@@ -57,9 +57,9 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
     print_first_throw_effect(&games);// TODO
     calc_team_first_throws(&games).serialize(&fileprefix,&date);
     let strafschluck_data = calculate_strafschluck(&games, &all_teams);
-    strafschluck_data.print();// TODO
-    calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();// TODO
-    calculate_throws_per_game(&games).serialize(&fileprefix,&date);// TODO
+    strafschluck_data.serialize(&fileprefix, &date);
+    calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
+    calculate_throws_per_game(&games).serialize(&fileprefix,&date);
     calc_enemy_accuracy(&games).serialize(&fileprefix,&date);
     calculate_hit_and_miss_chains_team_player(&games).serialize(&fileprefix, &date);
     calculate_amount_of_penalties(&games).serialize(&fileprefix, &date);
