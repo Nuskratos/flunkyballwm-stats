@@ -1,3 +1,4 @@
+use std::fmt::format;
 use crate::calc::calculation::{open_writer, percentage};
 use crate::data::NamedEntity;
 use crate::util::print_line_break;
@@ -35,11 +36,11 @@ pub struct NamedThrows{
     pub throw_data: FirstThrows
 }
 
-pub struct FirstThrowsStatistics{
+pub struct FirstTeamThrowsStatistics {
     pub teams: Vec<NamedThrows>
 }
 
-impl FirstThrowsStatistics{
+impl FirstTeamThrowsStatistics {
     pub fn print(&self){
         println!("Teamname:                   | Going first | Won as first | Win% First | Going Second | Won as Second | Win% Second");
         for elem in &self.teams {
@@ -55,5 +56,51 @@ impl FirstThrowsStatistics{
         for team in &self.teams{
             writer.write_record(&[file_prefix, team.named_entity.name, &team.throw_data.threw_first.to_string(), &team.throw_data.won_first.to_string(), &team.throw_data.win_perc_string(), &team.throw_data.threw_second.to_string(), &team.throw_data.won_second.to_string(), &team.throw_data.second_perc_string()]);
         }
+    }
+}
+
+pub struct FirstThrowStatistic{
+    pub first_throw_win :u32,
+    pub games: u32,
+    pub first_hit:u32,
+    pub first_hit_win_amount:u32,
+    pub first_miss:u32,
+    pub first_miss_win_amount:u32
+}
+
+impl FirstThrowStatistic{
+    pub fn first_throw_win_string(&self)->String{
+        format!("{:.2}", self.first_throw_win as f32 / self.games as f32)
+    }
+    pub fn first_hit_win_string(&self)->String{
+        format!("{:.2}", self.first_hit_win_amount as f32 / self.first_hit as f32)
+    }
+    pub fn first_miss_win_string(&self)->String{
+        format!("{:.2}", self.first_miss_win_amount as f32 / self.first_miss as f32)
+    }
+    pub fn general_first_string(&self)->String{
+        format!("In {} Spielen hat das Team mit dem 1. Wurfrecht {} mal gewonnen. Das sind {}%", self.games, self.first_throw_win, self.first_throw_win_string())
+    }
+    pub fn hit_first_string(&self)->String{
+        format!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst getroffen. Dabei {} mal gewonnen. Das sind {}%", self.first_hit, self.first_hit_win_amount, self.first_hit_win_string())
+    }
+    pub fn miss_first_string(&self)->String{
+        format!("In {} Spielen hat das Team mit dem 1. Wurfrecht zuerst verfehlt. Dabei {} mal gewonnen. Das sind {}%", self.first_miss,self.first_miss_win_amount, self.first_miss_win_string())
+    }
+    pub fn print(&self){
+        println!("{}", self.general_first_string());
+        println!("{}", self.hit_first_string());
+        println!("{}", self.miss_first_string());
+        println!();
+    }
+
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"general_first_throw.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix",  "Information"]);
+        }
+        writer.write_record(&[file_prefix, &self.general_first_string()]);
+        writer.write_record(&[file_prefix, &self.hit_first_string()]);
+        writer.write_record(&[file_prefix, &self.miss_first_string()]);
     }
 }

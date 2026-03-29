@@ -1,9 +1,10 @@
 use std::collections::HashMap;
-use crate::calc::first_throw_data::{FirstThrows, FirstThrowsStatistics, NamedThrows};
+use crate::calc::calculation::percentage;
+use crate::calc::first_throw_data::{FirstThrows, FirstTeamThrowsStatistics, NamedThrows, FirstThrowStatistic};
 use crate::data::{Game, NamedEntity, Team};
 use crate::util::{team_from_player, team_id_from_player, team_name_from_id};
 
-pub fn calc_team_first_throws(games: &Vec<Game>) ->FirstThrowsStatistics {
+pub fn calc_team_first_throws(games: &Vec<Game>) -> FirstTeamThrowsStatistics {
     // Times going first, times won going first, times going second, times won going second
     let mut first_throws: HashMap<NamedEntity, FirstThrows> = HashMap::new();
     for game in games {
@@ -29,5 +30,35 @@ pub fn calc_team_first_throws(games: &Vec<Game>) ->FirstThrowsStatistics {
     }
     result_team_vec.sort_by(|a, b| a.throw_data.threw_first.cmp(&b.throw_data.threw_first));
     result_team_vec.reverse();
-    FirstThrowsStatistics{teams:result_team_vec}
+    FirstTeamThrowsStatistics {teams:result_team_vec}
+}
+
+pub fn calc_general_first_throw(games:&Vec<Game>)-> FirstThrowStatistic{
+
+    let mut first_throw_win = 0;
+    let mut first_hit:u32 = 0;
+    let mut first_hit_win_amount = 0;
+    for game in games {
+        let mut first_hit_bool = false;
+        if game.rounds.first().unwrap().hit {
+            first_hit += 1;
+            first_hit_bool = true;
+        }
+        let mut winning_ids = (0, 0);
+        if game.result.points_left > game.result.points_right {
+            winning_ids = (game.left_1.id(), game.left_2.id());
+        } else {
+            winning_ids = (game.right_1.id(), game.right_2.id());
+        }
+        let thrower_id = game.rounds.first().unwrap().thrower.id();
+        if thrower_id == winning_ids.0 || thrower_id == winning_ids.1 {
+            first_throw_win += 1;
+            if first_hit_bool {
+                first_hit_win_amount += 1;
+            }
+        }
+    }
+    let first_miss = games.len() as u32- first_hit;
+    let first_miss_win_amount = first_throw_win - first_hit_win_amount;
+    FirstThrowStatistic{games:games.len() as u32, first_throw_win, first_hit,first_hit_win_amount,first_miss, first_miss_win_amount,}
 }

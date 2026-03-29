@@ -4,7 +4,7 @@ use crate::data::{Additional, Game, Team};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 use crate::util::{player_in_team, team_from_player};
 
-pub fn calculate_strafschluck(games: &Vec<Game>, teams: &Vec<Team>) -> StrafschluckData {
+pub fn calculate_strafschluck(games: &Vec<Game>) -> StrafschluckData {
     let mut data: StrafschluckData = Default::default();
     for game in games {
         let mut first_counter: StrafschluckCounter = StrafschluckCounter::new();
