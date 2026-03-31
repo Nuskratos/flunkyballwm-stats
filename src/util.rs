@@ -1,4 +1,7 @@
 use std::collections::HashSet;
+use std::fs::{File, OpenOptions};
+use std::path::Path;
+use csv::Writer;
 use crate::data::{Game, Team, TeamMember};
 use crate::team_player_data::TEAM_INVALID;
 
@@ -69,6 +72,25 @@ pub fn team_is_in_game(game: &Game, team: &Team) -> bool {
     let team_ids = vec![game.left_team.id(), game.right_team.id()];
     return team_ids.contains(&team.id());
 }
+
+pub struct OpenedWriter{
+    pub writer: Writer<File>,
+    pub file_exists:bool
+}
+
+pub fn open_writer(filename : String) -> OpenedWriter{
+    let path = Path::new(&filename);
+    let file_exists = path.exists();
+    let file = OpenOptions::new()
+        .write(true)
+        .append(true)
+        .create(true)
+        .open(path)
+        .expect("Couldn't open file");
+    let mut writer = csv::Writer::from_writer(file);
+    OpenedWriter{writer,file_exists}
+}
+
 
 #[cfg(test)]
 pub mod test{

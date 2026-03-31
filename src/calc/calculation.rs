@@ -56,17 +56,3 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> EntityAccuracy{
     result_vec.reverse();
     return EntityAccuracy{accuracies:result_vec};
 }
-
-
-pub fn open_writer(filename : String) -> (Writer<File>, bool){
-    let path = Path::new(&filename);
-    let file_exists = path.exists();
-    let file = OpenOptions::new()
-        .write(true)
-        .append(true)
-        .create(true)
-        .open(path)
-        .expect("Couldn't open file");
-    let mut wtr = csv::Writer::from_writer(file);
-    (wtr, file_exists)
-}

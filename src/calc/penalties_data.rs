@@ -1,8 +1,7 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
-use crate::calc::calculation::{open_writer, percentage};
 use crate::data::{Team, TeamMember};
-use crate::util::print_line_break;
+use crate::util::{open_writer, print_line_break, OpenedWriter};
 use crate::team_player_data::NAME_WIDTH;
 
 #[derive(Default, Ord, PartialOrd, Eq, PartialEq)]
@@ -68,16 +67,25 @@ impl PenaltiesStatistics{
         }
         println!();
     }
-    pub fn serialize(&self, file_prefix: &String, date : &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"penalties.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Strafschluck", "Strafbeer", "SpG", "BpG"]);
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let filesufix= "penalties.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Strafschluck", "Strafbeer", "SpG", "BpG"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, "Team", team.team.name(), &team.stats.schlucke.to_string(), &team.stats.beers.to_string(), &format!("{:.2}",team.stats.spg()), &format!("{:.2}",team.stats.bpg())]);
+            opened_writer.writer.write_record(&[file_prefix, "Team", &team.team.named_entity.name_or_alias(write_alias), &team.stats.schlucke.to_string(), &team.stats.beers.to_string(), &format!("{:.2}",team.stats.spg()), &format!("{:.2}",team.stats.bpg())]);
         }
         for player in &self.players{
-            writer.write_record(&[file_prefix, "Player", player.player.name(), &player.stats.schlucke.to_string(), &player.stats.beers.to_string(), &format!("{:.2}",player.stats.spg()), &format!("{:.2}",player.stats.bpg())]);
+            opened_writer.writer.write_record(&[file_prefix, "Player", &player.player.named_entity.name_or_alias(write_alias), &player.stats.schlucke.to_string(), &player.stats.beers.to_string(), &format!("{:.2}",player.stats.spg()), &format!("{:.2}",player.stats.bpg())]);
         }
     }
+
 }

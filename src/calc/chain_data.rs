@@ -1,9 +1,8 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 use crate::team_player_data::NAME_WIDTH;
-use crate::calc::calculation::open_writer;
 use crate::data::{Team, TeamMember};
-use crate::util::{ print_line_break};
+use crate::util::{open_writer, print_line_break, OpenedWriter};
 
 #[derive(Default)]
 pub struct ChainInformation {
@@ -81,16 +80,24 @@ impl ChainStatistics{
         println!();
 
     }
-    pub fn serialize(&self, file_prefix: &String, date : &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"throw_chains.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Hit-chain", "Miss-chain"]);
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let filesufix = "throw_chains.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Hit-chain", "Miss-chain"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, "Team", team.team.name(), &team.stats.total_hit.to_string(), &team.stats.total_miss.to_string()]);
+            opened_writer.writer.write_record(&[file_prefix, "Team", &team.team.named_entity.name_or_alias(write_alias), &team.stats.total_hit.to_string(), &team.stats.total_miss.to_string()]);
         }
         for player in &self.players{
-            writer.write_record(&[file_prefix, "Player", player.player.name(), &player.stats.total_hit.to_string(), &player.stats.total_miss.to_string()]);
+            opened_writer.writer.write_record(&[file_prefix, "Player", &player.player.named_entity.name_or_alias(write_alias), &player.stats.total_hit.to_string(), &player.stats.total_miss.to_string()]);
         }
     }
 }

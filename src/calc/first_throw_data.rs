@@ -1,7 +1,6 @@
 use std::fmt::format;
-use crate::calc::calculation::{open_writer, percentage};
 use crate::data::NamedEntity;
-use crate::util::print_line_break;
+use crate::util::{open_writer, print_line_break, OpenedWriter};
 
 pub struct FirstThrows {
     pub threw_first: u32,
@@ -49,12 +48,20 @@ impl FirstTeamThrowsStatistics {
         println!();
     }
     pub fn serialize(&self, file_prefix:&String, date: &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"first_throw.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Teamname", "Going First", "Won as First", "Win% First","Going Second", "Won as Second", "Win% second"]);
+        let filesufix= "first_throw.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Teamname", "Going First", "Won as First", "Win% First","Going Second", "Won as Second", "Win% second"]);
         }
         for team in &self.teams{
-            writer.write_record(&[file_prefix, team.named_entity.name, &team.throw_data.threw_first.to_string(), &team.throw_data.won_first.to_string(), &team.throw_data.win_perc_string(), &team.throw_data.threw_second.to_string(), &team.throw_data.won_second.to_string(), &team.throw_data.second_perc_string()]);
+            opened_writer.writer.write_record(&[file_prefix, &team.named_entity.name_or_alias(write_alias), &team.throw_data.threw_first.to_string(), &team.throw_data.won_first.to_string(), &team.throw_data.win_perc_string(), &team.throw_data.threw_second.to_string(), &team.throw_data.won_second.to_string(), &team.throw_data.second_perc_string()]);
         }
     }
 }
@@ -95,12 +102,12 @@ impl FirstThrowStatistic{
     }
 
     pub fn serialize(&self, file_prefix:&String, date: &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"general_first_throw.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix",  "Erstwurfeffekt"]);
+        let mut opened_writer = open_writer(date.to_string()+"general_first_throw.csv");
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix",  "Erstwurfeffekt"]);
         }
-        writer.write_record(&[file_prefix, &self.general_first_string()]);
-        writer.write_record(&[file_prefix, &self.hit_first_string()]);
-        writer.write_record(&[file_prefix, &self.miss_first_string()]);
+        opened_writer.writer.write_record(&[file_prefix, &self.general_first_string()]);
+        opened_writer.writer.write_record(&[file_prefix, &self.hit_first_string()]);
+        opened_writer.writer.write_record(&[file_prefix, &self.miss_first_string()]);
     }
 }

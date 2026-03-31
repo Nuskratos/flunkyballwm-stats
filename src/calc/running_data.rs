@@ -1,7 +1,7 @@
 use std::fs::File;
 use csv::Writer;
-use crate::calc::calculation::open_writer;
 use crate::data::Team;
+use crate::util::{open_writer, OpenedWriter};
 
 pub struct TeamRunningStatistics {
     pub speeds: Vec<(Team, RunningDiff)>,
@@ -22,13 +22,21 @@ impl TeamRunningStatistics {
             println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name(), diff.round_length(), diff.run_amount, diff.diff_to_expected)
         }
     }
-    pub fn serialize(&self, file_prefix: &String, date : &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"running_statistics.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Name", "Round length", "Rounds ran", "Diff to expected"]);
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let filesufix= "running_statistics.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Round length", "Rounds ran", "Diff to expected"]);
         }
         for (team, diff) in &self.speeds{
-            writer.write_record(&[file_prefix, team.name(), &format!("{:.3}",diff.round_length()), &format!("{:.3}",diff.run_amount), &format!("{:.3}",diff.diff_to_expected)]);
+            opened_writer.writer.write_record(&[file_prefix, &team.named_entity.name_or_alias(write_alias), &format!("{:.3}",diff.round_length()), &format!("{:.3}",diff.run_amount), &format!("{:.3}",diff.diff_to_expected)]);
         }
     }
 }

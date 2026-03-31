@@ -1,9 +1,11 @@
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
-use crate::calc::calculation::open_writer;
+use std::fs::File;
+use csv::Writer;
 use crate::calc::drink_avg_data::DrinkAvgStats;
 use crate::calc::drink_finished_data::DrinkFinishedStats;
 use crate::data::NamedEntity;
+use crate::util::{open_writer, OpenedWriter};
 
 pub struct PlayerDrinkingSpeed {
     pub drink_finished: DrinkFinishedStats,
@@ -83,12 +85,20 @@ for all above: StrafBeer counts as finished in +1 rounds");
     }
 
     pub fn serialize(&self, file_prefix:&String, date: &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"drinking_speed.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Player", "Pure finished", "Pure average", "All finished", "All average"]);
+        let filesufix= "drinking_speed.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Player", "Pure finished", "Pure average", "All finished", "All average"]);
         }
         for playerdrink_speed in &self.speeds{
-            writer.write_record(&[file_prefix, playerdrink_speed.player_entity.name, &playerdrink_speed.pure_finished(), &playerdrink_speed.pure_average(), &playerdrink_speed.all_finished(), &playerdrink_speed.all_average()]);
+            opened_writer. writer.write_record(&[file_prefix, &playerdrink_speed.player_entity.name_or_alias(write_alias), &playerdrink_speed.pure_finished(), &playerdrink_speed.pure_average(), &playerdrink_speed.all_finished(), &playerdrink_speed.all_average()]);
         }
     }
 }

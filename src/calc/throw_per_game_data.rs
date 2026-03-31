@@ -1,7 +1,7 @@
 use std::cmp::Ordering;
-use crate::calc::calculation::{open_writer, wrong_way_average};
+use crate::calc::calculation::{wrong_way_average};
 use crate::data::{NamedEntity, TeamMember};
-use crate::util::print_line_break;
+use crate::util::{open_writer, print_line_break, OpenedWriter};
 use crate::team_player_data::NAME_WIDTH;
 
 pub struct ThrowData {
@@ -30,16 +30,24 @@ impl ThrowData{
         println!();
     }
     pub fn serialize(&self, file_prefix:&String, date: &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"throws_per_game.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Games", "Throws", "Average"]);
+        let filesufix= "throws_per_game.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesufix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Games", "Throws", "Average"]);
         }
-        writer.write_record(&[file_prefix, "Average", &self.average.named_entity.name, &self.average.games.to_string(), &self.average.throws.to_string(), &self.average.average_str()]);
+        opened_writer.writer.write_record(&[file_prefix, "Average", &self.average.named_entity.name_or_alias(write_alias), &self.average.games.to_string(), &self.average.throws.to_string(), &self.average.average_str()]);
         for team in &self.team{
-            writer.write_record(&[file_prefix, "Team", team.named_entity.name, &team.games.to_string(), &team.throws.to_string(), &team.average_str()]);
+            opened_writer.writer.write_record(&[file_prefix, "Team", &team.named_entity.name_or_alias(write_alias), &team.games.to_string(), &team.throws.to_string(), &team.average_str()]);
         }
         for player in &self.player{
-            writer.write_record(&[file_prefix, "Player", player.named_entity.name, &player.games.to_string(), &player.throws.to_string(), &player.average_str()]);
+            opened_writer.writer.write_record(&[file_prefix, "Player", &player.named_entity.name_or_alias(write_alias), &player.games.to_string(), &player.throws.to_string(), &player.average_str()]);
         }
     }
 }

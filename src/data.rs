@@ -166,6 +166,15 @@ pub struct NamedEntity {
     pub(crate) alias: &'static str,
     pub(crate) id: u32
 }
+impl NamedEntity{
+    pub fn name_or_alias(&self, write_alias:bool)-> String{
+        if write_alias{
+            self.alias.to_string()
+        }else{
+            self.name.to_string()
+        }
+    }
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
 pub struct TeamMember {

@@ -1,6 +1,6 @@
 use std::fs::File;
 use csv::Writer;
-use crate::calc::calculation::open_writer;
+use crate::util::{open_writer, OpenedWriter};
 
 pub struct SideSplit {
     pub left: SideInformation,
@@ -15,12 +15,12 @@ impl SideSplit {
         println!();
     }
     pub fn serialize(&self, file_prefix:&String, date: &String){
-        let (mut writer, file_exists) = open_writer(date.to_string()+"side_information.csv");
-        if !file_exists{
-            writer.write_record(&["HiddenPrefix", "Side", "Wins", "Points", "Hits", "Throws", "Percentage", "Strafschluck", "Strafbier"]);
+        let mut opened_writer = open_writer(date.to_string()+"side_information.csv");
+        if !opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Side", "Wins", "Points", "Hits", "Throws", "Percentage", "Strafschluck", "Strafbier"]);
         }
-        self.left.serialize(&mut writer, file_prefix,"Left");
-        self.right.serialize(&mut writer, &file_prefix, "Right");
+        self.left.serialize(&mut opened_writer, file_prefix,"Left");
+        self.right.serialize(&mut opened_writer, &file_prefix, "Right");
         }
 }
 
@@ -35,10 +35,10 @@ pub struct SideInformation {
 }
 
 impl SideInformation {
-    pub fn serialize(&self, writer: &mut Writer<File>, file_prefix: &String, side_string : &str){
+    pub fn serialize(&self, opened_writer: &mut OpenedWriter, file_prefix: &String, side_string : &str){
         let percentage = self.hits as f32 / self.throws as f32;
         let perc_str = format!("{:.2}%", percentage);
-        writer.write_record(&[file_prefix, side_string, &self.wins.to_string(),&self.points.to_string(),
+        opened_writer.writer.write_record(&[file_prefix, side_string, &self.wins.to_string(),&self.points.to_string(),
             &self.hits.to_string(), &self.throws.to_string(), &perc_str,&self.schluck.to_string(), &self.beer.to_string()]);
     }
 }
