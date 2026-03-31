@@ -18,13 +18,13 @@ impl FirstThrows {
         }
     }
     pub fn win_perc(&self)->f32{
-        self.won_first as f32 / self.threw_first as f32
+        self.won_first as f32 / self.threw_first as f32 *100.0
     }
     pub fn win_perc_string(&self)->String{
         format!("{:.2}", self.win_perc())
     }
     pub fn second_perc(&self)->f32{
-        self.won_second as f32 / self.threw_second as f32
+        self.won_second as f32 / self.threw_second as f32 *100.0
     }
     pub fn second_perc_string(&self)->String{
         format!("{:.2}", self.second_perc())

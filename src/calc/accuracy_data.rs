@@ -88,7 +88,7 @@ impl EnemyAccuracy{
 
     fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
         if !opened_writer.file_exists{
-            opened_writer.writer.write_record(&["HiddenPrefix", "Teamname", "Thorws", "Hits", "Percentage"]);
+            opened_writer.writer.write_record(&["HiddenPrefix", "Teamname", "Throws", "Hits", "Percentage"]);
         }
         for team in &self.accuracies{
             opened_writer.writer.write_record(&[file_prefix, &team.named_entity.name_or_alias(write_alias), &team.throws.to_string(), &team.hits.to_string(), &team.percentage_string()]);

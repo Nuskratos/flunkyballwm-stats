@@ -42,7 +42,7 @@ impl ThrowData{
         if !opened_writer.file_exists{
             opened_writer.writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Games", "Throws", "Average"]);
         }
-        opened_writer.writer.write_record(&[file_prefix, "Average", &self.average.named_entity.name_or_alias(write_alias), &self.average.games.to_string(), &self.average.throws.to_string(), &self.average.average_str()]);
+        opened_writer.writer.write_record(&[file_prefix, "Tournament games", &self.average.named_entity.name_or_alias(write_alias), &self.average.games.to_string(), &self.average.throws.to_string(), &self.average.average_str() ]);
         for team in &self.team{
             opened_writer.writer.write_record(&[file_prefix, "Team", &team.named_entity.name_or_alias(write_alias), &team.games.to_string(), &team.throws.to_string(), &team.average_str()]);
         }
