@@ -49,7 +49,7 @@ fn print_all_calcs(games : &Vec<Game>){
     let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
     running_speeds.print();
 }
-fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : String){
+fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : &String){
     let all_players = players_from_games(&games);
     let all_teams = teams_from_games(&games);
     let strafschluck_data = calculate_strafschluck(&games);
@@ -83,7 +83,7 @@ fn print_hamburg_24(){
     let games = create_spassturnier_24();
     print_all_calcs(&games);
 }
-fn total_stats()->Vec<Game>{
+fn all_games() ->Vec<Game>{
     let mut games = create_no_gewertet();
     games.append(&mut create_spassturnier_24());
     games.append(&mut create_all_games_wm_2025());
@@ -94,9 +94,13 @@ fn wm_stats()->Vec<Game>{
     games.append(&mut create_all_games_wm_2025());
     games
 }
+fn non_wm_stats()->Vec<Game>{
+    let mut games = create_spassturnier_24();
+    games
+}
 
 fn print_total_stats(){
-    print_all_calcs(&total_stats());
+    print_all_calcs(&all_games());
 }
 
 fn print_wm_stats(){
@@ -105,14 +109,21 @@ fn print_wm_stats(){
 fn create_csv_of_statistics(){
     let date = Local::now().format("%Y-%m-%d").to_string();
     // All games
-    let all_games = total_stats();
-    create_csv_for_calcs(&all_games, "all_games".to_string(), date);
+    let all_games = all_games();
+    create_csv_for_calcs(&all_games, "all_games".to_string(), &date);
     // AlL WM
-
+    let all_wm = wm_stats();
+    create_csv_for_calcs(&all_wm, "all_wm".to_string(), &date);
     // All non VM
-
+    let all_non_wm = non_wm_stats();
+    create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string(), &date);
     // Every single tournament
-
+    let wm_2024 = create_no_gewertet();
+    create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
+    let wm_25 = create_all_games_wm_2025();
+    create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);
+    let spass24 = create_spassturnier_24();
+    create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
 
 }
 fn main() {

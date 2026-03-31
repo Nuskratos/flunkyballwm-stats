@@ -97,7 +97,7 @@ impl FirstThrowStatistic{
     pub fn serialize(&self, file_prefix:&String, date: &String){
         let (mut writer, file_exists) = open_writer(date.to_string()+"general_first_throw.csv");
         if !file_exists{
-            writer.write_record(&["HiddenPrefix",  "Information"]);
+            writer.write_record(&["HiddenPrefix",  "Erstwurfeffekt"]);
         }
         writer.write_record(&[file_prefix, &self.general_first_string()]);
         writer.write_record(&[file_prefix, &self.hit_first_string()]);
