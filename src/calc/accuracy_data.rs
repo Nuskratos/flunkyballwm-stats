@@ -26,13 +26,35 @@ impl Accuracy {
     pub fn default(named_entity: NamedEntity)-> Self{
         Self{named_entity:named_entity, throws:0, hits:0}
     }
-    pub fn serialize(&self, writer: &mut Writer<File>, file_prefix: &String){
-        writer.write_record(&[file_prefix, &self.named_entity.name.to_string(), &self.throws.to_string(), &self.hits.to_string(), &format!("{:.2}%", self.percentage())]);
-    }
     pub fn print(&self){
         println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", &self.named_entity.name, &self.throws, &self.hits, &self.percentage());
     }
 }
+
+pub struct EntityAccuracy{
+    pub accuracies: Vec<Accuracy>
+}
+impl EntityAccuracy{
+    pub fn print(&self){
+        println!("Throwing Accuracy:");
+        let width = 16;
+        println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Teamname", "Throws", "Hits", "Percentage");
+        for team in &self.accuracies {
+            println!("| {:>NAME_WIDTH$} | {:>width$} | {:>width$} | {:>width$.2} |", team.named_entity.name, team.throws, team.hits, team.percentage());
+        }
+        println!();
+    }
+    pub fn serialize(&self, file_prefix:&String, date: &String){
+        let (mut writer, file_exists) = open_writer(date.to_string()+"throwing_accuracy.csv");
+        if !file_exists{
+            writer.write_record(&["HiddenPrefix", "Name", "Throws", "Hits", "Accuracy"]);
+        }
+        for entity in &self.accuracies{
+            writer.write_record(&[file_prefix, entity.named_entity.name, &entity.throws.to_string(), &entity.hits.to_string(), &entity.percentage_string()]);
+        }
+    }
+}
+
 pub struct EnemyAccuracy{
     pub accuracies: Vec<Accuracy>
 }

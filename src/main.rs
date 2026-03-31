@@ -4,7 +4,7 @@ use serde::Serialize;
 use data::*;
 use wm24::*;
 use crate::calc::accuracy_calc::calc_enemy_accuracy;
-use crate::calc::calculation::{csv_side_information, csv_throwing_accuracy, print_side_information, print_throwing_accuracy};
+use crate::calc::calculation::{calculate_throwing_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
@@ -12,6 +12,7 @@ use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::first_throw_calc::{calc_general_first_throw, calc_team_first_throws};
+use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
 use crate::util::{players_from_games, teams_from_games};
@@ -30,8 +31,8 @@ mod wm25;
 fn print_all_calcs(games : &Vec<Game>){
     let all_players = players_from_games(&games);
     let all_teams = teams_from_games(&games);
-    print_throwing_accuracy(&games, &all_teams, &all_players);
-    print_side_information(&games);
+    calculate_throwing_accuracy(&games).print();
+    calc_side_information(&games).print();
     calc_general_first_throw(&games).print();
     calc_team_first_throws(&games).print();
     let strafschluck_data = calculate_strafschluck(&games);
@@ -55,8 +56,8 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : &String)
     let strafschluck_data = calculate_strafschluck(&games);
 
     strafschluck_data.serialize(&fileprefix, &date);
-    csv_throwing_accuracy(&games, &all_teams, &all_players, &fileprefix, &date);
-    csv_side_information(&games, &fileprefix, &date);
+    calculate_throwing_accuracy(games).serialize(&fileprefix,&date);
+    calc_side_information(&games).serialize(&fileprefix, &date);
     calc_general_first_throw(&games).serialize(&fileprefix,&date);
     calc_team_first_throws(&games).serialize(&fileprefix,&date);
     calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);

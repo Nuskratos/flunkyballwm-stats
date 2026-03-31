@@ -52,7 +52,7 @@ mod test{
         let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM3, TEST_TEAM2)];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
         let data = calculate_throws_per_game(&games);
-        assert_eq!(data.total_throws, 8);
+        assert_eq!(data.average.throws, 8);
         let first_avg =data.team.iter().find(|x|x.named_entity.name == TEST_TEAM1.name()).unwrap().average();
         let second_avg =data.team.iter().find(|x|x.named_entity.name == TEST_TEAM2.name()).unwrap().average();
         let third_avg =data.team.iter().find(|x|x.named_entity.name == TEST_TEAM3.name()).unwrap().average();

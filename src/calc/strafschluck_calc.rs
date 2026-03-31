@@ -101,7 +101,7 @@ mod test {
     fn test_strafschluck_0_point_five() {
         let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2)];
         let teams = vec![TEST_TEAM1, TEST_TEAM2];
-        let data = calculate_strafschluck(&games, &teams);
+        let data = calculate_strafschluck(&games);
         data.print();
         let strafschluck_effect = data.effect_of_single_schluck();
         assert!(approx_eq!(f32, strafschluck_effect, 0.5, ulps=2));
@@ -110,7 +110,7 @@ mod test {
     fn test_strafschluck_0_point_75() {
         let games = vec![game_3rd_finish(TEST_TEAM1, TEST_TEAM2), game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2), game_2nd_finish(TEST_TEAM1, TEST_TEAM2)];
         let teams = vec![TEST_TEAM1, TEST_TEAM2];
-        let data = calculate_strafschluck(&games, &teams);
+        let data = calculate_strafschluck(&games);
         data.print();
         let strafschluck_effect = data.effect_of_single_schluck();
         assert!(approx_eq!(f32, strafschluck_effect, 0.75, ulps=2));

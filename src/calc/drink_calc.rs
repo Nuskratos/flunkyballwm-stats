@@ -150,11 +150,11 @@ mod test {
         let players = vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
         let culled_data = calculate_drinking_speed_without_team(&games, &players, &teams, 0.5, &TEST_TEAM3);
-        let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
+        let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_culled_speed, 2.5));
 
         let total_data = calculate_drinking_speed(&games, &players, &teams, 0.5);
-        let first_total_speed = total_data.speeds.iter().find(|x| x.player_name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
+        let first_total_speed = total_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_total_speed,  8f32 / 3f32 ));
     }
 
