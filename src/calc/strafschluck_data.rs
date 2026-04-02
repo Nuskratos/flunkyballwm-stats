@@ -14,8 +14,14 @@ impl StrafschluckData {
     pub fn clean_average(&self) -> f32 {
         average(self.clean_hits, self.clean_drinks)
     }
+    pub fn string_clean_average(&self)->String{
+        format!("{:.3}",self.clean_average())
+    }
     pub fn straf_average(&self) -> f32 {
         average(self.straf_hits, self.straf_drinks)
+    }
+    pub fn string_straf_average(&self)->String{
+        format!("{:.3}",self.straf_average())
     }
     pub fn diff_average(&self) -> f32 {
         self.clean_average() - self.straf_average()
@@ -56,8 +62,8 @@ impl StrafschluckData {
         if !open_writer.file_exists{
             open_writer.writer.write_record(&["HiddenPrefix",  "Type", "Drinks finished", "Hits required", "Average","Information"]);
         }
-        open_writer.writer.write_record(&[file_prefix, "Clean", &self.clean_drinks.to_string(), &self.clean_hits.to_string(), &self.clean_average().to_string(), &self.straf_information()]);
-        open_writer.writer.write_record(&[file_prefix, "With >=1 Strafschluck", &self.straf_drinks.to_string(), &self.straf_hits.to_string(), &self.straf_average().to_string(), &self.straf_normalized()]);
+        open_writer.writer.write_record(&[file_prefix, "Clean", &self.clean_drinks.to_string(), &self.clean_hits.to_string(), &self.string_clean_average(), &self.straf_information()]);
+        open_writer.writer.write_record(&[file_prefix, "With >=1 Strafschluck", &self.straf_drinks.to_string(), &self.straf_hits.to_string(), &self.string_straf_average(), &self.straf_normalized()]);
     }
 
 }

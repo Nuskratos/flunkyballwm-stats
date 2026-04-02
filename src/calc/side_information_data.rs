@@ -36,7 +36,7 @@ pub struct SideInformation {
 
 impl SideInformation {
     pub fn serialize(&self, opened_writer: &mut OpenedWriter, file_prefix: &String, side_string : &str){
-        let percentage = self.hits as f32 / self.throws as f32;
+        let percentage = self.hits as f32 / self.throws as f32 *100.0;
         let perc_str = format!("{:.2}%", percentage);
         opened_writer.writer.write_record(&[file_prefix, side_string, &self.wins.to_string(),&self.points.to_string(),
             &self.hits.to_string(), &self.throws.to_string(), &perc_str,&self.schluck.to_string(), &self.beer.to_string()]);

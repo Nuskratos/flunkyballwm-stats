@@ -12,6 +12,9 @@ impl PpgHolder {
     pub fn ppg(&self) -> f32 {
         self.points as f32 / self.games as f32
     }
+    pub fn ppg_string(&self)->String{
+        format!("{:.2}", self.ppg())
+    }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
         let mut ord = other.ppg().partial_cmp(&self.ppg());
         return ord;
@@ -67,10 +70,10 @@ impl PpgStatistics{
             opened_writer.writer.write_record(&["HiddenPrefix", "Team or Player", "Name", "Points", "PpG"]);
         }
         for team in &self.teams{
-            opened_writer.writer.write_record(&[file_prefix, "Team", &team.team.named_entity.name_or_alias(write_alias), &team.stats.points.to_string(), &team.stats.ppg().to_string()]);
+            opened_writer.writer.write_record(&[file_prefix, "Team", &team.team.named_entity.name_or_alias(write_alias), &team.stats.points.to_string(), &team.stats.ppg_string()]);
         }
         for player in &self.players{
-            opened_writer. writer.write_record(&[file_prefix, "Player", &player.player.named_entity.name_or_alias(write_alias), &player.stats.points.to_string(), &player.stats.ppg().to_string()]);
+            opened_writer. writer.write_record(&[file_prefix, "Player", &player.player.named_entity.name_or_alias(write_alias), &player.stats.points.to_string(), &player.stats.ppg_string()]);
         }
     }
 }
