@@ -21,3 +21,5 @@ mod running_data;
 mod first_throw_data;
 pub(crate) mod first_throw_calc;
 pub mod accuracy_calc;
+pub mod rock_paper_scissors_data;
+pub mod rock_paper_scissors_calc;

@@ -12,6 +12,7 @@ use crate::calc::ppg_calc::calculate_amount_of_points_per_game;
 use crate::calc::running_calc::calculate_running_speeds;
 use crate::calc::strafschluck_calc::calculate_strafschluck;
 use crate::calc::first_throw_calc::{calc_general_first_throw, calc_team_first_throws};
+use crate::calc::rock_paper_scissors_calc::calculate_rock_paper_scissors;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
@@ -46,8 +47,8 @@ fn print_all_calcs(games : &Vec<Game>){
     penalties_stats.print();
     let ppg_stats = calculate_amount_of_points_per_game(&games);
     ppg_stats.print();
-    // TODO print_rock_paper_scissorvalues(&games, &all_teams, &all_players); // Generelles und beste/schlechteste matchups
     let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
+    calculate_rock_paper_scissors(&games).print();
     running_speeds.print();
 }
 fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : &String){
@@ -66,8 +67,8 @@ fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : &String)
     calculate_hit_and_miss_chains_team_player(&games).serialize(&fileprefix, &date);
     calculate_amount_of_penalties(&games).serialize(&fileprefix, &date);
     calculate_amount_of_points_per_game(&games).serialize(&fileprefix, &date);
-    // TODO print_rock_paper_scissorvalues(&games, &all_teams, &all_players); // Generelles und beste/schlechteste matchups
     calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
+    calculate_rock_paper_scissors(&games).serialize(&fileprefix, &date);
 }
 
 

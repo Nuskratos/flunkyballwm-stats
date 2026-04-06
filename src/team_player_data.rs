@@ -65,6 +65,7 @@ pub const TEST_TEAM4: Team = Team::create("TestTeam4", 9804, TEST_PLAYER7, TEST_
 pub const AVERAGE_TEAM: Team = Team{named_entity:AVERAGE_ENTITY, member_1:AVERAGE_PLAYER, member_2:AVERAGE_PLAYER};
 
 pub const NAME_WIDTH: usize = 27;
+pub const ENTRY_WIDTH: usize = 10;
 
 #[cfg(test)]
 pub mod test {

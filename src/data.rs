@@ -160,7 +160,7 @@ pub enum AdditionalType {
     STRAFSCHLUCK,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd, Copy)]
 pub struct NamedEntity {
     pub(crate) name :&'static str,
     pub(crate) alias: &'static str,
@@ -176,7 +176,7 @@ impl NamedEntity{
     }
 }
 
-#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd)]
+#[derive(Clone, Debug, PartialEq, Eq, Hash, Ord, PartialOrd, Copy)]
 pub struct TeamMember {
     pub(crate) named_entity: NamedEntity,
 }
@@ -222,6 +222,22 @@ impl Team{
     }
     pub fn id(&self) -> u32{
         self.named_entity.id
+    }
+}
+
+#[derive(Eq, Hash, PartialEq, Clone)]
+pub enum Entity{
+    Team(Team), Player(TeamMember)
+}
+impl Entity{
+    pub fn named(&self) -> &NamedEntity{
+        match self {
+            Entity::Team(t) => { &t.named_entity},
+            Entity::Player(m) => &m.named_entity
+        }
+    }
+    pub fn id(&self)->u32{
+        self.named().id
     }
 }
 
