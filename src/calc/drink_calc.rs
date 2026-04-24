@@ -157,7 +157,4 @@ mod test {
         let first_total_speed = total_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_total_speed,  8f32 / 3f32 ));
     }
-
-    #[test]
-    fn check_for_nan() {}
 }
