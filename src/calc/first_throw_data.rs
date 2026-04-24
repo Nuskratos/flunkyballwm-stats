@@ -76,8 +76,11 @@ pub struct FirstThrowStatistic{
 }
 
 impl FirstThrowStatistic{
+    pub fn first_throw_win(&self)->f32{
+        self.first_throw_win as f32 / self.games as f32
+}
     pub fn first_throw_win_string(&self)->String{
-        format!("{:.2}", self.first_throw_win as f32 / self.games as f32)
+        format!("{:.2}", self.first_throw_win)
     }
     pub fn first_hit_win_string(&self)->String{
         format!("{:.2}", self.first_hit_win_amount as f32 / self.first_hit as f32)
