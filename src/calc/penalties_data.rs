@@ -26,14 +26,17 @@ impl Penalties {
         return ord;
     }
     pub fn create_beer() -> Penalties {
-        let mut ret : Penalties = Default::default();
+        let mut ret : Penalties = Self::initial();
         ret.beers = 1;
         ret
     }
     pub fn create_schluck() -> Penalties {
-        let mut ret : Penalties = Default::default();
+        let mut ret : Penalties = Self::initial();
         ret.schlucke = 1;
         ret
+    }
+    pub fn initial() -> Penalties {
+        Penalties{beers: 0, schlucke: 0, games: 1}
     }
 }
 

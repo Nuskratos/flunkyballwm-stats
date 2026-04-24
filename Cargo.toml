@@ -11,3 +11,4 @@ float-cmp = "0.9.0"
 csv = "1.4.0"
 serde = { version = "1.0", features = ["derive"]}
 chrono = "0.4.44"
+approx = "0.5.1"
