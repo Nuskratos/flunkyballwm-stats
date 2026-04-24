@@ -17,7 +17,7 @@ impl PpgHolder {
     }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
         let mut ord = other.ppg().partial_cmp(&self.ppg());
-        return ord;
+        ord
     }
     pub fn new() -> PpgHolder {
         PpgHolder { points: 0, games: 1 }

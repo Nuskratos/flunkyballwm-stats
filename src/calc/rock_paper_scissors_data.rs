@@ -104,7 +104,7 @@ impl RockPaperScissorSingleStats{
         println!("Team:  | {:^NAME_WIDTH$} |{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}", self.entity.named().name, self.stats.won_rounds, self.stats.played_rounds, self.stats.string_win_percentage(), self.stats.string_estimated_win_percentage());
         println!("Best:  | {:^NAME_WIDTH$} |{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}", self.best_matchup().entity.named().name, best.stats.won_rounds, best.stats.played_rounds, best.stats.string_win_percentage(), best.stats.string_estimated_win_percentage());
         println!("Worst: | {:^NAME_WIDTH$} |{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}{:^ENTRY_WIDTH$}", self.worst_matchup().entity.named().name, worst.stats.won_rounds, worst.stats.played_rounds, worst.stats.string_win_percentage(), worst.stats.string_estimated_win_percentage());
-        println!("")
+        println!()
     }
 }
 impl PartialEq for RockPaperScissorSingleStats {

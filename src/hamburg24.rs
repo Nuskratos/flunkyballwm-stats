@@ -1,4 +1,3 @@
-use std::i8::MIN;
 use crate::{create_normal_rounds_left_right};
 use crate::data::{ARC, bool_vec_from_int, Game, results_from_additionals, Team, TeamMember};
 use crate::team_player_data::*;
@@ -20,7 +19,7 @@ pub fn create_spassturnier_24() ->Vec<Game>{
     ret_vec.push(game_13(LURCHIE, MICHI, LUISE, CHROME, JEROME, CHRIS));
     ret_vec.push(game_14(MINDESTGRÖSSE, HANNES, JONAS, BIERATENPARTEI, SEBI, BEEF));
     ret_vec.push(game_15(NAME_KOMMT_SPÄTER, SARA, KATHI, TOBÖNKE, TOBIAS, SÖNKE));
-    return ret_vec;
+    ret_vec
 }
 
 pub fn game_15(left_team: Team, left_1: TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2: TeamMember) -> Game {

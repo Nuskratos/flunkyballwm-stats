@@ -18,12 +18,12 @@ pub fn calculate_throws_per_game(games: &Vec<Game>) -> ThrowData {
         }
     }
     let mut team_vec: Vec<ThrowsPerGame> = Vec::new();
-    for (entity, tpg) in team_throws {
+    for (_entity, tpg) in team_throws {
         team_vec.push(tpg);
     }
     team_vec.sort_by(|a, b| a.custom_cmp(&b).unwrap());
     let mut player_vec: Vec<ThrowsPerGame> = Vec::new();
-    for (entity, tpg) in player_throws {
+    for (_entity, tpg) in player_throws {
         player_vec.push(tpg);
     }
     player_vec.sort_by(|a, b| a.custom_cmp(&b).unwrap());

@@ -187,7 +187,7 @@ impl TeamMember{
         if id < GOTHIC_CHARACTERS.len() as u32{
             alias = GOTHIC_CHARACTERS[id as usize];
         }
-        TeamMember{named_entity:NamedEntity{name:name,alias:alias,id:id}}
+        TeamMember{named_entity:NamedEntity{name,alias,id }}
     }
     pub fn name(&self) -> &str{
         self.named_entity.name
@@ -212,7 +212,7 @@ impl Team{
         if id-1000 < POE_LEAGUES.len() as u32{
             alias = POE_LEAGUES[(id-1000) as usize];
         }
-        Team{named_entity:NamedEntity{name:name, alias:alias, id}, member_1:member1, member_2:member2}
+        Team{named_entity:NamedEntity{name, alias, id}, member_1:member1, member_2:member2}
     }
     pub fn name(&self) -> &str{
         self.named_entity.name
@@ -319,7 +319,7 @@ impl Game {
                 ret.push(ARC{additional: add.clone(), round_nr: ix as u32});
             }
         }
-        return ret;
+        ret
     }
     pub fn print(&self) {
         println!("Spielnr: {}", self.match_number);

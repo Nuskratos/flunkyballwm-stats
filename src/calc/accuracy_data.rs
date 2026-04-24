@@ -1,5 +1,6 @@
 use std::fs::File;
 use csv::Writer;
+use crate::calc::accuracy_calc::calculate_throwing_accuracy;
 use crate::data::NamedEntity;
 use crate::team_player_data::NAME_WIDTH;
 use crate::util::{open_writer, OpenedWriter};
@@ -24,10 +25,13 @@ impl Accuracy {
         }
     }
     pub fn default(named_entity: NamedEntity)-> Self{
-        Self{named_entity:named_entity, throws:0, hits:0}
+        Self{named_entity, throws:0, hits:0}
     }
     pub fn print(&self){
         println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", &self.named_entity.name, &self.throws, &self.hits, &self.percentage());
+    }
+    fn seraialize_internal(&self, mut opened_writer:&mut OpenedWriter, write_alias:bool, file_prefix:&String){
+        opened_writer.writer.write_record(&[file_prefix, &self.named_entity.name_or_alias(write_alias), &self.throws.to_string(), &self.hits.to_string(), &self.percentage_string()]);
     }
 }
 
@@ -58,7 +62,7 @@ impl EntityAccuracy{
             opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Throws", "Hits", "Accuracy"]);
         }
         for entity in &self.accuracies{
-            opened_writer.writer.write_record(&[file_prefix, &entity.named_entity.name_or_alias(write_alias), &entity.throws.to_string(), &entity.hits.to_string(), &entity.percentage_string()]);
+            entity.seraialize_internal(&mut opened_writer, write_alias, &file_prefix);
         }
     }
 }
@@ -90,8 +94,7 @@ impl EnemyAccuracy{
         if !opened_writer.file_exists{
             opened_writer.writer.write_record(&["HiddenPrefix", "Teamname", "Throws", "Hits", "Percentage"]);
         }
-        for team in &self.accuracies{
-            opened_writer.writer.write_record(&[file_prefix, &team.named_entity.name_or_alias(write_alias), &team.throws.to_string(), &team.hits.to_string(), &team.percentage_string()]);
-        }
+        for entity in &self.accuracies{
+            entity.seraialize_internal(&mut opened_writer, write_alias, &file_prefix);        }
     }
 }

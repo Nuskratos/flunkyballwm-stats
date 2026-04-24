@@ -51,8 +51,8 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> EntityAccuracy{
     for score in player_scores {
         result_vec.push(score.1);
     }
-    result_vec.push(Accuracy{throws:throws, hits:hits, named_entity: AVERAGE_ENTITY});
+    result_vec.push(Accuracy{throws, hits, named_entity: AVERAGE_ENTITY});
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_vec.reverse();
-    return EntityAccuracy{accuracies:result_vec};
+    EntityAccuracy{accuracies:result_vec}
 }

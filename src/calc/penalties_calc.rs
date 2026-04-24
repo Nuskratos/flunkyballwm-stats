@@ -95,7 +95,7 @@ mod tests {
     #[test]
     fn test_single_game(){
         let games = vec![game_1st_finish_2straf(TEST_TEAM1, TEST_TEAM2)];
-        let result = calculate_amount_of_penalties(&games);;
+        let result = calculate_amount_of_penalties(&games);
         let t1_1 = result
             .players
             .iter()

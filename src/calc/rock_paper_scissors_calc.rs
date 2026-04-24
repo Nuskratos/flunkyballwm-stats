@@ -7,12 +7,12 @@ use std::collections::HashMap;
 pub fn calculate_rock_paper_scissors(games: &Vec<Game>) -> RockPaperScissorStats {
     let mut scores: HashMap<Entity, RockPaperScissorSingleStats> = HashMap::new();
     for game in games {
-        let winner: Entity = data::Entity::Player(game.rounds.first().unwrap().thrower);
-        let loser: Entity = data::Entity::Player(game.rounds.first().unwrap().runner);
+        let winner: Entity = Entity::Player(game.rounds.first().unwrap().thrower);
+        let loser: Entity = Entity::Player(game.rounds.first().unwrap().runner);
         let winner_team: Entity =
-            data::Entity::Team(team_from_player(winner.named().id, game).to_owned());
+            Entity::Team(team_from_player(winner.named().id, game).to_owned());
         let loser_team: Entity =
-            data::Entity::Team(team_from_player(loser.named().id, game).to_owned());
+            Entity::Team(team_from_player(loser.named().id, game).to_owned());
         scores
             .entry(winner.to_owned())
             .or_insert(RockPaperScissorSingleStats::default(&winner))

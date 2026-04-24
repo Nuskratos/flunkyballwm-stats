@@ -1,3 +1,4 @@
+use Ordering::{Greater, Less};
 use std::cmp::Ordering;
 use std::cmp::Ordering::Equal;
 use std::fs::File;
@@ -27,17 +28,17 @@ impl PlayerDrinkingSpeed {
     }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
         if self.drink_finished.all_drinks == 0 {
-            return Option::Some(Ordering::Greater);
+            return Some(Greater);
         }else if other.drink_finished.all_drinks == 0 {
-            return Some(Ordering::Less);
+            return Some(Less);
         }
         let mut ord = self.drink_avg.all_speed().partial_cmp(&other.drink_avg.all_speed());
         if ord.is_some() && ord.unwrap() == Equal {
             return self.drink_finished.pure_speed().partial_cmp(&other.drink_finished.pure_speed());
         }else if ord.is_none() {
-            return Option::Some(Ordering::Equal);
+            return Some(Equal);
         }
-        return ord;
+        ord
     }
     pub fn pure_finished(&self)->String{
         format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.pure_speed(), self.drink_finished.pure_hits, self.drink_finished.pure_drinks)

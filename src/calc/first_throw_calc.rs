@@ -23,14 +23,14 @@ pub fn calc_team_first_throws(games: &Vec<Game>) -> FirstTeamThrowsStatistics {
     }
     for game in games {
         // duplicate because of 2nd mutable borrow in first_throws.entry TODO make prettier
-        let Team_going_second = team_from_player(game.rounds.first().unwrap().runner.id(), game)
+        let team_going_second = team_from_player(game.rounds.first().unwrap().runner.id(), game)
             .named_entity
             .to_owned();
         let throws = first_throws
-            .entry(Team_going_second.to_owned())
+            .entry(team_going_second.to_owned())
             .or_insert(FirstThrows::default());
         throws.threw_second += 1;
-        if Team_going_second == game.winning_team().named_entity {
+        if team_going_second == game.winning_team().named_entity {
             throws.won_second += 1;
         }
     }

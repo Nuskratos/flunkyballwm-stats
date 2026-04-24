@@ -12,8 +12,8 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
     for player in players {
         let mut filtered_games: Vec<Game> = games.clone();
         filtered_games.retain(|x| !team_is_in_game(x, team_to_be_removed));
-        let finished = calculate_finished(&filtered_games, player, teams, schluck_effect);
-        let averages = calculate_avg(&filtered_games, player, teams, &finished, schluck_effect);
+        let finished = calculate_finished(&filtered_games, player, schluck_effect);
+        let averages = calculate_avg(&filtered_games, player, &finished, schluck_effect);
         playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_entity:player.named_entity.to_owned()});
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Less));
@@ -28,8 +28,8 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
 pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) -> DrinkingSpeedVec {
     let mut playerspeeds: Vec<PlayerDrinkingSpeed> = Vec::new();
     for player in players {
-        let finished = calculate_finished(games, player, teams, schluck_effect);
-        let averages = calculate_avg(games, player, teams, &finished, schluck_effect);
+        let finished = calculate_finished(games, player, schluck_effect);
+        let averages = calculate_avg(games, player, &finished, schluck_effect);
         playerspeeds.push(PlayerDrinkingSpeed { drink_finished: finished, drink_avg: averages, player_entity:player.named_entity.to_owned() });
     }
     playerspeeds.sort_by(|a, b| a.custom_cmp(&b).unwrap_or(Ordering::Equal));
@@ -37,7 +37,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, te
 }
 
 // TODO these functions could be refactored into working with maps for a runtime improvement
-fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, finished_stats: &DrinkFinishedStats, schluck_effect: f32) -> DrinkAvgStats {
+fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkFinishedStats, schluck_effect: f32) -> DrinkAvgStats {
     let mut avg_stats = DrinkAvgStats::new();
     for game in games {
         if !player_is_in_game(game, player) {
@@ -92,7 +92,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, fini
     avg_stats
 }
 
-fn calculate_finished(games: &Vec<Game>, player: &TeamMember, teams: &Vec<Team>, schluck_effect: f32) -> DrinkFinishedStats {
+fn calculate_finished(games: &Vec<Game>, player: &TeamMember, schluck_effect: f32) -> DrinkFinishedStats {
     let mut finshed_stats = DrinkFinishedStats::new();
     for game in games {
         if !player_is_in_game(game, player) {

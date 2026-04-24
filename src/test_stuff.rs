@@ -16,11 +16,11 @@ fn test_generate_game(hits_finished: u32, throw_percentage: Option<u32>) -> Test
     let mut first_percentage = 0;
     let mut second_percentage = 0;
     if throw_percentage.is_none() {
-        first_percentage = rand::thread_rng().gen_range(3..=6) * 10;
-        second_percentage = rand::thread_rng().gen_range(3..=6) * 10;
+        first_percentage = rand::rng().random_range(3..=6) * 10;
+        second_percentage = rand::rng().random_range(3..=6) * 10;
     }
     while iteration < 100 {
-        let guess_hit = rand::thread_rng().gen_range(1..=100);
+        let guess_hit = rand::rng().random_range(1..=100);
         let mut current_throw_percentage = 0;
         if throw_percentage.is_some() {
             current_throw_percentage = throw_percentage.unwrap();

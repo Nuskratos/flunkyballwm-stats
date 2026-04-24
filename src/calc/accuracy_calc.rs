@@ -1,6 +1,6 @@
 use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy};
-use crate::data::{Game, NamedEntity, Team, TeamMember};
-use crate::util::{team_from_player, team_id_from_player};
+use crate::data::{Game, NamedEntity, Team};
+use crate::util::{team_from_player};
 use std::collections::HashMap;
 
 pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
@@ -11,10 +11,10 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
 
     for game in games {
         for round in &game.rounds {
-            let playerAccuracy = player_scores
+            let player_accuracy = player_scores
                 .entry(round.thrower.named_entity.to_owned())
                 .or_insert(Accuracy::default(round.thrower.named_entity.to_owned()));
-            let teamAccuracy = team_scores
+            let team_accuracy = team_scores
                 .entry(
                     team_from_player(round.thrower.id(), game)
                         .named_entity
@@ -26,12 +26,12 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
                         .to_owned(),
                 ));
             throws = throws + 1;
-            playerAccuracy.throws += 1;
-            teamAccuracy.throws += 1;
+            player_accuracy.throws += 1;
+            team_accuracy.throws += 1;
             if round.hit {
                 hits = hits + 1;
-                playerAccuracy.hits += 1;
-                teamAccuracy.hits += 1;
+                player_accuracy.hits += 1;
+                team_accuracy.hits += 1;
             }
         }
     }
@@ -44,8 +44,8 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
         result_vec.push(score.1);
     }
     result_vec.push(Accuracy {
-        throws: throws,
-        hits: hits,
+        throws,
+        hits,
         named_entity: NamedEntity {
             name: "Average",
             alias: "Average",
@@ -54,7 +54,7 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
     });
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
     result_vec.reverse();
-    return result_vec;
+    result_vec
 }
 
 pub fn calc_enemy_accuracy(games: &Vec<Game>) -> EnemyAccuracy {

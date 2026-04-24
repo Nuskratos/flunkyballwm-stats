@@ -6,7 +6,7 @@ use std::fs::{File, OpenOptions};
 use std::path::Path;
 
 pub fn player_in_team(player_id: u32, team: &Team) -> bool {
-    return team.member_1.id() == player_id || team.member_2.id() == player_id;
+    team.member_1.id() == player_id || team.member_2.id() == player_id
 }
 
 pub fn team_from_player(player_id: u32, game: &Game) -> &Team {
@@ -71,11 +71,11 @@ pub fn player_is_in_game(game: &Game, player: &TeamMember) -> bool {
         game.right_1.id(),
         game.right_2.id(),
     ];
-    return player_ids.contains(&player.id());
+    player_ids.contains(&player.id())
 }
 pub fn team_is_in_game(game: &Game, team: &Team) -> bool {
     let team_ids = vec![game.left_team.id(), game.right_team.id()];
-    return team_ids.contains(&team.id());
+    team_ids.contains(&team.id())
 }
 
 pub struct OpenedWriter {
@@ -92,7 +92,7 @@ pub fn open_writer(filename: String) -> OpenedWriter {
         .create(true)
         .open(path)
         .expect("Couldn't open file");
-    let mut writer = csv::Writer::from_writer(file);
+    let mut writer = Writer::from_writer(file);
     OpenedWriter {
         writer,
         file_exists,

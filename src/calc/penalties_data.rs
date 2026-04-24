@@ -23,7 +23,7 @@ impl Penalties {
         if ord.is_some() && ord.unwrap() == Equal {
             return self.bpg().partial_cmp(&other.bpg());
         }
-        return ord;
+        ord
     }
     pub fn create_beer() -> Penalties {
         let mut ret : Penalties = Self::initial();

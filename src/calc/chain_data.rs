@@ -18,7 +18,7 @@ impl ChainInformation {
         if ord.is_some() && ord.unwrap() == Equal {
             return self.total_miss.partial_cmp(&other.total_miss);
         }
-        return ord;
+        ord
     }
     pub fn create(hit: bool) -> ChainInformation {
         let mut ret: ChainInformation = Default::default();
