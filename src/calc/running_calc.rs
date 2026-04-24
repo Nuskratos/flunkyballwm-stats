@@ -140,6 +140,4 @@ mod test {
         let speed_team_1 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM1.id()).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 1.0- 0.6/2.6));
     }
-
-    // TODO Test this with simulated data to see if any metric is close to the +- 0
 }
