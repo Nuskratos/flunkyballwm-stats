@@ -126,4 +126,12 @@ pub mod test{
         let rounds = create_normal_rounds_left_right(&left_team.member_1, &left_team.member_2, &right_team.member_1, &right_team.member_2, bool_vec_from_int(true, vec![2]), additionals, left_began);
         Game { result, match_number: 12, left_team: left_team.clone(), left_1: left_team.member_1, left_2: left_team.member_2, right_team: right_team.clone(), right_1:right_team.member_1, right_2: right_team.member_2, rounds }
     }
+    pub fn game_2nd_finish_right_began(left_team: Team, right_team: Team) -> Game {
+        let left_began = false;
+        let additionals = vec![ARC::finish(&right_team.member_1, 2), ARC::finish(&right_team.member_2, 2)];
+        let result = results_from_additionals(&additionals, &left_team);
+        let rounds = create_normal_rounds_left_right(&left_team.member_1, &left_team.member_2, &right_team.member_1, &right_team.member_2, bool_vec_from_int(true, vec![3]), additionals, left_began);
+        Game { result, match_number: 12, left_team: left_team.clone(), left_1: left_team.member_1, left_2: left_team.member_2, right_team: right_team.clone(), right_1:right_team.member_1, right_2: right_team.member_2, rounds }
+
+    }
 }
