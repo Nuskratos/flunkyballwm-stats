@@ -7,7 +7,7 @@ pub fn print_specials_2024(){
     println!("{} finished his beer without having a normal drink round in Game 17.", FLO.named_entity.name);
     println!("{} finished his beer without throwing in game 16.", TOBIAS.named_entity.name);
 }
-pub fn create_no_gewertet() -> Vec<Game> {
+pub fn create_wm24_no_illegal() -> Vec<Game> {
     let mut ret_vec: Vec<Game> = Vec::new();
     ret_vec.push(first_game_new(STRAMMSEIN.clone(), SASCHA.clone(), JONAS.clone(), WHITE_CLAW.clone(), TOBIAS.clone(), LUISE.clone()));
     ret_vec.push(game_3(DA_HAM_SIE.clone(), JEROME.clone(), BEEF.clone(), WEDELMEDEL.clone(), CHRIS.clone(), MALTE.clone()));

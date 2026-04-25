@@ -29,76 +29,72 @@ mod fake_game;
 mod hamburg24;
 mod wm25;
 
-fn print_all_calcs(games : &Vec<Game>){
-    let all_players = players_from_games(&games);
-    let all_teams = teams_from_games(&games);
-    calculate_throwing_accuracy(&games).print();
-    calc_side_information(&games).print();
-    calc_general_first_throw(&games).print();
-    calc_team_first_throws(&games).print();
-    let strafschluck_data = calculate_strafschluck(&games);
+fn print_all_calcs(games : &Vec<Vec<Game>>){
+    let flattened = games.into_iter().flatten().cloned().collect();
+    let all_players = players_from_games(&flattened);
+    let all_teams = teams_from_games(&flattened);
+    calculate_throwing_accuracy(&flattened).print();
+    calc_side_information(&flattened).print();
+    calc_general_first_throw(&flattened).print();
+    calc_team_first_throws(&flattened).print();
+    let strafschluck_data = calculate_strafschluck(&flattened);
     strafschluck_data.print();
-    calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
-    calculate_throws_per_game(&games).print();
-    calc_enemy_accuracy(&games).print();
-    calculate_hit_and_miss_chains_team_player(&games).print();
+    calculate_drinking_speed(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
+    calculate_throws_per_game(&flattened).print();
+    calc_enemy_accuracy(&flattened).print();
+    calculate_hit_and_miss_chains_team_player(&flattened).print();
     //print_amount_of_penalties(&games, &all_teams, &all_players);
-    let penalties_stats = calculate_amount_of_penalties(&games);
+    let penalties_stats = calculate_amount_of_penalties(&flattened);
     penalties_stats.print();
-    let ppg_stats = calculate_amount_of_points_per_game(&games);
+    let ppg_stats = calculate_amount_of_points_per_game(&flattened);
     ppg_stats.print();
-    let running_speeds = calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
-    calculate_rock_paper_scissors(&games).print();
+    let running_speeds = calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
+    calculate_rock_paper_scissors(&flattened).print();
     running_speeds.print();
 }
-fn create_csv_for_calcs(games : &Vec<Game>, fileprefix : String, date : &String){
-    let all_players = players_from_games(&games);
-    let all_teams = teams_from_games(&games);
-    let strafschluck_data = calculate_strafschluck(&games);
+fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &String){
+    let flattened = games.into_iter().flatten().cloned().collect();
+    let all_players = players_from_games(&flattened);
+    let all_teams = teams_from_games(&flattened);
+    let strafschluck_data = calculate_strafschluck(&flattened);
 
     strafschluck_data.serialize(&fileprefix, &date);
-    calculate_throwing_accuracy(games).serialize(&fileprefix,&date);
-    calc_side_information(&games).serialize(&fileprefix, &date);
-    calc_general_first_throw(&games).serialize(&fileprefix,&date);
-    calc_team_first_throws(&games).serialize(&fileprefix,&date);
-    calculate_drinking_speed(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
-    calculate_throws_per_game(&games).serialize(&fileprefix,&date);
-    calc_enemy_accuracy(&games).serialize(&fileprefix,&date);
-    calculate_hit_and_miss_chains_team_player(&games).serialize(&fileprefix, &date);
-    calculate_amount_of_penalties(&games).serialize(&fileprefix, &date);
-    calculate_amount_of_points_per_game(&games).serialize(&fileprefix, &date);
-    calculate_running_speeds(&games, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
-    calculate_rock_paper_scissors(&games).serialize(&fileprefix, &date);
+    calculate_throwing_accuracy(&flattened).serialize(&fileprefix,&date);
+    calc_side_information(&flattened).serialize(&fileprefix, &date);
+    calc_general_first_throw(&flattened).serialize(&fileprefix,&date);
+    calc_team_first_throws(&flattened).serialize(&fileprefix,&date);
+    calculate_drinking_speed(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
+    calculate_throws_per_game(&flattened).serialize(&fileprefix,&date);
+    calc_enemy_accuracy(&flattened).serialize(&fileprefix,&date);
+    calculate_hit_and_miss_chains_team_player(&flattened).serialize(&fileprefix, &date);
+    calculate_amount_of_penalties(&flattened).serialize(&fileprefix, &date);
+    calculate_amount_of_points_per_game(&flattened).serialize(&fileprefix, &date);
+    calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
+    calculate_rock_paper_scissors(&flattened).serialize(&fileprefix, &date);
 }
 
 
 fn print_wm25(){
-    let games = create_all_games_wm_2025();
+    let games = vec![create_all_games_wm_2025()];
     print_all_calcs(&games);
 }
 
 fn print_wm24(){
-    let games = create_no_gewertet();
+    let games = vec![create_wm24_no_illegal()];
     print_all_calcs(&games);
 }
 fn print_hamburg_24(){
-    let games = create_spassturnier_24();
+    let games = vec![create_spassturnier_24()];
     print_all_calcs(&games);
 }
-fn all_games() ->Vec<Game>{
-    let mut games = create_no_gewertet();
-    games.append(&mut create_spassturnier_24());
-    games.append(&mut create_all_games_wm_2025());
-    games
+fn all_games() ->Vec<Vec<Game>>{
+    vec![create_wm24_no_illegal(), create_spassturnier_24(), create_all_games_wm_2025()]
 }
-fn wm_stats()->Vec<Game>{
-    let mut games = create_no_gewertet();
-    games.append(&mut create_all_games_wm_2025());
-    games
+fn wm_stats()->Vec<Vec<Game>>{
+    vec![create_wm24_no_illegal(), create_all_games_wm_2025()]
 }
-fn non_wm_stats()->Vec<Game>{
-    let mut games = create_spassturnier_24();
-    games
+fn non_wm_stats()->Vec<Vec<Game>>{
+    vec![create_spassturnier_24()]
 }
 
 fn print_total_stats(){
@@ -120,11 +116,11 @@ fn create_csv_of_statistics(){
     let all_non_wm = non_wm_stats();
     create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string(), &date);
     // Every single tournament
-    let wm_2024 = create_no_gewertet();
+    let wm_2024 = vec![create_wm24_no_illegal()];
     create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
-    let wm_25 = create_all_games_wm_2025();
+    let wm_25 = vec![create_all_games_wm_2025()];
     create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);
-    let spass24 = create_spassturnier_24();
+    let spass24 = vec![create_spassturnier_24()];
     create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
 
 }
