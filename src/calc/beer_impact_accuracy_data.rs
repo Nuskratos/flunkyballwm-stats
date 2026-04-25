@@ -2,6 +2,7 @@ use crate::calc::accuracy_data::Accuracy;
 use crate::data::NamedEntity;
 use std::collections::HashMap;
 use crate::team_player_data::AVERAGE_ENTITY;
+use crate::util::open_writer;
 
 #[derive(Ord, PartialEq, Eq, PartialOrd, Debug, Clone)]
 pub struct EntityBeerImpact {
@@ -77,7 +78,7 @@ impl TournamentEntityBeerImpact {
                 .insert(other_impact.0.to_owned(), other_impact.1.to_owned());
         }
     }
-    pub fn raw_points(self) -> RawBeerImpact {
+    pub fn raw_points(&self) -> RawBeerImpact {
         let mut index = 0;
         let mut ret_val: RawBeerImpact = RawBeerImpact {
             accuracy_at_beers_drank: Vec::new(),
@@ -112,13 +113,20 @@ impl TournamentEntityBeerImpact {
         println!("Effect of beers on accuracy:");
         let width = 10;
         for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
-            println!(
-                "Accuracy at: {:>2} beers drank: {:.2} ({:<2}/{:>2})",
-                i,
-                general_values.percentage(),
-                general_values.hits,
-                general_values.throws
-            )
+            println!("Effect of beers on accuracy for {}", general_values.named_entity.name);
+            general_values.print_for_beer_impact(i);
         }
+        for (_,entity) in self.impacts.iter() {
+            println!("Effect of beers on accuracy for {}", entity.named_entity.name);
+            for (i, accuracy) in entity.accuracy_points.iter().enumerate() {
+                accuracy.print_for_beer_impact(i);
+            }
+        }
+    }
+    pub fn serialize(self, file_prefix:&String, date: &String){
+        let filesuffix = "beer_impact_accuracy.csv".to_string();
+        let real_writer = open_writer(date.to_string()+&filesuffix);
+
+        // Add alias writer once personal stats shall be created
     }
 }

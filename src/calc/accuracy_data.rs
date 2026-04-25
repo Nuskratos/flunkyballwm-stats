@@ -31,6 +31,9 @@ impl Accuracy {
     pub fn print(&self){
         println!("{:<30} threw: {:>3} and hit: {:>3} which is {:<4.2}%", &self.named_entity.name, &self.throws, &self.hits, &self.percentage());
     }
+    pub fn print_for_beer_impact(&self, i : usize){
+        println!("Accuracy at: {:>2} beers drank: {:.2} ({:<3}/{:>3})", i, &self.percentage(), &self.hits, &self.throws)
+    }
     fn seraialize_internal(&self, mut opened_writer:&mut OpenedWriter, write_alias:bool, file_prefix:&String){
         opened_writer.writer.write_record(&[file_prefix, &self.named_entity.name_or_alias(write_alias), &self.throws.to_string(), &self.hits.to_string(), &self.percentage_string()]);
     }
