@@ -23,3 +23,5 @@ pub(crate) mod first_throw_calc;
 pub mod accuracy_calc;
 pub mod rock_paper_scissors_data;
 pub mod rock_paper_scissors_calc;
+pub mod beer_impact_accuracy_data;
+pub mod beer_impact_accuracy_calc;

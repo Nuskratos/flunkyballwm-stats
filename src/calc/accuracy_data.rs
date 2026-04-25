@@ -5,6 +5,7 @@ use crate::data::NamedEntity;
 use crate::team_player_data::NAME_WIDTH;
 use crate::util::{open_writer, OpenedWriter};
 
+#[derive(Ord, PartialEq, Eq, PartialOrd, Debug, Copy, Clone)]
 pub struct Accuracy {
     pub named_entity: NamedEntity,
     pub throws: u32,
@@ -32,6 +33,10 @@ impl Accuracy {
     }
     fn seraialize_internal(&self, mut opened_writer:&mut OpenedWriter, write_alias:bool, file_prefix:&String){
         opened_writer.writer.write_record(&[file_prefix, &self.named_entity.name_or_alias(write_alias), &self.throws.to_string(), &self.hits.to_string(), &self.percentage_string()]);
+    }
+    pub fn merge(&mut self, other: &Self) {
+        self.throws += other.throws;
+        self.hits += other.hits;
     }
 }
 

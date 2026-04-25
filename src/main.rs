@@ -4,6 +4,7 @@ use serde::Serialize;
 use data::*;
 use wm24::*;
 use crate::calc::accuracy_calc::calc_enemy_accuracy;
+use crate::calc::beer_impact_accuracy_calc::calculate_beer_impact_accuracy;
 use crate::calc::calculation::{calculate_throwing_accuracy};
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
@@ -51,6 +52,7 @@ fn print_all_calcs(games : &Vec<Vec<Game>>){
     let running_speeds = calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
     calculate_rock_paper_scissors(&flattened).print();
     running_speeds.print();
+    calculate_beer_impact_accuracy(&games).print();
 }
 fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &String){
     let flattened = games.into_iter().flatten().cloned().collect();
@@ -71,6 +73,7 @@ fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &St
     calculate_amount_of_points_per_game(&flattened).serialize(&fileprefix, &date);
     calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
     calculate_rock_paper_scissors(&flattened).serialize(&fileprefix, &date);
+    //TODO calculate_beer_impact_accuracy(&games).serialize(&fileprefix, &date);
 }
 
 

@@ -106,19 +106,20 @@ pub mod test {
         ARC,
     };
 
-    pub fn game_2nd_finish(left_team: Team, right_team: Team) -> Game {
-        let left_began = true;
-        let additionals = vec![
-            ARC::finish(&left_team.member_1, 2),
-            ARC::finish(&left_team.member_2, 2),
-        ];
+    pub fn simple_game_from_data(
+        left_team: Team,
+        right_team: Team,
+        hit_vec: Vec<bool>,
+        left_began: bool,
+        additionals: Vec<ARC>,
+    ) -> Game {
         let result = results_from_additionals(&additionals, &left_team);
         let rounds = create_normal_rounds_left_right(
             &left_team.member_1,
             &left_team.member_2,
             &right_team.member_1,
             &right_team.member_2,
-            bool_vec_from_int(true, vec![3]),
+            hit_vec,
             additionals,
             left_began,
         );
@@ -134,33 +135,23 @@ pub mod test {
             rounds,
         }
     }
+    pub fn game_2nd_finish(left_team: Team, right_team: Team) -> Game {
+        let left_began = true;
+        let additionals = vec![
+            ARC::finish(&left_team.member_1, 2),
+            ARC::finish(&left_team.member_2, 2),
+        ];
+        let hit_vec = bool_vec_from_int(true, vec![3]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
+    }
     pub fn game_2nd_finish_enemy_miss(left_team: Team, right_team: Team) -> Game {
         let left_began = true;
         let additionals = vec![
             ARC::finish(&left_team.member_1, 2),
             ARC::finish(&left_team.member_2, 2),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            vec![true, false, true],
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = vec![true, false, true];
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
 
     pub fn game_3rd_finish(left_team: Team, right_team: Team) -> Game {
@@ -169,27 +160,8 @@ pub mod test {
             ARC::finish(&left_team.member_1, 4),
             ARC::finish(&left_team.member_2, 4),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            bool_vec_from_int(true, vec![5]),
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = bool_vec_from_int(true, vec![5]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
 
     pub fn game_1st_finish_2straf(left_team: Team, right_team: Team) -> Game {
@@ -200,27 +172,8 @@ pub mod test {
             ARC::finish(&left_team.member_1, 1),
             ARC::finish(&left_team.member_2, 1),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            bool_vec_from_int(true, vec![2]),
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = bool_vec_from_int(true, vec![2]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
     pub fn game_2nd_finish_right_began(left_team: Team, right_team: Team) -> Game {
         let left_began = false;
@@ -228,27 +181,8 @@ pub mod test {
             ARC::finish(&right_team.member_1, 2),
             ARC::finish(&right_team.member_2, 2),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            bool_vec_from_int(true, vec![3]),
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = bool_vec_from_int(true, vec![3]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
     pub fn game_5th_finish_strafbeer(left_team: Team, right_team: Team) -> Game {
         let left_began = true;
@@ -260,27 +194,8 @@ pub mod test {
             ARC::schluck(&right_team.member_1, 4),
             ARC::finish(&left_team.member_1, 4),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            bool_vec_from_int(true, vec![5]),
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = bool_vec_from_int(true, vec![5]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
 
     pub fn game_2nd_finish_after_enemy_began(left_team: Team, right_team: Team) -> Game {
@@ -289,26 +204,16 @@ pub mod test {
             ARC::finish(&left_team.member_1, 3),
             ARC::finish(&left_team.member_2, 3),
         ];
-        let result = results_from_additionals(&additionals, &left_team);
-        let rounds = create_normal_rounds_left_right(
-            &left_team.member_1,
-            &left_team.member_2,
-            &right_team.member_1,
-            &right_team.member_2,
-            bool_vec_from_int(true, vec![4]),
-            additionals,
-            left_began,
-        );
-        Game {
-            result,
-            match_number: 12,
-            left_team: left_team.clone(),
-            left_1: left_team.member_1,
-            left_2: left_team.member_2,
-            right_team: right_team.clone(),
-            right_1: right_team.member_1,
-            right_2: right_team.member_2,
-            rounds,
-        }
+        let hit_vec = bool_vec_from_int(true, vec![4]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
+    }
+    pub fn game_finished_after_everyone_missed_first(left_team: Team, right_team: Team) -> Game {
+        let left_began = true;
+        let additionals = vec![
+            ARC::finish(&left_team.member_1, 6),
+            ARC::finish(&left_team.member_2, 6),
+        ];
+        let hit_vec = vec![false,false,false,false,true,true,true];
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
 }
