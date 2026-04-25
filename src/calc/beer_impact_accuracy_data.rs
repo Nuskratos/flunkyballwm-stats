@@ -110,18 +110,17 @@ impl TournamentEntityBeerImpact {
     }
 
     pub fn print(self) {
-        println!("Effect of beers on accuracy:");
         let width = 10;
+        println!("Effect of beers on accuracy for {}", "Average");
         for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
-            println!("Effect of beers on accuracy for {}", general_values.named_entity.name);
             general_values.print_for_beer_impact(i);
         }
-        for (_,entity) in self.impacts.iter() {
+/*        for (_,entity) in self.impacts.iter() {
             println!("Effect of beers on accuracy for {}", entity.named_entity.name);
             for (i, accuracy) in entity.accuracy_points.iter().enumerate() {
                 accuracy.print_for_beer_impact(i);
             }
-        }
+        }*/
     }
     pub fn serialize(self, file_prefix:&String, date: &String){
         let filesuffix = "beer_impact_accuracy.csv".to_string();

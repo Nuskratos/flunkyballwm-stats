@@ -90,14 +90,16 @@ fn print_hamburg_24(){
     let games = vec![create_spassturnier_24()];
     print_all_calcs(&games);
 }
-fn all_games() ->Vec<Vec<Game>>{
-    vec![create_wm24_no_illegal(), create_spassturnier_24(), create_all_games_wm_2025()]
-}
 fn wm_stats()->Vec<Vec<Game>>{
     vec![create_wm24_no_illegal(), create_all_games_wm_2025()]
 }
 fn non_wm_stats()->Vec<Vec<Game>>{
     vec![create_spassturnier_24()]
+}
+fn all_games() ->Vec<Vec<Game>>{
+    let mut all_games = wm_stats();
+    all_games.extend(non_wm_stats());
+    all_games
 }
 
 fn print_total_stats(){
@@ -118,6 +120,7 @@ fn create_csv_of_statistics(){
     // All non VM
     let all_non_wm = non_wm_stats();
     create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string(), &date);
+
     // Every single tournament
     let wm_2024 = vec![create_wm24_no_illegal()];
     create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
