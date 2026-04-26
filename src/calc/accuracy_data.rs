@@ -109,3 +109,33 @@ impl EnemyAccuracy{
 pub struct FirstThrowAccuracy{
     pub accuracies: Vec<Accuracy>
 }
+
+impl FirstThrowAccuracy{
+    pub fn print(&self){
+        println!("First Throw Accuracy:");
+        let width = 10;
+        println!("| {:^NAME_WIDTH$} | {:^width$} | {:^width$} | {:^width$} |", "Teamname", "Throws", "Hits", "Percentage");
+        for entity in &self.accuracies {
+            entity.print();
+        }
+        println!();
+    }
+
+    pub fn serialize(&self, file_prefix:&String, date:&String) {
+        let filesuffix = "further_first_throw_accuracy.csv".to_string();
+        let real_writer = open_writer(date.to_string() + &filesuffix);
+        self.serialize_internal(real_writer, false, &file_prefix);
+
+        let alias_writer = open_writer("alias".to_string() + &date.to_string() + &filesuffix);
+        self.serialize_internal(alias_writer, true, &file_prefix);
+    }
+
+    pub fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
+        if ! opened_writer.file_exists{
+            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Throws", "Hits", "Percentage"]);
+        }
+        for entity in &self.accuracies{
+            entity.seraialize_internal(&mut opened_writer, write_alias, &file_prefix);
+        }
+    }
+}

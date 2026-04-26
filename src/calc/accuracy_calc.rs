@@ -242,9 +242,6 @@ mod tests {
         // t2_1 2/3 t2_2 1/1
         convert_first_throw_games(&mut games);
         let data = calc_special_first_throw_accuracy(&games);
-        let team1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.name()).unwrap();
-        let team2 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM2.name()).unwrap();
-
         let t1_1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.member_1.name()).unwrap();
         let team_1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.name()).unwrap();
 
