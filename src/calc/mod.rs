@@ -25,3 +25,5 @@ pub mod rock_paper_scissors_data;
 pub mod rock_paper_scissors_calc;
 pub mod beer_impact_accuracy_data;
 pub mod beer_impact_accuracy_calc;
+pub mod accuracy_after_running_data;
+pub mod accuracy_after_running_calc;
