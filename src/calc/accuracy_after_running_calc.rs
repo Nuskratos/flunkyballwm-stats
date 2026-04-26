@@ -25,8 +25,10 @@ pub fn calculate_accuracy_after_running(games: &Vec<Game>) -> AccuracyAfterRunni
             }
         }
     }
-    let mut average_running = average_from_map(&ran_map);
-    let mut average_without_running = average_from_map(&didnt_ran_map);
+    let average = EntityAccuracy {
+        running: average_from_map(&ran_map),
+        without_running: average_from_map(&didnt_ran_map),
+    };
     let all_keys: HashSet<_> = ran_map.keys().chain(didnt_ran_map.keys()).collect();
 
     // 2. Map them to your struct
@@ -37,7 +39,7 @@ pub fn calculate_accuracy_after_running(games: &Vec<Game>) -> AccuracyAfterRunni
             without_running: didnt_ran_map.get(entity).cloned().unwrap_or(Accuracy::new(entity.clone())),
         })
         .collect();
-    AccuracyAfterRunningData{entities: entity_accuracies, average_running: average_running, average_without_running: average_without_running}
+    AccuracyAfterRunningData{entities: entity_accuracies, average}
 }
 fn add_to_maps(round: &Round, ran_map: &mut HashMap<NamedEntity, Accuracy>, didnt_ran_map: &mut HashMap<NamedEntity, Accuracy>, prev_round: &Option<Round>, game :&Game) {
     let thrower = round.thrower.clone().named_entity;
@@ -69,28 +71,33 @@ mod test{
     use super::*;
 
     #[test]
-    fn test_running_accuracy(){
-        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM1),
-                         game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM1)];
+    fn test_running_accuracy() {
+        let games = vec![
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM1),
+            game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM1),
+        ];
 
         let data = calculate_accuracy_after_running(&games);
 
-        assert_eq!(data.average_running.throws, 2);
-        assert_eq!(data.average_running.hits, 1);
-        assert_eq!(data.average_without_running.throws, 4);
-        assert_eq!(data.average_without_running.hits, 4);
+        assert_eq!(data.average.running.throws, 2);
+        assert_eq!(data.average.running.hits, 1);
+        assert_eq!(data.average.without_running.throws, 4);
+        assert_eq!(data.average.without_running.hits, 4);
     }
+
     #[test]
-    fn test_running_accuracy_special_throw(){
-        let mut games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM1),
-                         game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM1)];
+    fn test_running_accuracy_special_throw() {
+        let mut games = vec![
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM1),
+            game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM1),
+        ];
         convert_first_throw_games(&mut games);
         let data = calculate_accuracy_after_running(&games);
 
-        assert_eq!(data.average_running.throws, 2);
-        assert_eq!(data.average_running.hits, 1);
-        assert_eq!(data.average_without_running.throws, 4);
-        assert_eq!(data.average_without_running.hits, 4);
+        assert_eq!(data.average.running.throws, 2);
+        assert_eq!(data.average.running.hits, 1);
+        assert_eq!(data.average.without_running.throws, 4);
+        assert_eq!(data.average.without_running.hits, 4);
     }
 
     #[test]
@@ -110,10 +117,10 @@ mod test{
         let team2 = data.entities.iter().find(|e| e.running.named_entity == TEST_TEAM2.named_entity).unwrap();
         let team3 = data.entities.iter().find(|e| e.running.named_entity == TEST_TEAM3.named_entity).unwrap();
 
-        assert_eq!(data.average_running.throws, 6);
-        assert_eq!(data.average_running.hits, 3);
-        assert_eq!(data.average_without_running.throws, 10);
-        assert_eq!(data.average_without_running.hits, 8);
+        assert_eq!(data.average.running.throws, 6);
+        assert_eq!(data.average.running.hits, 3);
+        assert_eq!(data.average.without_running.throws, 10);
+        assert_eq!(data.average.without_running.hits, 8);
 
         assert_eq!(t1_1.running.throws, 1);
         assert_eq!(t1_1.running.hits, 1);
@@ -164,10 +171,10 @@ mod test{
         let team2 = data.entities.iter().find(|e| e.running.named_entity == TEST_TEAM2.named_entity).unwrap();
         let team3 = data.entities.iter().find(|e| e.running.named_entity == TEST_TEAM3.named_entity).unwrap();
 
-        assert_eq!(data.average_running.throws, 6);
-        assert_eq!(data.average_running.hits, 3);
-        assert_eq!(data.average_without_running.throws, 10);
-        assert_eq!(data.average_without_running.hits, 8);
+        assert_eq!(data.average.running.throws, 6);
+        assert_eq!(data.average.running.hits, 3);
+        assert_eq!(data.average.without_running.throws, 10);
+        assert_eq!(data.average.without_running.hits, 8);
 
         assert_eq!(t1_1.running.throws, 1);
         assert_eq!(t1_1.running.hits, 1);

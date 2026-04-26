@@ -5,18 +5,23 @@ pub struct EntityAccuracy{
     pub running: Accuracy,
 }
 
+impl EntityAccuracy{
+    pub fn print(&self){
+        let width = 30;
+        println!("{:>width$} with running the previous round: {} ({:>3}/{:>3}) when not running: {} ({:>3}/{:>3})", self.running.named_entity.name, self.running.percentage_string(), self.running.hits, self.running.throws, self.without_running.percentage_string(), self.without_running.hits, self.without_running.throws);
+    }
+}
+
 pub struct AccuracyAfterRunningData{
     pub(crate) entities: Vec<EntityAccuracy>,
-    pub average_running: Accuracy,
-    pub average_without_running: Accuracy,
+    pub(crate) average: EntityAccuracy,
 }
 
 impl AccuracyAfterRunningData{
     pub fn print(&self){
-        println!("Average without running: {:?}", self.average_without_running);
-        println!("Average running: {:?}", self.average_running);
-        for (i, entity) in self.entities.iter().enumerate(){
-            println!("Entity {}: without running: {:?}, running: {:?}", i, entity.without_running, entity.running);
+        self.average.print();
+        for entity in self.entities.iter(){
+            entity.print();
         }
     }
 
