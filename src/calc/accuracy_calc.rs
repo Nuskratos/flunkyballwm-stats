@@ -60,7 +60,7 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
 pub fn calc_enemy_accuracy(games: &Vec<Game>) -> EnemyAccuracy {
     let mut enemy_accuracy: HashMap<&Team, Accuracy> = HashMap::new();
     for game in games {
-        let first_enemy_stats = team_from_player(game.rounds.first().unwrap().thrower.id(), game);
+        let first_enemy_stats = team_from_player(game.first_throw().thrower.id(), game);
         let second_enemy_stats = if &game.left_team == first_enemy_stats {
             &game.right_team
         } else {
@@ -96,7 +96,7 @@ pub fn calc_enemy_accuracy(games: &Vec<Game>) -> EnemyAccuracy {
 mod tests {
     use super::*;
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2};
-    use crate::util::test::{game_2nd_finish, game_2nd_finish_enemy_miss};
+    use crate::util::test::{convert_first_throw, convert_first_throw_games, game_2nd_finish, game_2nd_finish_enemy_miss, game_finished_after_everyone_missed_first};
     use approx::assert_relative_eq;
     #[test]
     fn test_throwing_accuracy() {
@@ -105,7 +105,7 @@ mod tests {
             game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM2),
             game_2nd_finish_enemy_miss(TEST_TEAM2, TEST_TEAM1),
         ]; // t1_1 2/3 t1_2 2/2
-           // t2_1 2/3 t2_2 1/1
+        // t2_1 2/3 t2_2 1/1
         let data = calculate_throwing_accuracy(&games);
         let t1_1 = data
             .iter()
@@ -140,6 +140,48 @@ mod tests {
         assert_relative_eq!(team_1.percentage(), 80.0);
         assert_relative_eq!(team_2.percentage(), 75.0);
     }
+    #[test]
+    fn test_throwing_accuracy_doesnt_include_special_first() {
+        let mut games = vec![
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM2),
+            game_finished_after_everyone_missed_first(TEST_TEAM1, TEST_TEAM2),
+        ];
+        convert_first_throw_games(&mut games);
+        let data = calculate_throwing_accuracy(&games);
+        let t1_1 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM1.member_1.name())
+            .unwrap();
+        let t1_2 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM1.member_2.name())
+            .unwrap();
+        let t2_1 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM2.member_1.name())
+            .unwrap();
+        let t2_2 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM2.member_2.name())
+            .unwrap();
+        let team_1 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM1.name())
+            .unwrap();
+        let team_2 = data
+            .iter()
+            .find(|x| x.named_entity.name == TEST_TEAM2.name())
+            .unwrap();
+
+        assert_relative_eq!(t1_1.percentage(), 1f32 / 1f32 * 100.0);
+        assert_relative_eq!(t1_2.percentage(), 3f32 / 4f32 * 100.0);
+        assert_relative_eq!(t2_1.percentage(), 2f32 / 4f32 * 100.0);
+        assert_relative_eq!(t2_2.percentage(), 0f32 / 1f32 * 100.0);
+
+        assert_relative_eq!(team_1.percentage(), 80.0);
+        assert_relative_eq!(team_2.percentage(), 40.0);
+    }
 
     #[test]
     fn test_enemy_accuracy() {
@@ -155,5 +197,21 @@ mod tests {
 
         assert_relative_eq!(team1.percentage(), 75.0);
         assert_relative_eq!(team2.percentage(), 80.0);
+    }
+
+    #[test]
+    fn test_enemy_accuracy_new_first() {
+        let mut games = vec![
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish_enemy_miss(TEST_TEAM2, TEST_TEAM1),
+        ];
+        convert_first_throw_games(&mut games);
+        let data = calc_enemy_accuracy(&games);
+        let team1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.name()).unwrap();
+        let team2 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM2.name()).unwrap();
+
+        assert_relative_eq!(team1.percentage(), 2f32 / 3f32 * 100.0);
+        assert_relative_eq!(team2.percentage(), 2f32 / 3f32 * 100.0);
     }
 }

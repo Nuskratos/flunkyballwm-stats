@@ -46,7 +46,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
         let player_team = team_id_from_player(player.id(), game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id(), game);
+        let is_from_first_team = player_team == team_id_from_player(game.first_throw().thrower.id(), game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
@@ -101,7 +101,7 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, schluck_effect: f3
         let player_team = team_id_from_player(player.id(), game);
         let mut tmp_round = 0;
         let mut tmp_schluck = 0.0;
-        let is_from_first_team = player_team == team_id_from_player(game.rounds.first().unwrap().thrower.id(), game);
+        let is_from_first_team = player_team == team_id_from_player(game.first_throw().thrower.id(), game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;

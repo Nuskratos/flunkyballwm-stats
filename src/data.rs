@@ -309,9 +309,16 @@ pub struct Game {
     pub(crate) right_2: TeamMember,
     pub(crate) result: Result,
     pub(crate) rounds: Vec<Round>,
+    pub(crate) special_first_throw: Option<Round>
 }
 
 impl Game {
+    pub fn first_throw(&self) -> &Round {
+        self.special_first_throw
+            .as_ref()
+            .or_else(|| self.rounds.first())
+            .expect("game must contain either a special first throw or at least one round")
+    }
     pub fn additionals_vec(&self) -> Vec<ARC>{
         let mut ret :Vec<ARC> = Vec::new();
         for (ix,round) in self.rounds.iter().enumerate() {
