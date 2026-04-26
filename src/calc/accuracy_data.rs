@@ -25,7 +25,7 @@ impl Accuracy {
             self.hits += 1;
         }
     }
-    pub fn default(named_entity: NamedEntity)-> Self{
+    pub fn new(named_entity: NamedEntity) -> Self{
         Self{named_entity, throws:0, hits:0}
     }
     pub fn print(&self){
@@ -105,4 +105,7 @@ impl EnemyAccuracy{
         for entity in &self.accuracies{
             entity.seraialize_internal(&mut opened_writer, write_alias, &file_prefix);        }
     }
+}
+pub struct FirstThrowAccuracy{
+    pub accuracies: Vec<Accuracy>
 }

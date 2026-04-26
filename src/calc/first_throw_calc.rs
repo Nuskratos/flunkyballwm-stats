@@ -142,11 +142,11 @@ mod tests {
     }
 
     #[test]
-    fn test_first_works_new(){
+    fn test_first_works_new() {
         let mut games = vec![
-        game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
-        game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
-        game_2nd_finish_after_enemy_began(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish_after_enemy_began(TEST_TEAM1, TEST_TEAM2),
         ];
         convert_first_throw_games(&mut games);
         let data = calc_general_first_throw(&games);

@@ -30,7 +30,7 @@ impl EntityBeerImpact {
     pub fn add_throw(&mut self, hit: bool, beers_drank: usize) {
         while self.accuracy_points.len() <= beers_drank {
             self.accuracy_points
-                .push(Accuracy::default(self.named_entity.clone()));
+                .push(Accuracy::new(self.named_entity.clone()));
         }
         self.accuracy_points[beers_drank].add_throw(hit);
     }
@@ -90,7 +90,7 @@ impl TournamentEntityBeerImpact {
                     while (ret_val.accuracy_at_beers_drank.len() <= index) {
                         ret_val
                             .accuracy_at_beers_drank
-                            .push(Accuracy::default(AVERAGE_ENTITY.clone()));
+                            .push(Accuracy::new(AVERAGE_ENTITY.clone()));
                     }
                     ret_val.accuracy_at_beers_drank[index].merge(&entry.accuracy_points[index]);
                     changed_value = true;

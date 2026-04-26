@@ -1,4 +1,4 @@
-use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy};
+use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy, FirstThrowAccuracy};
 use crate::data::{Game, NamedEntity, Team};
 use crate::util::{team_from_player};
 use std::collections::HashMap;
@@ -13,14 +13,14 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
         for round in &game.rounds {
             let player_accuracy = player_scores
                 .entry(round.thrower.named_entity.to_owned())
-                .or_insert(Accuracy::default(round.thrower.named_entity.to_owned()));
+                .or_insert(Accuracy::new(round.thrower.named_entity.to_owned()));
             let team_accuracy = team_scores
                 .entry(
                     team_from_player(round.thrower.id(), game)
                         .named_entity
                         .to_owned(),
                 )
-                .or_insert(Accuracy::default(
+                .or_insert(Accuracy::new(
                     team_from_player(round.thrower.id(), game)
                         .named_entity
                         .to_owned(),
@@ -92,10 +92,26 @@ pub fn calc_enemy_accuracy(games: &Vec<Game>) -> EnemyAccuracy {
     }
 }
 
+pub fn calc_special_first_throw_accuracy(games: &Vec<Game>) -> FirstThrowAccuracy {
+    let mut entity_map : HashMap<NamedEntity, Accuracy> = HashMap::new();
+    for game in games {
+        if game.special_first_throw.is_none() {
+            continue;
+        }
+        let first_throw = game.special_first_throw.to_owned().unwrap();
+        let thrower = first_throw.thrower.named_entity.to_owned();
+        let team = team_from_player(first_throw.thrower.id(), game).named_entity;
+        //Create entry or add throw
+        entity_map.entry(thrower).or_insert(Accuracy::new(thrower)).add_throw(first_throw.hit);
+        entity_map.entry(team).or_insert(Accuracy::new(team)).add_throw(first_throw.hit);
+    }
+    FirstThrowAccuracy{accuracies: entity_map.into_values().collect()}
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2};
+    use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
     use crate::util::test::{convert_first_throw, convert_first_throw_games, game_2nd_finish, game_2nd_finish_enemy_miss, game_finished_after_everyone_missed_first};
     use approx::assert_relative_eq;
     #[test]
@@ -213,5 +229,43 @@ mod tests {
 
         assert_relative_eq!(team1.percentage(), 2f32 / 3f32 * 100.0);
         assert_relative_eq!(team2.percentage(), 2f32 / 3f32 * 100.0);
+    }
+
+    #[test]
+    fn test_first_throw_accuracy() {
+        let mut games = vec![
+            game_2nd_finish(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish_enemy_miss(TEST_TEAM1, TEST_TEAM2),
+            game_finished_after_everyone_missed_first(TEST_TEAM1, TEST_TEAM2),
+            game_2nd_finish(TEST_TEAM2, TEST_TEAM3),
+        ]; // t1_1 2/3 t1_2 2/2
+        // t2_1 2/3 t2_2 1/1
+        convert_first_throw_games(&mut games);
+        let data = calc_special_first_throw_accuracy(&games);
+        let team1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.name()).unwrap();
+        let team2 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM2.name()).unwrap();
+
+        let t1_1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.member_1.name()).unwrap();
+        let team_1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM1.name()).unwrap();
+
+        let t2_1 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM2.member_1.name()).unwrap();
+        let team_2 = data.accuracies.iter().find(|x| x.named_entity.name == TEST_TEAM2.name()).unwrap();
+
+
+        assert_eq!(t1_1.throws, 3);
+        assert_eq!(t1_1.hits, 2);
+        assert_eq!(team_1.throws, 3);
+        assert_eq!(team_1.hits, 2);
+
+        assert_eq!(t2_1.throws, 1);
+        assert_eq!(t2_1.hits, 1);
+        assert_eq!(team_2.throws, 1);
+        assert_eq!(team_2.hits, 1);
+    }
+    #[test]
+    fn test_first_throw_old_data(){
+        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2)];
+        let data = calc_special_first_throw_accuracy(&games);
+        assert_eq!(data.accuracies.len(), 0);
     }
 }
