@@ -25,6 +25,25 @@ pub fn calculate_accuracy_after_running(games: &Vec<Game>) -> AccuracyAfterRunni
             }
         }
     }
+    /*
+    // check effect if only at least 5 throws in each category is there
+    let mut list_removeable_entities: Vec<NamedEntity> = vec![];
+    for (entity, acc) in ran_map.iter_mut(){
+        if acc.throws < 5{
+            list_removeable_entities.push(entity.clone());
+        }
+    }
+    for (entity, acc) in didnt_ran_map.iter_mut(){
+        if acc.throws < 5{
+            list_removeable_entities.push(entity.clone());
+        }
+    }
+    for entity in list_removeable_entities.iter(){
+        ran_map.remove(entity);
+        didnt_ran_map.remove(entity);
+    }*/
+
+
     let average = EntityAccuracy {
         running: average_from_map(&ran_map),
         without_running: average_from_map(&didnt_ran_map),
@@ -32,13 +51,19 @@ pub fn calculate_accuracy_after_running(games: &Vec<Game>) -> AccuracyAfterRunni
     let all_keys: HashSet<_> = ran_map.keys().chain(didnt_ran_map.keys()).collect();
 
     // 2. Map them to your struct
-    let entity_accuracies: Vec<EntityAccuracy> = all_keys
+    let mut entity_accuracies: Vec<EntityAccuracy> = all_keys
         .into_iter()
         .map(|entity| EntityAccuracy {
             running: ran_map.get(entity).cloned().unwrap_or(Accuracy::new(entity.clone())),
             without_running: didnt_ran_map.get(entity).cloned().unwrap_or(Accuracy::new(entity.clone())),
         })
         .collect();
+    entity_accuracies.sort_by(|a, b| {
+        b.difference()
+            .partial_cmp(&a.difference())
+            .unwrap()
+    });
+
     AccuracyAfterRunningData{entities: entity_accuracies, average}
 }
 fn add_to_maps(round: &Round, ran_map: &mut HashMap<NamedEntity, Accuracy>, didnt_ran_map: &mut HashMap<NamedEntity, Accuracy>, prev_round: &Option<Round>, game :&Game) {
