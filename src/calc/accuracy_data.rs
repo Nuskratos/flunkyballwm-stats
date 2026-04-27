@@ -17,6 +17,9 @@ impl Accuracy {
         self.hits as f32 / self.throws as f32 * 100.0
     }
     pub fn percentage_string(&self)->String{
+        if self.throws == 0 {
+            return "?%".to_string();
+        }
         format!("{:.2}%", self.percentage())
     }
     pub fn add_throw(&mut self, hit: bool) {

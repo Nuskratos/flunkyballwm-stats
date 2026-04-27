@@ -1,8 +1,9 @@
 use crate::calc::accuracy_data::Accuracy;
 use crate::data::NamedEntity;
-use std::collections::HashMap;
 use crate::team_player_data::AVERAGE_ENTITY;
-use crate::util::open_writer;
+use crate::util::{open_writer, OpenedWriter};
+use std::collections::HashMap;
+use std::fmt::Write;
 
 #[derive(Ord, PartialEq, Eq, PartialOrd, Debug, Clone)]
 pub struct EntityBeerImpact {
@@ -22,17 +23,21 @@ impl EntityBeerImpact {
         }
     }
     pub fn new(entity: NamedEntity) -> EntityBeerImpact {
-        EntityBeerImpact {
-            named_entity: entity,
-            accuracy_points: Vec::new(),
-        }
+        EntityBeerImpact { named_entity: entity, accuracy_points: Vec::new() }
     }
     pub fn add_throw(&mut self, hit: bool, beers_drank: usize) {
         while self.accuracy_points.len() <= beers_drank {
-            self.accuracy_points
-                .push(Accuracy::new(self.named_entity.clone()));
+            self.accuracy_points.push(Accuracy::new(self.named_entity.clone()));
         }
         self.accuracy_points[beers_drank].add_throw(hit);
+    }
+
+    fn documentation_string(&self) -> String {
+        let mut ret_val = String::new();
+        for (i, acc) in self.accuracy_points.iter().enumerate() {
+            let _ = write!(ret_val, "{}: {}({:>3}/{:>3})", i, acc.percentage_string(), acc.hits, acc.throws);
+        }
+        ret_val
     }
 }
 
@@ -61,10 +66,7 @@ impl TournamentEntityBeerImpact {
     pub fn merge(&mut self, other: &Self) {
         let mut list_of_changed: Vec<NamedEntity> = Vec::new();
         for (_, impact) in self.impacts.iter_mut() {
-            let found_entity = other
-                .impacts
-                .iter()
-                .find(|(_, x)| x.named_entity == impact.named_entity);
+            let found_entity = other.impacts.iter().find(|(_, x)| x.named_entity == impact.named_entity);
             if found_entity.is_some() {
                 impact.merge(found_entity.unwrap().1);
                 list_of_changed.push(impact.named_entity.clone());
@@ -74,23 +76,18 @@ impl TournamentEntityBeerImpact {
             if list_of_changed.contains(&other_impact.1.named_entity) {
                 continue;
             }
-            self.impacts
-                .insert(other_impact.0.to_owned(), other_impact.1.to_owned());
+            self.impacts.insert(other_impact.0.to_owned(), other_impact.1.to_owned());
         }
     }
     pub fn raw_points(&self) -> RawBeerImpact {
         let mut index = 0;
-        let mut ret_val: RawBeerImpact = RawBeerImpact {
-            accuracy_at_beers_drank: Vec::new(),
-        };
+        let mut ret_val: RawBeerImpact = RawBeerImpact { accuracy_at_beers_drank: Vec::new() };
         loop {
             let mut changed_value = false;
             for (_, entry) in self.impacts.iter() {
                 if entry.accuracy_points.len() > index {
                     while (ret_val.accuracy_at_beers_drank.len() <= index) {
-                        ret_val
-                            .accuracy_at_beers_drank
-                            .push(Accuracy::new(AVERAGE_ENTITY.clone()));
+                        ret_val.accuracy_at_beers_drank.push(Accuracy::new(AVERAGE_ENTITY.clone()));
                     }
                     ret_val.accuracy_at_beers_drank[index].merge(&entry.accuracy_points[index]);
                     changed_value = true;
@@ -111,21 +108,43 @@ impl TournamentEntityBeerImpact {
 
     pub fn print(self) {
         let width = 10;
-        println!("Effect of beers on accuracy for {}", "Average");
+        println!("Possible effect of beers on accuracy for {}", "Average");
         for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
             general_values.print_for_beer_impact(i);
         }
-/*        for (_,entity) in self.impacts.iter() {
-            println!("Effect of beers on accuracy for {}", entity.named_entity.name);
-            for (i, accuracy) in entity.accuracy_points.iter().enumerate() {
-                accuracy.print_for_beer_impact(i);
-            }
-        }*/
     }
-    pub fn serialize(self, file_prefix:&String, date: &String){
+    pub fn serialize(self, file_prefix: &String, date: &String) {
         let filesuffix = "beer_impact_accuracy.csv".to_string();
-        let real_writer = open_writer(date.to_string()+&filesuffix);
-
+        let real_writer = open_writer(date.to_string() + &filesuffix);
+        self.serialize_internal(real_writer, false, &file_prefix);
         // Add alias writer once personal stats shall be created
+
+        let personal_suffix = "personal_beer_impact_accuracy.csv".to_string();
+        let personal_writer = open_writer(date.to_string() + &personal_suffix);
+        self.serialize_internal_personal(personal_writer, false, &file_prefix);
+
+        let alias_personal_writer = open_writer("alias".to_string()+ &date.to_string() + &personal_suffix);
+        self.serialize_internal_personal(alias_personal_writer, true, &file_prefix);
+    }
+
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias: bool, file_prefix: &str) {
+        if !opened_writer.file_exists {
+            opened_writer.writer.write_record(&["HiddenPrefix", "Accuracy"]);
+        }
+        for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
+            opened_writer.writer.write_record(&[file_prefix, &general_values.percentage_string()]);
+        }
+    }
+    fn serialize_internal_personal(&self, mut opened_writer: OpenedWriter, write_alias: bool, file_prefix: &str) {
+        if !opened_writer.file_exists {
+            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Accuracies"]);
+        }
+        for (i, general_values) in self.impacts.iter().enumerate() {
+            opened_writer.writer.write_record(&[
+                file_prefix,
+                &general_values.1.named_entity.name_or_alias(write_alias),
+                &general_values.1.documentation_string(),
+            ]);
+        }
     }
 }

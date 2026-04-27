@@ -75,8 +75,8 @@ fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &St
     calculate_amount_of_points_per_game(&flattened).serialize(&fileprefix, &date);
     calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
     calculate_rock_paper_scissors(&flattened).serialize(&fileprefix, &date);
-    //TODO calculate_beer_impact_accuracy(&games).serialize(&fileprefix, &date);
-    // TODO accuracy after running
+    calculate_beer_impact_accuracy(&games).serialize(&fileprefix, &date);
+    calculate_accuracy_after_running(&flattened).serialize(&fileprefix, &date);
 }
 
 
