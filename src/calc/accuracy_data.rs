@@ -14,6 +14,9 @@ pub struct Accuracy {
 
 impl Accuracy {
     pub fn percentage(&self) -> f32 {
+        if self.throws == 0 {
+            return 0.0;
+        }
         self.hits as f32 / self.throws as f32 * 100.0
     }
     pub fn percentage_string(&self)->String{
