@@ -35,13 +35,13 @@ pub struct NamedThrows{
     pub throw_data: FirstThrows
 }
 
-pub struct FirstTeamThrowsStatistics {
+pub struct FirstEntityThrowsStatistics {
     pub teams: Vec<NamedThrows>
 }
 
-impl FirstTeamThrowsStatistics {
+impl FirstEntityThrowsStatistics {
     pub fn print(&self){
-        println!("Teamname:                   | Going first | Won as first | Win% First | Going Second | Won as Second | Win% Second");
+        println!("Name:                   | Going first | Won as first | Win% First | Going Second | Won as Second | Win% Second");
         for elem in &self.teams {
             println!("{:<27} | {:<11} | {:<12}  | {:<12}  | {:<12} | {:<12} | {:<8}", elem.named_entity.name, elem.throw_data.threw_first, elem.throw_data.won_first, elem.throw_data.win_perc_string(),elem.throw_data.threw_second, elem.throw_data.won_second, elem.throw_data.second_perc_string());
         }
@@ -58,7 +58,7 @@ impl FirstTeamThrowsStatistics {
 
     fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix:&String){
         if !opened_writer.file_exists{
-            opened_writer.writer.write_record(&["HiddenPrefix", "Teamname", "Going First", "Won as First", "Win% First","Going Second", "Won as Second", "Win% second"]);
+            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Going First", "Won as First", "Win% First","Going Second", "Won as Second", "Win% second"]);
         }
         for team in &self.teams{
             opened_writer.writer.write_record(&[file_prefix, &team.named_entity.name_or_alias(write_alias), &team.throw_data.threw_first.to_string(), &team.throw_data.won_first.to_string(), &team.throw_data.win_perc_string(), &team.throw_data.threw_second.to_string(), &team.throw_data.won_second.to_string(), &team.throw_data.second_perc_string()]);

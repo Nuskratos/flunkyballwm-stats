@@ -18,6 +18,16 @@ pub fn team_from_player(player_id: u32, game: &Game) -> &Team {
     }
     &TEAM_INVALID
 }
+pub fn teammate_from_player(player_id: u32, game: &Game) -> Option<TeamMember> {
+    let team = team_from_player(player_id, game);
+    if team.member_1.id() == player_id {
+        return Some(team.member_2.clone());
+    }
+    if team.member_2.id() == player_id {
+        return Some(team.member_1.clone());
+    }
+    None
+}
 
 pub fn team_id_from_player(player_id: u32, game: &Game) -> u32 {
     team_from_player(player_id, game).id()

@@ -50,7 +50,7 @@ pub fn calculate_accuracy_after_running(games: &Vec<Game>) -> AccuracyAfterRunni
     };
     let all_keys: HashSet<_> = ran_map.keys().chain(didnt_ran_map.keys()).collect();
 
-    // 2. Map them to your struct
+    // 2. Map them to the
     let mut entity_accuracies: Vec<EntityAccuracy> = all_keys
         .into_iter()
         .map(|entity| EntityAccuracy {
