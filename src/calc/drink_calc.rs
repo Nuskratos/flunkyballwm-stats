@@ -25,7 +25,7 @@ pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<Te
     DrinkingSpeedVec { schluck_effect, speeds: playerspeeds }
 }
 
-pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) -> DrinkingSpeedVec {
+pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, schluck_effect: f32) -> DrinkingSpeedVec {
     let mut playerspeeds: Vec<PlayerDrinkingSpeed> = Vec::new();
     for player in players {
         let finished = calculate_finished(games, player, schluck_effect);
@@ -39,7 +39,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, te
 // TODO these functions could be refactored into working with maps for a runtime improvement
 fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkFinishedStats, schluck_effect: f32) -> DrinkAvgStats {
     let mut avg_stats = DrinkAvgStats::new();
-    for game in games {
+    'game: for game in games {
         if !player_is_in_game(game, player) {
             continue;
         }
@@ -49,12 +49,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
         let is_from_first_team = player_team == team_id_from_player(game.first_throw().thrower.id(), game);
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
-        let mut person_finished = false;
-        let mut all_rounds = game.rounds.clone();
-        if game.special_first_throw.is_some() {
-            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
-        }
-        for (i, round) in all_rounds.iter().enumerate() {
+        'round: for (i, round) in game.all_rounds().iter().enumerate() {
             if i % 2 == offset && round.hit { // correct team hitting
                 tmp_round += 1;
             }
@@ -64,8 +59,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
                         avg_stats.p_avg(1, tmp_round);
                     }
                     avg_stats.a_avg(1, tmp_round as f32 + tmp_schluck);
-                    person_finished = true;
-                    // Some kind of exit to game would be efficient, but should not have consequences, because nothing will be added
+                    break 'round;
                 }
                 if add.kind == STRAFBIER && add.source.id() == player.id() {
                     if !schluck_happened {
@@ -81,7 +75,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
                     schluck_happened = true;
                 }
             }
-            if i == game.rounds.len() - 1 && !person_finished {
+            if i == game.rounds.len() - 1 {
                 let pure_finished_average = average(finished_stats.pure_hits, finished_stats.pure_drinks).floor() as u32;
                 if tmp_round >= pure_finished_average && pure_finished_average > 0 {
                     avg_stats.p_avg(1, tmp_round + 1)
@@ -147,10 +141,12 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, schluck_effect: f3
 
 #[cfg(test)]
 mod test {
+    use approx::assert_relative_eq;
     use float_cmp::approx_eq;
     use crate::calc::drink_calc::{calculate_drinking_speed, calculate_drinking_speed_without_team};
     use crate::team_player_data::{TEST_PLAYER1, TEST_PLAYER2, TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
-    use crate::util::test::{game_2nd_finish, game_3rd_finish};
+    use crate::util::convert_first_throw_games;
+    use crate::util::test::{game_2nd_finish, game_3rd_finish, game_finished_with_strafbier_2_rounds, game_not_finished_with_strafbier_2_rounds};
 
     #[test]
     fn culled_team_calculation_works() {
@@ -161,8 +157,28 @@ mod test {
         let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_culled_speed, 2.5));
 
-        let total_data = calculate_drinking_speed(&games, &players, &teams, 0.5);
+        let total_data = calculate_drinking_speed(&games, &players, 0.5);
         let first_total_speed = total_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_total_speed,  8f32 / 3f32 ));
     }
+
+    #[test]
+    fn straf_bier_finished_calc(){
+        let mut games = vec![game_finished_with_strafbier_2_rounds(TEST_TEAM1, TEST_TEAM2)];
+        convert_first_throw_games(&mut games);
+        let data = calculate_drinking_speed(&games, &vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2], 0.5);
+        assert_relative_eq!(data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed(), 2.5);
+        assert_relative_eq!(data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER2.name()).unwrap().drink_avg.all_speed(), 2.0);
+    }
+
+    #[test]
+    fn straf_bier_not_finished_calc(){
+        let mut games = vec![game_not_finished_with_strafbier_2_rounds(TEST_TEAM1, TEST_TEAM2)];
+        convert_first_throw_games(&mut games);
+        let data = calculate_drinking_speed(&games, &vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2], 0.5);
+        assert_relative_eq!(data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed(), 3.0);
+        assert_relative_eq!(data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER2.name()).unwrap().drink_avg.all_speed(), 2.0);
+
+    }
+
 }

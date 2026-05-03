@@ -43,7 +43,7 @@ fn print_all_calcs(games : &Vec<Vec<Game>>){
     calc_team_first_throws(&flattened).print();
     let strafschluck_data = calculate_strafschluck(&flattened);
     strafschluck_data.print();
-    calculate_drinking_speed(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).print();
+    calculate_drinking_speed(&flattened, &all_players, strafschluck_data.effect_of_single_schluck()).print();
     calculate_throws_per_game(&flattened).print();
     calc_enemy_accuracy(&flattened).print();
     calculate_hit_and_miss_chains_team_player(&flattened).print();
@@ -70,7 +70,7 @@ fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &St
     calc_side_information(&flattened).serialize(&fileprefix, &date);
     calc_general_first_throw(&flattened).serialize(&fileprefix,&date);
     calc_team_first_throws(&flattened).serialize(&fileprefix,&date);
-    calculate_drinking_speed(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
+    calculate_drinking_speed(&flattened, &all_players, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
     calculate_throws_per_game(&flattened).serialize(&fileprefix,&date);
     calc_enemy_accuracy(&flattened).serialize(&fileprefix,&date);
     calculate_hit_and_miss_chains_team_player(&flattened).serialize(&fileprefix, &date);

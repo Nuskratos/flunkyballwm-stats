@@ -238,4 +238,25 @@ pub mod test {
         let hit_vec = vec![false,false,false,false,true,true,true];
         simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
     }
+    pub fn game_finished_with_strafbier_2_rounds(left_team:Team, right_team:Team) -> Game{
+        let left_began = true;
+        let additionals = vec![
+            ARC::beer(&left_team.member_1, 2),
+            ARC::finish(&left_team.member_2, 2),
+            ARC::finish(&left_team.member_1,6)
+        ];
+        let hit_vec = bool_vec_from_int(true, vec![7]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
+    }
+    pub fn game_not_finished_with_strafbier_2_rounds(left_team:Team, right_team:Team) -> Game{
+        let left_began = true;
+        let additionals = vec![
+            ARC::beer(&left_team.member_1, 2),
+            ARC::finish(&left_team.member_2, 2),
+            ARC::finish(&right_team.member_1,7),
+            ARC::finish(&right_team.member_1,7)
+        ];
+        let hit_vec = bool_vec_from_int(true, vec![8]);
+        simple_game_from_data(left_team, right_team, hit_vec, left_began, additionals)
+    }
 }
