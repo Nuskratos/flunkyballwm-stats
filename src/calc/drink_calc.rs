@@ -50,7 +50,11 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
-        for (i, round) in game.rounds.iter().enumerate() {
+        let mut all_rounds = game.rounds.clone();
+        if game.special_first_throw.is_some() {
+            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
+        }
+        for (i, round) in all_rounds.iter().enumerate() {
             if i % 2 == offset && round.hit { // correct team hitting
                 tmp_round += 1;
             }
@@ -105,7 +109,11 @@ fn calculate_finished(games: &Vec<Game>, player: &TeamMember, schluck_effect: f3
         let offset = if is_from_first_team { 0 } else { 1 };
         let mut schluck_happened = false;
         let mut person_finished = false;
-        for (i, round) in game.rounds.iter().enumerate() {
+        let mut all_rounds = game.rounds.clone();
+        if game.special_first_throw.is_some() {
+            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
+        }
+        for (i, round) in all_rounds.iter().enumerate() {
             if i % 2 == offset && round.hit { // correct team hitting
                 tmp_round += 1;
             }

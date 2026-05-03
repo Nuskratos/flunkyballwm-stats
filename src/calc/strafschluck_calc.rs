@@ -12,7 +12,11 @@ pub fn calculate_strafschluck(games: &Vec<Game>) -> StrafschluckData {
         let first_team = team_from_player(game.first_throw().thrower.id(), game);
         let mut strafbeer_hit: HashMap<u32, u32> = HashMap::new();
         let mut strafbeer_schluck: HashMap<u32, u32> = HashMap::new();
-        for (ix, round) in game.rounds.iter().enumerate() {
+        let mut all_rounds = game.rounds.clone();
+        if game.special_first_throw.is_some() {
+            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
+        }
+        for (ix, round) in all_rounds.iter().enumerate() {
             if round.hit {
                 if ix % 2 == 0 {
                     first_counter.hits += 1;

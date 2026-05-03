@@ -86,9 +86,11 @@ mod tests {
     use super::*;
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2};
     use crate::util::test::{
-        convert_first_throw_games, game_2nd_finish, game_2nd_finish_after_enemy_began, game_2nd_finish_right_began,
+        game_2nd_finish, game_2nd_finish_after_enemy_began, game_2nd_finish_right_began,
     };
     use approx::assert_relative_eq;
+    use crate::util::convert_first_throw_games;
+
     #[test]
     fn test_general_first_throw() {
         let games = vec![

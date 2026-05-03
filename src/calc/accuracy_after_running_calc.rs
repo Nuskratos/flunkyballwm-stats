@@ -92,7 +92,8 @@ fn average_from_map(map: &HashMap<NamedEntity, Accuracy>) -> Accuracy{
 
 mod test{
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
-    use crate::util::test::{convert_first_throw_games, game_2nd_finish, game_2nd_finish_enemy_miss, game_5th_finish_strafbeer, game_finished_after_everyone_missed_first};
+    use crate::util::convert_first_throw_games;
+    use crate::util::test::{game_2nd_finish, game_2nd_finish_enemy_miss, game_5th_finish_strafbeer, game_finished_after_everyone_missed_first};
     use super::*;
 
     #[test]

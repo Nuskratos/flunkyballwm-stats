@@ -2,6 +2,7 @@ use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy, FirstThrowAccuracy};
 use crate::data::{Game, NamedEntity, Team};
 use crate::util::{team_from_player};
 use std::collections::HashMap;
+use crate::team_player_data::AVERAGE_ENTITY;
 
 pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
     let mut throws = 0;
@@ -10,6 +11,7 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
     let mut team_scores: HashMap<NamedEntity, Accuracy> = HashMap::new();
 
     for game in games {
+        let mut all_rounds = game.rounds.clone();
         for round in &game.rounds {
             let player_accuracy = player_scores
                 .entry(round.thrower.named_entity.to_owned())
@@ -104,16 +106,22 @@ pub fn calc_special_first_throw_accuracy(games: &Vec<Game>) -> FirstThrowAccurac
         //Create entry or add throw
         entity_map.entry(thrower).or_insert(Accuracy::new(thrower)).add_throw(first_throw.hit);
         entity_map.entry(team).or_insert(Accuracy::new(team)).add_throw(first_throw.hit);
+        entity_map.entry(AVERAGE_ENTITY).or_insert(Accuracy::new(AVERAGE_ENTITY)).add_throw(first_throw.hit);
     }
-    FirstThrowAccuracy{accuracies: entity_map.into_values().collect()}
+    let mut result_vec: Vec<Accuracy> = entity_map.values().cloned().collect();
+    result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
+    result_vec.reverse();
+    FirstThrowAccuracy{accuracies: result_vec}
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2, TEST_TEAM3};
-    use crate::util::test::{convert_first_throw, convert_first_throw_games, game_2nd_finish, game_2nd_finish_enemy_miss, game_finished_after_everyone_missed_first};
+    use crate::util::test::{  game_2nd_finish, game_2nd_finish_enemy_miss, game_finished_after_everyone_missed_first};
     use approx::assert_relative_eq;
+    use crate::util::convert_first_throw_games;
+
     #[test]
     fn test_throwing_accuracy() {
         let games = vec![

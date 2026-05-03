@@ -9,7 +9,7 @@ pub fn calculate_hit_and_miss_chains_team_player(games: &Vec<Game>) -> ChainStat
     let mut team_chain: HashMap<&Team, ChainInformation> = HashMap::new();
     let mut player_chain: HashMap<&TeamMember, ChainInformation> = HashMap::new();
     for game in games {
-        for round in &game.rounds {
+        for round in&game.rounds {
             let team = team_from_player(round.thrower.id(), game);
             team_chain
                 .entry(team)

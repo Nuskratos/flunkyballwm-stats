@@ -12,7 +12,11 @@ pub fn calculate_throws_per_game(games: &Vec<Game>) -> ThrowData {
     for game in games {
         add_game_count_to_maps(game, &mut team_throws, &mut player_throws);
         total_throws += game.rounds.len() as u32;
-        for round in &game.rounds {
+        let mut all_rounds = game.rounds.clone();
+        if game.special_first_throw.is_some() {
+            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
+        }
+        for round in &all_rounds {
             player_throws.entry(round.thrower.named_entity.to_owned()).and_modify(|x| x.throws += 1);
             team_throws.entry(team_from_player(round.thrower.id(), game).named_entity.to_owned()).and_modify(|x| x.throws +=1);
         }

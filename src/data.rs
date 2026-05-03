@@ -282,6 +282,26 @@ impl ARC {
     pub(crate) fn schluck(team_member: &TeamMember, round_nr: u32) -> ARC {
         ARC { additional: Additional::schluck(team_member.clone()), round_nr }
     }
+    // right vec![ARC::finish(&left_2, 8),ARC::finish(&left_1, 10)];
+    // additionals(left1, left2, right1,right2, (None, None,8,10),vec![], vec![], vec![],); TODO think of an option. it's way too much
+    pub(crate) fn all_additionals(finished: (Option<i32>, Option<i32>, Option<i32>, Option<i32>), optionals: Vec<ARC>, left_1: &TeamMember, left_2: &TeamMember, right_1: &TeamMember, right_2: &TeamMember) -> Vec<ARC> {
+        // while optionals not empty
+        let mut ret_val = optionals.clone();
+        if(finished.0.is_some()){
+            ret_val.push(ARC::finish(left_1, finished.0.unwrap() as u32 ));
+        }
+        if(finished.1.is_some()){
+            ret_val.push(ARC::finish(left_2, finished.1.unwrap()as u32 ));
+        }
+        if(finished.2.is_some()){
+            ret_val.push(ARC::finish(right_1, finished.2.unwrap()as u32 ));
+        }
+        if(finished.3.is_some()){
+            ret_val.push(ARC::finish(right_2, finished.3.unwrap()as u32 ));
+        }
+        ret_val.sort_by(|a, b| a.round_nr.cmp(&b.round_nr));
+        ret_val
+    }
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -309,10 +329,19 @@ pub struct Game {
     pub(crate) right_2: TeamMember,
     pub(crate) result: Result,
     pub(crate) rounds: Vec<Round>,
-    pub(crate) special_first_throw: Option<Round>
+    pub(crate) special_first_throw: Option<Round>,
+    //pub(crate) all_rounds: Vec<Round>
 }
 
 impl Game {
+    /*pub fn new(match_number: u32, left_team:Team, left_1:TeamMember, left_2:TeamMember, right_team:Team, right_1:TeamMember, right_2:TeamMember,result:Result, rounds:Vec<Round>, special_first_throw:Option<Round>)->Game{
+        let mut ret = Game{match_number,left_team, left_1,left_2,right_team,right_1,right_2,result,rounds,special_first_throw,all_rounds: vec![]};
+        ret.all_rounds.extend(ret.rounds.iter().cloned());
+        if ret.special_first_throw.is_some(){
+            ret.all_rounds.push(ret.special_first_throw.clone().unwrap());
+        }
+        ret
+    }*/
     pub fn first_throw(&self) -> &Round {
         self.special_first_throw
             .as_ref()
@@ -328,11 +357,27 @@ impl Game {
         }
         ret
     }
+    pub fn all_rounds(&self)->Vec<Round>{
+        let mut retval = self.rounds.clone();
+        if self.special_first_throw.is_some() {
+            retval.insert(0,self.special_first_throw.clone().unwrap());
+        }
+        retval
+    }
     pub fn print(&self) {
         println!("Spielnr: {}", self.match_number);
         println!("Team: {0:<16.16} | Team: {1:<16.16}", self.left_team.named_entity.name, self.right_team.named_entity.name);
         println!("Spieler1: {0:<12.12} | Spieler1: {1:<12.12}", self.left_1.named_entity.name, self.right_1.named_entity.name);
         println!("Spieler2: {0:<12.12} | Spieler2: {1:<12.12}", self.left_2.named_entity.name, self.right_2.named_entity.name);
+        if self.special_first_throw.is_some() {
+            let round = self.special_first_throw.as_ref().unwrap();
+            let left1 = player_round_string(&self.left_1, &round, true);
+            let left2 = player_round_string(&self.left_2, &round, true);
+            let right1 = player_round_string(&self.right_1, &round, false);
+            let right2 = player_round_string(&self.right_2, &round, false);
+            println!("{0:^5}|{1:^5}|{2:^5}|{3:^5}|{4:^5}|{5:^5}|{6:^5}|{7:^5}", left1.0, left2.0, left1.1, left2.1, right1.0, right2.0, right1.1, right2.1);
+
+        }
         for round in &self.rounds {
             let left1 = player_round_string(&self.left_1, &round, true);
             let left2 = player_round_string(&self.left_2, &round, true);

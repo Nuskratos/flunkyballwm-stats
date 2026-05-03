@@ -13,7 +13,7 @@ pub fn calc_side_information(games: &Vec<Game>) -> SideSplit {
         }
         left.points += game.result.points_left;
         right.points += game.result.points_right;
-        for round in &game.rounds {
+        for round in &game.all_rounds() {
             if round.thrower.id() == game.left_1.id() || round.thrower.id() == game.left_2.id() {
                 left.throws += 1;
                 if round.hit {

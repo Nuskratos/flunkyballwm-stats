@@ -27,19 +27,29 @@ impl PlayerDrinkingSpeed {
 
     }
     pub fn custom_cmp(&self, other: &Self) -> Option<Ordering> {
-        if self.drink_finished.all_drinks == 0 {
-            return Some(Greater);
-        }else if other.drink_finished.all_drinks == 0 {
-            return Some(Less);
-        }
-        let mut ord = self.drink_avg.all_speed().partial_cmp(&other.drink_avg.all_speed());
-        if ord.is_some() && ord.unwrap() == Equal {
-            return self.drink_finished.pure_speed().partial_cmp(&other.drink_finished.pure_speed());
-        }else if ord.is_none() {
-            return Some(Equal);
-        }
-        ord
+    match (
+        self.drink_finished.all_drinks == 0,
+        other.drink_finished.all_drinks == 0,
+    ) {
+        (true, true) => return Some(Ordering::Equal),
+        (true, false) => return Some(Ordering::Greater),
+        (false, true) => return Some(Ordering::Less),
+        (false, false) => {}
     }
+
+    match self
+        .drink_avg
+        .all_speed()
+        .partial_cmp(&other.drink_avg.all_speed())
+    {
+        Some(Ordering::Equal) => self
+            .drink_finished
+            .pure_speed()
+            .partial_cmp(&other.drink_finished.pure_speed()),
+        Some(ordering) => Some(ordering),
+        None => Some(Ordering::Equal),
+    }
+}
     pub fn pure_finished(&self)->String{
         format!("{:>.2} ({:>4.2} / {:>2})", self.drink_finished.pure_speed(), self.drink_finished.pure_hits, self.drink_finished.pure_drinks)
     }

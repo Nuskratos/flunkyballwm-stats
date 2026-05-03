@@ -25,7 +25,7 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             let team_2_drink_speed = other_speeds.speeds.iter().find(|x| x.player_entity == enemy_team.member_2.named_entity).unwrap().drink_avg.all_speed();
             let mut team1_finished = false;
             let mut team2_finished = false;
-            for round in &game.rounds {
+            for round in &game.all_rounds() {
                 if team_id_from_player(round.runner.id(), game) == team.id() && round.hit {
                     current_run += current_diff.baseline;
                 }

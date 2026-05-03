@@ -20,6 +20,7 @@ use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
 use crate::util::{players_from_games, teams_from_games};
 use crate::wm25::create_all_games_wm_2025;
+use crate::wm26::create_all_games_wm_2026;
 
 mod data;
 mod wm24;
@@ -30,6 +31,7 @@ mod util;
 mod fake_game;
 mod hamburg24;
 mod wm25;
+mod wm26;
 
 fn print_all_calcs(games : &Vec<Vec<Game>>){
     let flattened = games.into_iter().flatten().cloned().collect();
@@ -80,8 +82,6 @@ fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &St
     calculate_accuracy_after_running(&flattened).serialize(&fileprefix, &date);
     calc_special_first_throw_accuracy(&flattened).serialize(&fileprefix, &date);
 }
-
-
 fn print_wm25(){
     let games = vec![create_all_games_wm_2025()];
     print_all_calcs(&games);
@@ -96,7 +96,7 @@ fn print_hamburg_24(){
     print_all_calcs(&games);
 }
 fn wm_stats()->Vec<Vec<Game>>{
-    vec![create_wm24_no_illegal(), create_all_games_wm_2025()]
+    vec![create_wm24_no_illegal(), create_all_games_wm_2025(), create_all_games_wm_2026()]
 }
 fn non_wm_stats()->Vec<Vec<Game>>{
     vec![create_spassturnier_24()]
@@ -131,6 +131,8 @@ fn create_csv_of_statistics(){
     create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
     let wm_25 = vec![create_all_games_wm_2025()];
     create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);
+    let wm_26 = vec![create_all_games_wm_2026()];
+    create_csv_for_calcs(&wm_26, "wm26".to_string(), &date);
     let spass24 = vec![create_spassturnier_24()];
     create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
 

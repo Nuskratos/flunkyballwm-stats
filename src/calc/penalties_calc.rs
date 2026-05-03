@@ -32,7 +32,11 @@ pub fn calculate_amount_of_penalties(games: &Vec<Game>) -> PenaltiesStatistics {
             .entry(game.right_2.to_owned())
             .and_modify(|x| x.games += 1)
             .or_insert(Penalties::initial());
-        for round in &game.rounds {
+        let mut all_rounds = game.rounds.clone();
+        if game.special_first_throw.is_some() {
+            all_rounds.insert(0,game.special_first_throw.clone().unwrap());
+        }
+        for round in &all_rounds {
             for add in &round.additionals {
                 match add.kind {
                     STRAFSCHLUCK => {

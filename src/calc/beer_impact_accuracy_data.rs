@@ -129,15 +129,15 @@ impl TournamentEntityBeerImpact {
 
     fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias: bool, file_prefix: &str) {
         if !opened_writer.file_exists {
-            opened_writer.writer.write_record(&["HiddenPrefix", "Accuracy"]);
+            opened_writer.writer.write_record(&["HiddenPrefix","Getrunkene Biere", "Genauigkeit"]);
         }
         for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
-            opened_writer.writer.write_record(&[file_prefix, &general_values.percentage_string()]);
+            opened_writer.writer.write_record(&[file_prefix, &i.to_string(),&general_values.percentage_string()]);
         }
     }
     fn serialize_internal_personal(&self, mut opened_writer: OpenedWriter, write_alias: bool, file_prefix: &str) {
         if !opened_writer.file_exists {
-            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Accuracies"]);
+            opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Genauigkeit"]);
         }
         for (i, general_values) in self.impacts.iter().enumerate() {
             opened_writer.writer.write_record(&[

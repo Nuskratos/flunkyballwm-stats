@@ -109,6 +109,16 @@ pub fn open_writer(filename: String) -> OpenedWriter {
     }
 }
 
+pub fn convert_first_throw(game: &mut Game){
+    game.special_first_throw = Some(game.rounds[0].clone());
+    game.rounds.remove(0);
+}
+pub fn convert_first_throw_games(games : &mut Vec<Game>){
+    for game in games {
+        convert_first_throw(game)
+    }
+}
+
 #[cfg(test)]
 pub mod test {
     use crate::data::{
@@ -144,15 +154,6 @@ pub mod test {
             right_2: right_team.member_2,
             rounds,
             special_first_throw: None,
-        }
-    }
-    pub fn convert_first_throw(game: &mut Game){
-        game.special_first_throw = Some(game.rounds[0].clone());
-        game.rounds.remove(0);
-    } 
-    pub fn convert_first_throw_games(games : &mut Vec<Game>){
-        for game in games {
-            convert_first_throw(game)
         }
     }
     
