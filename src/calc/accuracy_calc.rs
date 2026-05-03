@@ -1,26 +1,42 @@
 use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy, EntityAccuracy, FirstThrowAccuracy};
-use crate::data::{Game, NamedEntity, Team};
+use crate::data::{Game, NamedEntity, Round, Team};
 use crate::util::{team_from_player};
 use std::collections::HashMap;
 use crate::team_player_data::AVERAGE_ENTITY;
 
 pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> EntityAccuracy {
+    calculate_special_accuracy(games, None::<fn(&Game, usize) -> bool>)
+}
+pub fn calculate_special_accuracy(games: &Vec<Game>, filter_function: Option<impl Fn(&Game, usize)->bool>) -> EntityAccuracy
+{
     let mut average: Accuracy = Accuracy::new(AVERAGE_ENTITY);
     let mut player_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
     let mut team_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
-
     for game in games {
-        for round in &game.rounds {
+        for (i,round) in game.rounds.iter().enumerate() {
             let team_entity_from_player = team_from_player(round.thrower.id(), game).named_entity.to_owned();
             let player_accuracy = player_scores.entry(round.thrower.named_entity.to_owned()).or_insert(Accuracy{named_entity: round.thrower.named_entity.to_owned(), hits:0, throws:0});
             let team_accuracy = team_scores.entry(team_entity_from_player.to_owned()).or_insert(Accuracy{named_entity: team_entity_from_player, hits:0, throws:0});
-            average.throws = average.throws + 1;
-            player_accuracy.throws += 1;
-            team_accuracy.throws +=1;
-            if round.hit {
-                average.hits = average.hits + 1;
-                player_accuracy.hits += 1;
-                team_accuracy.hits +=1;
+            if let Some(filter_fn) = &filter_function {
+                if filter_fn(game, i) {
+                    average.throws = average.throws + 1;
+                    player_accuracy.throws += 1;
+                    team_accuracy.throws +=1;
+                    if round.hit {
+                        average.hits = average.hits + 1;
+                        player_accuracy.hits += 1;
+                        team_accuracy.hits +=1;
+                    }
+                }
+            }else{
+                average.throws = average.throws + 1;
+                player_accuracy.throws += 1;
+                team_accuracy.throws +=1;
+                if round.hit {
+                    average.hits = average.hits + 1;
+                    player_accuracy.hits += 1;
+                    team_accuracy.hits +=1;
+                }
             }
         }
     }

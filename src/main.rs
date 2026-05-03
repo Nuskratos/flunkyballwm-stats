@@ -1,10 +1,11 @@
 use std::fmt::Debug;
 use chrono::Local;
+use serde::de::Unexpected::Option;
 use serde::Serialize;
 use data::*;
 use wm24::*;
 use crate::calc::accuracy_after_running_calc::calculate_accuracy_after_running;
-use crate::calc::accuracy_calc::{calc_enemy_accuracy, calc_special_first_throw_accuracy, calculate_throwing_accuracy};
+use crate::calc::accuracy_calc::{calc_enemy_accuracy, calc_special_first_throw_accuracy, calculate_special_accuracy, calculate_throwing_accuracy};
 use crate::calc::beer_impact_accuracy_calc::calculate_beer_impact_accuracy;
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
@@ -17,7 +18,7 @@ use crate::calc::rock_paper_scissors_calc::calculate_rock_paper_scissors;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
-use crate::team_player_data::ARON;
+use crate::team_player_data::{ARON, FLO};
 use crate::util::{player_is_in_game, players_from_games, teams_from_games};
 use crate::wm25::create_all_games_wm_2025;
 use crate::wm26::create_all_games_wm_2026;
@@ -145,8 +146,17 @@ fn main() {
     for game in aron_games_filtered{
         game.print();
     }*/
-    print_total_stats();
-    create_csv_of_statistics()
+    let games =create_all_games_wm_2026();
+    fn flo_war_durch(game: &Game, round: usize)-> bool {
+        game.additionals_vec().iter().any(|x| {
+            x.additional.source == FLO
+                && x.additional.kind == AdditionalType::FINISHED
+                && x.round_nr < round as u32
+        })
+    }
+    calculate_special_accuracy(&games, Some(flo_war_durch)).print();
+    //print_total_stats();
+    //create_csv_of_statistics()
 }
 
 
