@@ -31,9 +31,9 @@ impl PlayerDrinkingSpeed {
         self.drink_finished.all_drinks == 0,
         other.drink_finished.all_drinks == 0,
     ) {
-        (true, true) => return Some(Ordering::Equal),
-        (true, false) => return Some(Ordering::Greater),
-        (false, true) => return Some(Ordering::Less),
+        (true, true) => return Some(Equal),
+        (true, false) => return Some(Greater),
+        (false, true) => return Some(Less),
         (false, false) => {}
     }
 
@@ -42,12 +42,12 @@ impl PlayerDrinkingSpeed {
         .all_speed()
         .partial_cmp(&other.drink_avg.all_speed())
     {
-        Some(Ordering::Equal) => self
+        Some(Equal) => self
             .drink_finished
             .pure_speed()
             .partial_cmp(&other.drink_finished.pure_speed()),
         Some(ordering) => Some(ordering),
-        None => Some(Ordering::Equal),
+        None => Some(Equal),
     }
 }
     pub fn pure_finished(&self)->String{

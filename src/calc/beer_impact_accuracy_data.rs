@@ -86,7 +86,7 @@ impl TournamentEntityBeerImpact {
             let mut changed_value = false;
             for (_, entry) in self.impacts.iter() {
                 if entry.accuracy_points.len() > index {
-                    while (ret_val.accuracy_at_beers_drank.len() <= index) {
+                    while ret_val.accuracy_at_beers_drank.len() <= index {
                         ret_val.accuracy_at_beers_drank.push(Accuracy::new(AVERAGE_ENTITY.clone()));
                     }
                     ret_val.accuracy_at_beers_drank[index].merge(&entry.accuracy_points[index]);
@@ -107,7 +107,6 @@ impl TournamentEntityBeerImpact {
     }
 
     pub fn print(self) {
-        let width = 10;
         println!("Possible effect of beers on accuracy for {}", "Average");
         for (i, general_values) in self.raw_points().accuracy_at_beers_drank.iter().enumerate() {
             general_values.print_for_beer_impact(i);
@@ -116,7 +115,7 @@ impl TournamentEntityBeerImpact {
     pub fn serialize(self, file_prefix: &String, date: &String) {
         let filesuffix = "beer_impact_accuracy.csv".to_string();
         let real_writer = open_writer(date.to_string() + &filesuffix);
-        self.serialize_internal(real_writer, false, &file_prefix);
+        self.serialize_internal(real_writer, &file_prefix);
         // Add alias writer once personal stats shall be created
 
         let personal_suffix = "personal_beer_impact_accuracy.csv".to_string();
@@ -127,7 +126,7 @@ impl TournamentEntityBeerImpact {
         self.serialize_internal_personal(alias_personal_writer, true, &file_prefix);
     }
 
-    fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias: bool, file_prefix: &str) {
+    fn serialize_internal(&self, mut opened_writer: OpenedWriter, file_prefix: &str) {
         if !opened_writer.file_exists {
             opened_writer.writer.write_record(&["HiddenPrefix","Getrunkene Biere", "Genauigkeit"]);
         }
@@ -139,7 +138,7 @@ impl TournamentEntityBeerImpact {
         if !opened_writer.file_exists {
             opened_writer.writer.write_record(&["HiddenPrefix", "Name", "Genauigkeit"]);
         }
-        for (i, general_values) in self.impacts.iter().enumerate() {
+        for general_values in self.impacts.iter() {
             opened_writer.writer.write_record(&[
                 file_prefix,
                 &general_values.1.named_entity.name_or_alias(write_alias),

@@ -20,7 +20,6 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             let mut current_run = 0.0;
             // Calculating speeds of enemy team
             let enemy_team = if &game.left_team == team { &game.right_team } else { &game.left_team };
-            let enemy_vec = vec![enemy_team.clone()];
             let team_1_drink_speed = other_speeds.speeds.iter().find(|x| x.player_entity == enemy_team.member_1.named_entity).unwrap().drink_avg.all_speed();
             let team_2_drink_speed = other_speeds.speeds.iter().find(|x| x.player_entity == enemy_team.member_2.named_entity).unwrap().drink_avg.all_speed();
             let mut team1_finished = false;

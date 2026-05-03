@@ -128,7 +128,7 @@ mod test{
 
     #[test]
     fn test_complex_running_accuracy(){
-        let mut games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2),// running: 1/1 non-running: 2/2
+        let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2),// running: 1/1 non-running: 2/2
         game_finished_after_everyone_missed_first(TEST_TEAM1, TEST_TEAM3), // running: 1/3 non-running: 2/4
         game_2nd_finish_enemy_miss(TEST_TEAM3, TEST_TEAM2),// running: 0/1 non-running: 2/2
         game_2nd_finish(TEST_TEAM2, TEST_TEAM1)]; // running: 1/1 non-running: 2/2

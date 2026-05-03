@@ -287,16 +287,16 @@ impl ARC {
     pub(crate) fn all_additionals(finished: (Option<i32>, Option<i32>, Option<i32>, Option<i32>), optionals: Vec<ARC>, left_1: &TeamMember, left_2: &TeamMember, right_1: &TeamMember, right_2: &TeamMember) -> Vec<ARC> {
         // while optionals not empty
         let mut ret_val = optionals.clone();
-        if(finished.0.is_some()){
+        if finished.0.is_some(){
             ret_val.push(ARC::finish(left_1, finished.0.unwrap() as u32 ));
         }
-        if(finished.1.is_some()){
+        if finished.1.is_some(){
             ret_val.push(ARC::finish(left_2, finished.1.unwrap()as u32 ));
         }
-        if(finished.2.is_some()){
+        if finished.2.is_some(){
             ret_val.push(ARC::finish(right_1, finished.2.unwrap()as u32 ));
         }
-        if(finished.3.is_some()){
+        if finished.3.is_some(){
             ret_val.push(ARC::finish(right_2, finished.3.unwrap()as u32 ));
         }
         ret_val.sort_by(|a, b| a.round_nr.cmp(&b.round_nr));

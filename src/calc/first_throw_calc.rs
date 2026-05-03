@@ -11,14 +11,24 @@ pub fn calc_team_first_throws(games: &Vec<Game>) -> FirstEntityThrowsStatistics 
         let first_won_game = team_going_first == game.winning_team().named_entity;
         add_entity_throws_to_map(&mut first_throws, team_going_first, first_won_game, true);
         add_entity_throws_to_map(&mut first_throws, game.first_throw().thrower.named_entity, first_won_game, true);
-        add_entity_throws_to_map(&mut first_throws, teammate_from_player(game.first_throw().thrower.id(), game).unwrap().named_entity, first_won_game, true);
+        add_entity_throws_to_map(
+            &mut first_throws,
+            teammate_from_player(game.first_throw().thrower.id(), game).unwrap().named_entity,
+            first_won_game,
+            true,
+        );
 
         //2nd team
         let team_going_second = team_from_player(game.first_throw().runner.id(), game).named_entity.to_owned();
         let second_won_game = team_going_second == game.winning_team().named_entity;
         add_entity_throws_to_map(&mut first_throws, team_going_second, second_won_game, false);
         add_entity_throws_to_map(&mut first_throws, game.first_throw().runner.named_entity, second_won_game, false);
-        add_entity_throws_to_map(&mut first_throws, teammate_from_player(game.first_throw().runner.id(), game).unwrap().named_entity, second_won_game, false);
+        add_entity_throws_to_map(
+            &mut first_throws,
+            teammate_from_player(game.first_throw().runner.id(), game).unwrap().named_entity,
+            second_won_game,
+            false,
+        );
     }
 
     let mut result_vec: Vec<NamedThrows> = Vec::new();
@@ -30,14 +40,14 @@ pub fn calc_team_first_throws(games: &Vec<Game>) -> FirstEntityThrowsStatistics 
     FirstEntityThrowsStatistics { teams: result_vec }
 }
 
-fn add_entity_throws_to_map(map: &mut HashMap<NamedEntity, FirstThrows>, named_entity: NamedEntity, won_game: bool, threw_first:bool) {
+fn add_entity_throws_to_map(map: &mut HashMap<NamedEntity, FirstThrows>, named_entity: NamedEntity, won_game: bool, threw_first: bool) {
     let throws = map.entry(named_entity.to_owned()).or_insert(FirstThrows::default());
-    if(threw_first){
+    if threw_first {
         throws.threw_first += 1;
         if won_game {
             throws.won_first += 1;
         }
-    }else{
+    } else {
         throws.threw_second += 1;
         if won_game {
             throws.won_second += 1;
@@ -71,25 +81,16 @@ pub fn calc_general_first_throw(games: &Vec<Game>) -> FirstThrowStatistic {
     }
     let first_miss = games.len() as u32 - first_hit;
     let first_miss_win_amount = first_throw_win - first_hit_win_amount;
-    FirstThrowStatistic {
-        games: games.len() as u32,
-        first_throw_win,
-        first_hit,
-        first_hit_win_amount,
-        first_miss,
-        first_miss_win_amount,
-    }
+    FirstThrowStatistic { games: games.len() as u32, first_throw_win, first_hit, first_hit_win_amount, first_miss, first_miss_win_amount }
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use crate::team_player_data::{TEST_TEAM1, TEST_TEAM2};
-    use crate::util::test::{
-        game_2nd_finish, game_2nd_finish_after_enemy_began, game_2nd_finish_right_began,
-    };
-    use approx::assert_relative_eq;
     use crate::util::convert_first_throw_games;
+    use crate::util::test::{game_2nd_finish, game_2nd_finish_after_enemy_began, game_2nd_finish_right_began};
+    use approx::assert_relative_eq;
 
     #[test]
     fn test_general_first_throw() {

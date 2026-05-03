@@ -40,7 +40,7 @@ pub fn calculate_drinking_speed(games: &Vec<Game>, players: &Vec<TeamMember>, sc
 // TODO these functions could be refactored into working with maps for a runtime improvement
 fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkFinishedStats, schluck_effect: f32) -> DrinkAvgStats {
     let mut avg_stats = DrinkAvgStats::new();
-    'game: for game in games {
+    for game in games {
         if !player_is_in_game(game, player) {
             continue;
         }

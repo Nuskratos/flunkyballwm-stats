@@ -11,7 +11,6 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
     let mut team_scores: HashMap<NamedEntity, Accuracy> = HashMap::new();
 
     for game in games {
-        let mut all_rounds = game.rounds.clone();
         for round in &game.rounds {
             let player_accuracy = player_scores
                 .entry(round.thrower.named_entity.to_owned())
