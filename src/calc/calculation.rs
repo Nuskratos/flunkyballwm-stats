@@ -21,38 +21,3 @@ pub fn percentage(divisor: usize, divident: usize) -> f32 { divisor as f32 / div
 pub fn average(divisor: u32, dividend: u32) -> f32 { divisor as f32 / dividend as f32 }
 
 pub fn wrong_way_average(dividend: u32, divisor: u32) -> f32 { divisor as f32 / dividend as f32 }
-
-pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> EntityAccuracy{
-    let mut throws = 0;
-    let mut hits = 0;
-    let mut player_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
-    let mut team_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
-
-    for game in games {
-        for round in &game.rounds {
-            let team_entity_from_player = team_from_player(round.thrower.id(), game).named_entity.to_owned();
-            let player_accuracy = player_scores.entry(round.thrower.named_entity.to_owned()).or_insert(Accuracy{named_entity: round.thrower.named_entity.to_owned(), hits:0, throws:0});
-            let team_accuracy = team_scores.entry(team_entity_from_player.to_owned()).or_insert(Accuracy{named_entity: team_entity_from_player, hits:0, throws:0});
-            throws = throws + 1;
-            player_accuracy.throws += 1;
-            team_accuracy.throws +=1;
-            if round.hit {
-                hits = hits + 1;
-                player_accuracy.hits += 1;
-                team_accuracy.hits +=1;
-            }
-        }
-    }
-
-    let mut result_vec: Vec<Accuracy> = Vec::new();
-    for score in team_scores {
-        result_vec.push(score.1);
-    }
-    for score in player_scores {
-        result_vec.push(score.1);
-    }
-    result_vec.push(Accuracy{throws, hits, named_entity: AVERAGE_ENTITY});
-    result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
-    result_vec.reverse();
-    EntityAccuracy{accuracies:result_vec}
-}

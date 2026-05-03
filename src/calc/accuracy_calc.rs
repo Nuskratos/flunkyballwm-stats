@@ -1,38 +1,26 @@
-use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy, FirstThrowAccuracy};
+use crate::calc::accuracy_data::{Accuracy, EnemyAccuracy, EntityAccuracy, FirstThrowAccuracy};
 use crate::data::{Game, NamedEntity, Team};
 use crate::util::{team_from_player};
 use std::collections::HashMap;
 use crate::team_player_data::AVERAGE_ENTITY;
 
-pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
-    let mut throws = 0;
-    let mut hits = 0;
-    let mut player_scores: HashMap<NamedEntity, Accuracy> = HashMap::new();
-    let mut team_scores: HashMap<NamedEntity, Accuracy> = HashMap::new();
+pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> EntityAccuracy {
+    let mut average: Accuracy = Accuracy::new(AVERAGE_ENTITY);
+    let mut player_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
+    let mut team_scores :HashMap<NamedEntity, Accuracy> = HashMap::new();
 
     for game in games {
         for round in &game.rounds {
-            let player_accuracy = player_scores
-                .entry(round.thrower.named_entity.to_owned())
-                .or_insert(Accuracy::new(round.thrower.named_entity.to_owned()));
-            let team_accuracy = team_scores
-                .entry(
-                    team_from_player(round.thrower.id(), game)
-                        .named_entity
-                        .to_owned(),
-                )
-                .or_insert(Accuracy::new(
-                    team_from_player(round.thrower.id(), game)
-                        .named_entity
-                        .to_owned(),
-                ));
-            throws = throws + 1;
+            let team_entity_from_player = team_from_player(round.thrower.id(), game).named_entity.to_owned();
+            let player_accuracy = player_scores.entry(round.thrower.named_entity.to_owned()).or_insert(Accuracy{named_entity: round.thrower.named_entity.to_owned(), hits:0, throws:0});
+            let team_accuracy = team_scores.entry(team_entity_from_player.to_owned()).or_insert(Accuracy{named_entity: team_entity_from_player, hits:0, throws:0});
+            average.throws = average.throws + 1;
             player_accuracy.throws += 1;
-            team_accuracy.throws += 1;
+            team_accuracy.throws +=1;
             if round.hit {
-                hits = hits + 1;
+                average.hits = average.hits + 1;
                 player_accuracy.hits += 1;
-                team_accuracy.hits += 1;
+                team_accuracy.hits +=1;
             }
         }
     }
@@ -44,18 +32,10 @@ pub fn calculate_throwing_accuracy(games: &Vec<Game>) -> Vec<Accuracy> {
     for score in player_scores {
         result_vec.push(score.1);
     }
-    result_vec.push(Accuracy {
-        throws,
-        hits,
-        named_entity: NamedEntity {
-            name: "Average",
-            alias: "Average",
-            id: 999,
-        },
-    });
     result_vec.sort_by(|a, b| a.percentage().partial_cmp(&b.percentage()).unwrap());
+    result_vec.push(average);
     result_vec.reverse();
-    result_vec
+    EntityAccuracy{accuracies:result_vec}
 }
 
 pub fn calc_enemy_accuracy(games: &Vec<Game>) -> EnemyAccuracy {
@@ -129,7 +109,7 @@ mod tests {
             game_2nd_finish_enemy_miss(TEST_TEAM2, TEST_TEAM1),
         ]; // t1_1 2/3 t1_2 2/2
         // t2_1 2/3 t2_2 1/1
-        let data = calculate_throwing_accuracy(&games);
+        let data = calculate_throwing_accuracy(&games).accuracies;
         let t1_1 = data
             .iter()
             .find(|x| x.named_entity.name == TEST_TEAM1.member_1.name())
@@ -171,7 +151,7 @@ mod tests {
             game_finished_after_everyone_missed_first(TEST_TEAM1, TEST_TEAM2),
         ];
         convert_first_throw_games(&mut games);
-        let data = calculate_throwing_accuracy(&games);
+        let data = calculate_throwing_accuracy(&games).accuracies;
         let t1_1 = data
             .iter()
             .find(|x| x.named_entity.name == TEST_TEAM1.member_1.name())
