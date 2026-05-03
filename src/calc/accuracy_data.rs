@@ -25,6 +25,12 @@ impl Accuracy {
         }
         format!("{:.2}%", self.percentage())
     }
+    pub fn percentage_and_data_string(&self)->String{
+        if self.throws == 0 {
+            return "?%".to_string();
+        }
+        format!("{:.2}% ({:>3}/{:>3})", self.percentage(), self.hits, self.throws)
+    }
     pub fn add_throw(&mut self, hit: bool) {
         self.throws += 1;
         if hit {

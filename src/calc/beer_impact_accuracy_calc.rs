@@ -3,12 +3,8 @@ use crate::data::{AdditionalType, Game, NamedEntity};
 use crate::util::team_from_player;
 use std::collections::HashMap;
 
-pub fn calculate_beer_impact_accuracy_for_one_tournament(
-    games: &Vec<Game>,
-) -> TournamentEntityBeerImpact {
-    let mut ret_val = TournamentEntityBeerImpact {
-        impacts: HashMap::new(),
-    };
+pub fn calculate_beer_impact_accuracy_for_one_tournament(games: &Vec<Game>) -> TournamentEntityBeerImpact {
+    let mut ret_val = TournamentEntityBeerImpact {impacts: HashMap::new()}; // TODO check impact for multi vector games
     let mut player_beer_map: HashMap<NamedEntity, u32> = HashMap::new();
     for game in games {
         // Add accuracy for Player beer count

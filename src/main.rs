@@ -18,8 +18,9 @@ use crate::calc::rock_paper_scissors_calc::calculate_rock_paper_scissors;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
-use crate::team_player_data::{ARON, FLO};
+use crate::team_player_data::{ARON, FLO, JEROME};
 use crate::util::{player_is_in_game, players_from_games, teams_from_games};
+use crate::util::print_games_from_player;
 use crate::wm25::create_all_games_wm_2025;
 use crate::wm26::create_all_games_wm_2026;
 
@@ -137,16 +138,7 @@ fn create_csv_of_statistics(){
     create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
 }
 fn main() {
-    /*let aron_games = all_games();
-    let flattened: Vec<Game> = aron_games.iter().flatten().cloned().collect();
-    let aron_games_filtered: Vec<Game> = flattened.iter()
-        .filter(|game| player_is_in_game(game, &ARON))
-        .cloned()
-        .collect();
-    for game in aron_games_filtered{
-        game.print();
-    }*/
-    let games =create_all_games_wm_2026();
+    /*let games =create_all_games_wm_2026();
     fn flo_war_durch(game: &Game, round: usize)-> bool {
         game.additionals_vec().iter().any(|x| {
             x.additional.source == FLO
@@ -154,9 +146,12 @@ fn main() {
                 && x.round_nr < round as u32
         })
     }
-    calculate_special_accuracy(&games, Some(flo_war_durch)).print();
+    calculate_special_accuracy(&games, Some(flo_war_durch)).print();*/
     //print_total_stats();
-    //create_csv_of_statistics()
+    create_csv_of_statistics()
+    //let games = create_all_games_wm_2026();
+    //calculate_drinking_speed(&games, &players_from_games(&games), 0.0).print();
+    //print_games_from_player(JEROME, &games)
 }
 
 

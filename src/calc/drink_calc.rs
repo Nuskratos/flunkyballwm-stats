@@ -5,6 +5,7 @@ use crate::calc::drink_finished_data::DrinkFinishedStats;
 use crate::calc::drink_total_data::{DrinkingSpeedVec, PlayerDrinkingSpeed};
 use crate::data::{Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
+use crate::team_player_data::JEROME;
 use crate::util::{player_is_in_game, team_id_from_player, team_is_in_game};
 
 // Used in the calculation for the running speeds
@@ -76,7 +77,7 @@ fn calculate_avg(games: &Vec<Game>, player: &TeamMember, finished_stats: &DrinkF
                     schluck_happened = true;
                 }
             }
-            if i == game.rounds.len() - 1 {
+            if i == game.rounds.len() {
                 let pure_finished_average = average(finished_stats.pure_hits, finished_stats.pure_drinks).floor() as u32;
                 if tmp_round >= pure_finished_average && pure_finished_average > 0 {
                     avg_stats.p_avg(1, tmp_round + 1)

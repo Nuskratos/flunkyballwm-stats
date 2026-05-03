@@ -119,12 +119,20 @@ pub fn convert_first_throw_games(games : &mut Vec<Game>){
     }
 }
 
+pub fn print_games_from_player(player : TeamMember, games : &Vec<Game>){
+    let aron_games_filtered: Vec<Game> = games.iter()
+        .filter(|game| player_is_in_game(game, &player))
+        .cloned()
+        .collect();
+    for game in &aron_games_filtered{
+        game.print();
+    }
+    println!("{}",aron_games_filtered.len().to_string());
+}
 #[cfg(test)]
 pub mod test {
-    use crate::data::{
-        bool_vec_from_int, create_normal_rounds_left_right, results_from_additionals, Game, Team,
-        ARC,
-    };
+    use crate::data::{bool_vec_from_int, create_normal_rounds_left_right, results_from_additionals, Game, Team, TeamMember, ARC};
+    use crate::util::player_is_in_game;
 
     pub fn simple_game_from_data(
         left_team: Team,
