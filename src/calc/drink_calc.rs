@@ -7,7 +7,8 @@ use crate::data::{Game, Team, TeamMember};
 use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
 use crate::util::{player_is_in_game, team_id_from_player, team_is_in_game};
 
-pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32, team_to_be_removed: &Team) -> DrinkingSpeedVec {
+// Used in the calculation for the running speeds
+pub fn calculate_drinking_speed_without_team(games: &Vec<Game>, players: &Vec<TeamMember>, schluck_effect: f32, team_to_be_removed: &Team) -> DrinkingSpeedVec {
     let mut playerspeeds: Vec<PlayerDrinkingSpeed> = Vec::new();
     for player in players {
         let mut filtered_games: Vec<Game> = games.clone();
@@ -153,7 +154,7 @@ mod test {
         let games = vec![game_2nd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM1, TEST_TEAM2), game_3rd_finish(TEST_TEAM1, TEST_TEAM3)];
         let players = vec![TEST_TEAM1.member_1, TEST_TEAM1.member_2];
         let teams = vec![TEST_TEAM1, TEST_TEAM2, TEST_TEAM3];
-        let culled_data = calculate_drinking_speed_without_team(&games, &players, &teams, 0.5, &TEST_TEAM3);
+        let culled_data = calculate_drinking_speed_without_team(&games, &players, 0.5, &TEST_TEAM3);
         let first_culled_speed = culled_data.speeds.iter().find(|x| x.player_entity.name == TEST_PLAYER1.name()).unwrap().drink_avg.all_speed();
         assert!(approx_eq!(f32, first_culled_speed, 2.5));
 

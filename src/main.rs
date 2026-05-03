@@ -18,7 +18,8 @@ use crate::calc::rock_paper_scissors_calc::calculate_rock_paper_scissors;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
 use crate::hamburg24::create_spassturnier_24;
-use crate::util::{players_from_games, teams_from_games};
+use crate::team_player_data::ARON;
+use crate::util::{player_is_in_game, players_from_games, teams_from_games};
 use crate::wm25::create_all_games_wm_2025;
 use crate::wm26::create_all_games_wm_2026;
 
@@ -53,8 +54,8 @@ fn print_all_calcs(games : &Vec<Vec<Game>>){
     let ppg_stats = calculate_amount_of_points_per_game(&flattened);
     ppg_stats.print();
     let running_speeds = calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck());
-    calculate_rock_paper_scissors(&flattened).print();
     running_speeds.print();
+    calculate_rock_paper_scissors(&flattened).print();
     calculate_beer_impact_accuracy(&games).print();
     calculate_accuracy_after_running(&flattened).print();
     calc_special_first_throw_accuracy(&flattened).print();
@@ -125,7 +126,6 @@ fn create_csv_of_statistics(){
     // All non VM
     let all_non_wm = non_wm_stats();
     create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string(), &date);
-
     // Every single tournament
     let wm_2024 = vec![create_wm24_no_illegal()];
     create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
@@ -135,9 +135,17 @@ fn create_csv_of_statistics(){
     create_csv_for_calcs(&wm_26, "wm26".to_string(), &date);
     let spass24 = vec![create_spassturnier_24()];
     create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
-
 }
 fn main() {
+    /*let aron_games = all_games();
+    let flattened: Vec<Game> = aron_games.iter().flatten().cloned().collect();
+    let aron_games_filtered: Vec<Game> = flattened.iter()
+        .filter(|game| player_is_in_game(game, &ARON))
+        .cloned()
+        .collect();
+    for game in aron_games_filtered{
+        game.print();
+    }*/
     print_total_stats();
     create_csv_of_statistics()
 }

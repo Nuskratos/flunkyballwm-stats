@@ -10,6 +10,7 @@ use crate::util::{team_from_player, team_id_from_player, team_is_in_game};
 pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) -> TeamRunningStatistics {
     let mut team_diff_map: HashMap<u32, RunningDiff> = HashMap::new();
     for team in teams {
+        let other_speeds = calculate_drinking_speed_without_team(games, players, schluck_effect, team);
         for game in games {
             if !team_is_in_game(game, team) {
                 continue;
@@ -20,7 +21,6 @@ pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, te
             // Calculating speeds of enemy team
             let enemy_team = if &game.left_team == team { &game.right_team } else { &game.left_team };
             let enemy_vec = vec![enemy_team.clone()];
-            let other_speeds = calculate_drinking_speed_without_team(games, players, &enemy_vec, schluck_effect, team);
             let team_1_drink_speed = other_speeds.speeds.iter().find(|x| x.player_entity == enemy_team.member_1.named_entity).unwrap().drink_avg.all_speed();
             let team_2_drink_speed = other_speeds.speeds.iter().find(|x| x.player_entity == enemy_team.member_2.named_entity).unwrap().drink_avg.all_speed();
             let mut team1_finished = false;

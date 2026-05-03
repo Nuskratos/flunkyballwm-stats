@@ -330,18 +330,9 @@ pub struct Game {
     pub(crate) result: Result,
     pub(crate) rounds: Vec<Round>,
     pub(crate) special_first_throw: Option<Round>,
-    //pub(crate) all_rounds: Vec<Round>
 }
 
 impl Game {
-    /*pub fn new(match_number: u32, left_team:Team, left_1:TeamMember, left_2:TeamMember, right_team:Team, right_1:TeamMember, right_2:TeamMember,result:Result, rounds:Vec<Round>, special_first_throw:Option<Round>)->Game{
-        let mut ret = Game{match_number,left_team, left_1,left_2,right_team,right_1,right_2,result,rounds,special_first_throw,all_rounds: vec![]};
-        ret.all_rounds.extend(ret.rounds.iter().cloned());
-        if ret.special_first_throw.is_some(){
-            ret.all_rounds.push(ret.special_first_throw.clone().unwrap());
-        }
-        ret
-    }*/
     pub fn first_throw(&self) -> &Round {
         self.special_first_throw
             .as_ref()

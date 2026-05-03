@@ -381,7 +381,7 @@ pub fn game_a23(left_team: Team, left_1:TeamMember, left_2: TeamMember, right_te
     let left_began = true;
     let additionals = vec![ARC::schluck(&right_1, 3), ARC::finish(&right_2, 7),ARC::finish(&left_1, 8),ARC::finish(&right_1, 9)];
     let result = results_from_additionals(&additionals, &left_team);
-    let rounds = create_normal_rounds_left_right(&left_1, &left_2, &right_1, &right_2, bool_vec_from_int(false, vec![3, 1,1,5]), additionals, left_began);
+    let rounds = create_normal_rounds_left_right(&left_1, &left_2, &right_1, &right_2, bool_vec_from_int(false, vec![3,1,1,5]), additionals, left_began);
     Game{ result, match_number: 101, left_team, left_1, left_2, right_1, right_2, right_team, rounds, special_first_throw: None }
 }
 pub fn game_a22(left_team: Team, left_1:TeamMember, left_2: TeamMember, right_team: Team, right_1: TeamMember, right_2:TeamMember)-> Game{
