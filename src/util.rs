@@ -3,7 +3,7 @@ use crate::team_player_data::TEAM_INVALID;
 use csv::Writer;
 use std::collections::HashSet;
 use std::fs::{File, OpenOptions};
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 pub fn player_in_team(player_id: u32, team: &Team) -> bool {
     team.member_1.id() == player_id || team.member_2.id() == player_id
@@ -94,13 +94,13 @@ pub struct OpenedWriter {
 }
 
 pub fn open_writer(filename: String) -> OpenedWriter {
-    let path = Path::new(&filename);
+    let path = PathBuf::from("csv").join(&filename);
     let file_exists = path.exists();
     let file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
-        .open(path)
+        .open(&path)
         .expect("Couldn't open file");
     let mut writer = Writer::from_writer(file);
     OpenedWriter {

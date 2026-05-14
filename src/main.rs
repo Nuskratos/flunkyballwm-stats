@@ -7,6 +7,7 @@ use wm24::*;
 use crate::calc::accuracy_after_running_calc::calculate_accuracy_after_running;
 use crate::calc::accuracy_calc::{calc_enemy_accuracy, calc_special_first_throw_accuracy, calculate_special_accuracy, calculate_throwing_accuracy};
 use crate::calc::beer_impact_accuracy_calc::calculate_beer_impact_accuracy;
+use crate::calc::calculation::show_difference_for_first_throws;
 use crate::calc::chain_calc::calculate_hit_and_miss_chains_team_player;
 use crate::calc::drink_calc::calculate_drinking_speed;
 use crate::calc::penalties_calc::calculate_amount_of_penalties;
@@ -119,7 +120,7 @@ fn print_wm_stats(){
 fn create_csv_of_statistics(){
     let date = Local::now().format("%Y-%m-%d").to_string();
     // All games
-    let all_games = all_games();
+    /*let all_games = all_games();
     create_csv_for_calcs(&all_games, "all_games".to_string(), &date);
     // AlL WM
     let all_wm = wm_stats();
@@ -131,24 +132,32 @@ fn create_csv_of_statistics(){
     let wm_2024 = vec![create_wm24_no_illegal()];
     create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
     let wm_25 = vec![create_all_games_wm_2025()];
-    create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);
+    create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);*/
     let wm_26 = vec![create_all_games_wm_2026()];
     create_csv_for_calcs(&wm_26, "wm26".to_string(), &date);
     let spass24 = vec![create_spassturnier_24()];
-    create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
+    //create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
 }
+
+
+
 fn main() {
-    /*let games =create_all_games_wm_2026();
+    /*let games : Vec<Vec<Game>> =wm_stats();
+    let flattened :Vec<Game>= games.into_iter().flatten().collect();
     fn flo_war_durch(game: &Game, round: usize)-> bool {
-        game.additionals_vec().iter().any(|x| {
+        !game.additionals_vec().iter().any(|x| {
             x.additional.source == FLO
                 && x.additional.kind == AdditionalType::FINISHED
                 && x.round_nr < round as u32
         })
     }
-    calculate_special_accuracy(&games, Some(flo_war_durch)).print();*/
+    calculate_special_accuracy(&flattened, Some(flo_war_durch)).print();*/
     //print_total_stats();
-    create_csv_of_statistics()
+    let games = create_all_games_wm_2026();
+    let first_throws = calc_special_first_throw_accuracy(&games);
+    let general_accuracy = calculate_throwing_accuracy(&games);
+    show_difference_for_first_throws(&first_throws, &general_accuracy);
+    //create_csv_of_statistics()
     //let games = create_all_games_wm_2026();
     //calculate_drinking_speed(&games, &players_from_games(&games), 0.0).print();
     //print_games_from_player(JEROME, &games)
