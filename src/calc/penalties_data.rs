@@ -70,12 +70,12 @@ impl PenaltiesStatistics{
         }
         println!();
     }
-    pub fn serialize(&self, file_prefix:&String, date: &String){
-        let filesufix= "penalties.csv".to_string();
-        let real_writer = open_writer(date.to_string()+&filesufix);
+    pub fn serialize(&self, file_prefix:&String){
+        let filesuffix = "penalties.csv".to_string();
+        let real_writer = open_writer(&filesuffix);
         self.serialize_internal(real_writer, false, &file_prefix);
 
-        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        let alias_writer = open_writer(&("alias".to_owned()+ &filesuffix));
         self.serialize_internal(alias_writer, true, &file_prefix);
     }
 

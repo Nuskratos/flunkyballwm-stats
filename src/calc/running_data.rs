@@ -22,12 +22,12 @@ impl TeamRunningStatistics {
             println!("| {:>name_width$} | {:>width$.3} | {:>width$.3} | {:>width$.3} |", team.name(), diff.round_length(), diff.run_amount, diff.diff_to_expected)
         }
     }
-    pub fn serialize(&self, file_prefix:&String, date: &String){
-        let filesufix= "running_statistics.csv".to_string();
-        let real_writer = open_writer(date.to_string()+&filesufix);
+    pub fn serialize(&self, file_prefix:&String){
+        let filesuffix = "running_statistics.csv".to_string();
+        let real_writer = open_writer(&filesuffix);
         self.serialize_internal(real_writer, false, &file_prefix);
 
-        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesufix);
+        let alias_writer = open_writer(&("alias".to_owned()+ &filesuffix));
         self.serialize_internal(alias_writer, true, &file_prefix);
     }
 

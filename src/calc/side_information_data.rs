@@ -14,8 +14,8 @@ impl SideSplit {
         println!("Rechts | {:<5} | {:<5}  | {:.2} = {:>5} von {:<5}   | {:<5}  | {:<5}", self.right.wins, self.right.points, self.right.hits as f32 / self.right.throws as f32 * 100.0, self.right.hits, self.right.throws, self.right.schluck, self.right.beer);
         println!();
     }
-    pub fn serialize(&self, file_prefix:&String, date: &String){
-        let mut opened_writer = open_writer(date.to_string()+"side_information.csv");
+    pub fn serialize(&self, file_prefix:&String){
+        let mut opened_writer = open_writer("side_information.csv");
         if !opened_writer.file_exists{
             opened_writer.writer.write_record(&["HiddenPrefix", "Side", "Wins", "Points", "Hits", "Throws", "Percentage", "Strafschluck", "Strafbier"]);
         }

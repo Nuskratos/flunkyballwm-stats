@@ -125,7 +125,7 @@ mod test {
         let speed_team_1 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM1.id()).unwrap().1.round_length();
         let speed_team_3 = data.speeds.iter().find(|x| x.0.id() == TEST_TEAM3.id()).unwrap().1.round_length();
         assert!(approx_eq!(f32, speed_team_1, 2.0/3.0));
-        assert!(approx_eq!(f32, speed_team_3, 1.25));
+        assert!(approx_eq!(f32, speed_team_3, 1.25)); // TODO why does this test now fail?
     }
 
     #[test]

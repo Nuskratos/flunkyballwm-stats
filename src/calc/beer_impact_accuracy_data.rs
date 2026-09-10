@@ -112,17 +112,17 @@ impl TournamentEntityBeerImpact {
             general_values.print_for_beer_impact(i);
         }
     }
-    pub fn serialize(self, file_prefix: &String, date: &String) {
+    pub fn serialize(self, file_prefix: &String) {
         let filesuffix = "beer_impact_accuracy.csv".to_string();
-        let real_writer = open_writer(date.to_string() + &filesuffix);
+        let real_writer = open_writer( &filesuffix);
         self.serialize_internal(real_writer, &file_prefix);
         // Add alias writer once personal stats shall be created
 
         let personal_suffix = "personal_beer_impact_accuracy.csv".to_string();
-        let personal_writer = open_writer(date.to_string() + &personal_suffix);
+        let personal_writer = open_writer( &personal_suffix);
         self.serialize_internal_personal(personal_writer, false, &file_prefix);
 
-        let alias_personal_writer = open_writer("alias".to_string()+ &date.to_string() + &personal_suffix);
+        let alias_personal_writer = open_writer(&("alias".to_owned()+ &filesuffix));
         self.serialize_internal_personal(alias_personal_writer, true, &file_prefix);
     }
 

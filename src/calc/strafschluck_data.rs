@@ -57,8 +57,8 @@ impl StrafschluckData {
         println!();
     }
 
-    pub fn serialize(&self, file_prefix:&String, date: &String){
-        let mut open_writer = open_writer(date.to_string()+"strafschluck.csv");
+    pub fn serialize(&self, file_prefix:&String){
+        let mut open_writer = open_writer("strafschluck.csv");
         if !open_writer.file_exists{
             open_writer.writer.write_record(&["HiddenPrefix",  "Type", "Drinks finished", "Hits required", "Average","Information"]);
         }

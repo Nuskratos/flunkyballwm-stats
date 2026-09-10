@@ -4,6 +4,7 @@ use csv::Writer;
 use std::collections::HashSet;
 use std::fs::{File, OpenOptions};
 use std::path::{Path, PathBuf};
+use chrono::Local;
 
 pub fn player_in_team(player_id: u32, team: &Team) -> bool {
     team.member_1.id() == player_id || team.member_2.id() == player_id
@@ -93,16 +94,21 @@ pub struct OpenedWriter {
     pub file_exists: bool,
 }
 
-pub fn open_writer(filename: String) -> OpenedWriter {
-    let path = PathBuf::from("csv").join(&filename);
+pub fn open_writer(filename: &str) -> OpenedWriter {
+    let dir = PathBuf::from("csv").join(Local::now().format("%Y-%m-%d").to_string());
+    std::fs::create_dir_all(&dir).expect("Couldn't create csv directory");
+
+    let path = dir.join(filename);
     let file_exists = path.exists();
+
     let file = OpenOptions::new()
         .write(true)
         .append(true)
         .create(true)
         .open(&path)
         .expect("Couldn't open file");
-    let mut writer = Writer::from_writer(file);
+
+    let writer = Writer::from_writer(file);
     OpenedWriter {
         writer,
         file_exists,

@@ -62,28 +62,28 @@ fn print_all_calcs(games : &Vec<Vec<Game>>){
     calculate_accuracy_after_running(&flattened).print();
     calc_special_first_throw_accuracy(&flattened).print();
 }
-fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String, date : &String){
+fn create_csv_for_calcs(games : &Vec<Vec<Game>>, fileprefix : String){
     let flattened = games.into_iter().flatten().cloned().collect();
     let all_players = players_from_games(&flattened);
     let all_teams = teams_from_games(&flattened);
     let strafschluck_data = calculate_strafschluck(&flattened);
 
-    strafschluck_data.serialize(&fileprefix, &date);
-    calculate_throwing_accuracy(&flattened).serialize(&fileprefix,&date);
-    calc_side_information(&flattened).serialize(&fileprefix, &date);
-    calc_general_first_throw(&flattened).serialize(&fileprefix,&date);
-    calc_team_first_throws(&flattened).serialize(&fileprefix,&date);
-    calculate_drinking_speed(&flattened, &all_players, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix,&date);
-    calculate_throws_per_game(&flattened).serialize(&fileprefix,&date);
-    calc_enemy_accuracy(&flattened).serialize(&fileprefix,&date);
-    calculate_hit_and_miss_chains_team_player(&flattened).serialize(&fileprefix, &date);
-    calculate_amount_of_penalties(&flattened).serialize(&fileprefix, &date);
-    calculate_amount_of_points_per_game(&flattened).serialize(&fileprefix, &date);
-    calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix, &date);
-    calculate_rock_paper_scissors(&flattened).serialize(&fileprefix, &date);
-    calculate_beer_impact_accuracy(&games).serialize(&fileprefix, &date);
-    calculate_accuracy_after_running(&flattened).serialize(&fileprefix, &date);
-    calc_special_first_throw_accuracy(&flattened).serialize(&fileprefix, &date);
+    strafschluck_data.serialize(&fileprefix);
+    calculate_throwing_accuracy(&flattened).serialize(&fileprefix);
+    calc_side_information(&flattened).serialize(&fileprefix);
+    calc_general_first_throw(&flattened).serialize(&fileprefix);
+    calc_team_first_throws(&flattened).serialize(&fileprefix);
+    calculate_drinking_speed(&flattened, &all_players, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix);
+    calculate_throws_per_game(&flattened).serialize(&fileprefix);
+    calc_enemy_accuracy(&flattened).serialize(&fileprefix);
+    calculate_hit_and_miss_chains_team_player(&flattened).serialize(&fileprefix);
+    calculate_amount_of_penalties(&flattened).serialize(&fileprefix);
+    calculate_amount_of_points_per_game(&flattened).serialize(&fileprefix);
+    calculate_running_speeds(&flattened, &all_players, &all_teams, strafschluck_data.effect_of_single_schluck()).serialize(&fileprefix);
+    calculate_rock_paper_scissors(&flattened).serialize(&fileprefix);
+    calculate_beer_impact_accuracy(&games).serialize(&fileprefix);
+    calculate_accuracy_after_running(&flattened).serialize(&fileprefix);
+    calc_special_first_throw_accuracy(&flattened).serialize(&fileprefix);
 }
 fn print_wm25(){
     let games = vec![create_all_games_wm_2025()];
@@ -118,31 +118,30 @@ fn print_wm_stats(){
     print_all_calcs(&wm_stats());
 }
 fn create_csv_of_statistics(){
-    let date = Local::now().format("%Y-%m-%d").to_string();
     // All games
-    /*let all_games = all_games();
-    create_csv_for_calcs(&all_games, "all_games".to_string(), &date);
+    let all_games = all_games();
+    create_csv_for_calcs(&all_games, "all_games".to_string());
     // AlL WM
     let all_wm = wm_stats();
-    create_csv_for_calcs(&all_wm, "all_wm".to_string(), &date);
+    create_csv_for_calcs(&all_wm, "all_wm".to_string());
     // All non VM
     let all_non_wm = non_wm_stats();
-    create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string(), &date);
+    create_csv_for_calcs(&all_non_wm, "all_non_wm".to_string());
     // Every single tournament
     let wm_2024 = vec![create_wm24_no_illegal()];
-    create_csv_for_calcs(&wm_2024, "wm24".to_string(), &date);
+    create_csv_for_calcs(&wm_2024, "wm24".to_string());
     let wm_25 = vec![create_all_games_wm_2025()];
-    create_csv_for_calcs(&wm_25, "wm25".to_string(), &date);*/
+    create_csv_for_calcs(&wm_25, "wm25".to_string());
     let wm_26 = vec![create_all_games_wm_2026()];
-    create_csv_for_calcs(&wm_26, "wm26".to_string(), &date);
+    create_csv_for_calcs(&wm_26, "wm26".to_string());
     let spass24 = vec![create_spassturnier_24()];
-    //create_csv_for_calcs(&spass24, "spass24".to_string(), &date);
+    create_csv_for_calcs(&spass24, "spass24".to_string());
 }
 
 
 
 fn main() {
-    /*let games : Vec<Vec<Game>> =wm_stats();
+    let games : Vec<Vec<Game>> =wm_stats();
     let flattened :Vec<Game>= games.into_iter().flatten().collect();
     fn flo_war_durch(game: &Game, round: usize)-> bool {
         !game.additionals_vec().iter().any(|x| {
@@ -151,13 +150,9 @@ fn main() {
                 && x.round_nr < round as u32
         })
     }
-    calculate_special_accuracy(&flattened, Some(flo_war_durch)).print();*/
+    calculate_special_accuracy(&flattened, Some(flo_war_durch)).print();
     //print_total_stats();
-    let games = create_all_games_wm_2026();
-    let first_throws = calc_special_first_throw_accuracy(&games);
-    let general_accuracy = calculate_throwing_accuracy(&games);
-    show_difference_for_first_throws(&first_throws, &general_accuracy);
-    //create_csv_of_statistics()
+    create_csv_of_statistics()
     //let games = create_all_games_wm_2026();
     //calculate_drinking_speed(&games, &players_from_games(&games), 0.0).print();
     //print_games_from_player(JEROME, &games)

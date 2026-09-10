@@ -38,12 +38,12 @@ impl AccuracyAfterRunningData{
             entity.print();
         }
     }
-    pub fn serialize(&self, file_prefix: &String, date: &String){
+    pub fn serialize(&self, file_prefix: &String){
         let filesuffix = "running_impact_on_accuracy.csv".to_string();
-        let real_writer = open_writer(date.to_string()+&filesuffix);
+        let real_writer = open_writer(&filesuffix);
         self.serialize_internal(real_writer, false, &file_prefix);
 
-        let alias_writer = open_writer("alias".to_string()+&date.to_string()+&filesuffix);
+        let alias_writer = open_writer(&("alias".to_owned()+ &filesuffix));
         self.serialize_internal(alias_writer, true, &file_prefix);
     }
     fn serialize_internal(&self, mut opened_writer: OpenedWriter, write_alias:bool, file_prefix: &str){
