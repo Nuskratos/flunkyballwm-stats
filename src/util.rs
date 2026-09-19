@@ -168,6 +168,7 @@ pub mod test {
             right_2: right_team.member_2,
             rounds,
             special_first_throw: None,
+            won_rps_but_decided_to_run: false
         }
     }
     

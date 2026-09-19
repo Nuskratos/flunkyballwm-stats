@@ -3,7 +3,6 @@ use chrono::Local;
 use serde::de::Unexpected::Option;
 use serde::Serialize;
 use data::*;
-use wm24::*;
 use crate::calc::accuracy_after_running_calc::calculate_accuracy_after_running;
 use crate::calc::accuracy_calc::{calc_enemy_accuracy, calc_special_first_throw_accuracy, calculate_special_accuracy, calculate_throwing_accuracy};
 use crate::calc::beer_impact_accuracy_calc::calculate_beer_impact_accuracy;
@@ -18,23 +17,22 @@ use crate::calc::first_throw_calc::{calc_general_first_throw, calc_team_first_th
 use crate::calc::rock_paper_scissors_calc::calculate_rock_paper_scissors;
 use crate::calc::side_information_calc::calc_side_information;
 use crate::calc::throw_per_game_calc::calculate_throws_per_game;
-use crate::hamburg24::create_spassturnier_24;
+use crate::tournaments::hamburg24::create_spassturnier_24;
 use crate::team_player_data::{ARON, FLO, JEROME};
+use crate::tournaments::spass_26::{create_2026_01_spass, create_2026_02_spass};
+use crate::tournaments::wm24::create_wm24_no_illegal;
 use crate::util::{player_is_in_game, players_from_games, teams_from_games};
 use crate::util::print_games_from_player;
-use crate::wm25::create_all_games_wm_2025;
-use crate::wm26::create_all_games_wm_2026;
+use crate::tournaments::wm25::create_all_games_wm_2025;
+use crate::tournaments::wm26::create_all_games_wm_2026;
 
 mod data;
-mod wm24;
 pub mod team_player_data;
 mod test_stuff;
 mod calc;
 mod util;
 mod fake_game;
-mod hamburg24;
-mod wm25;
-mod wm26;
+mod tournaments;
 
 fn print_all_calcs(games : &Vec<Vec<Game>>){
     let flattened = games.into_iter().flatten().cloned().collect();
@@ -102,7 +100,7 @@ fn wm_stats()->Vec<Vec<Game>>{
     vec![create_wm24_no_illegal(), create_all_games_wm_2025(), create_all_games_wm_2026()]
 }
 fn non_wm_stats()->Vec<Vec<Game>>{
-    vec![create_spassturnier_24()]
+    vec![create_spassturnier_24(), create_2026_01_spass(), create_2026_02_spass()]
 }
 fn all_games() ->Vec<Vec<Game>>{
     let mut all_games = wm_stats();
@@ -136,14 +134,21 @@ fn create_csv_of_statistics(){
     create_csv_for_calcs(&wm_26, "wm26".to_string());
     let spass24 = vec![create_spassturnier_24()];
     create_csv_for_calcs(&spass24, "spass24".to_string());
+    let spass26_01 = vec![create_2026_01_spass()];
+    create_csv_for_calcs(&spass26_01, "spass26_01".to_string());
+    let spass26_02 = vec![create_2026_02_spass()];
+    create_csv_for_calcs(&spass26_02, "spass26_02".to_string());
 }
 
 
 
 fn main() {
-    let games : Vec<Vec<Game>> =wm_stats();
-    let flattened :Vec<Game>= games.into_iter().flatten().collect();
-    fn flo_war_durch(game: &Game, round: usize)-> bool {
+    let games : Vec<Vec<Game>> =vec![create_2026_02_spass()];
+    games.first().unwrap().last().unwrap().print();
+    create_csv_of_statistics();
+    //create_csv_for_calcs(&games, "spass26_01".to_string());
+//    let flattened :Vec<Game>= games.into_iter().flatten().collect();
+    /*fn flo_war_durch(game: &Game, round: usize)-> bool {
         !game.additionals_vec().iter().any(|x| {
             x.additional.source == FLO
                 && x.additional.kind == AdditionalType::FINISHED
@@ -152,7 +157,7 @@ fn main() {
     }
     calculate_special_accuracy(&flattened, Some(flo_war_durch)).print();
     //print_total_stats();
-    create_csv_of_statistics()
+    create_csv_of_statistics()*/
     //let games = create_all_games_wm_2026();
     //calculate_drinking_speed(&games, &players_from_games(&games), 0.0).print();
     //print_games_from_player(JEROME, &games)

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use crate::calc::strafschluck_data::{StrafschluckCounter, StrafschluckData};
-use crate::data::{Additional, Game, Team};
-use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
+use crate::data::{Additional, AdditionalType, Game, Team};
+use crate::data::AdditionalType::*;
 use crate::util::{player_in_team, team_from_player};
 
 pub fn calculate_strafschluck(games: &Vec<Game>) -> StrafschluckData {

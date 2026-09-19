@@ -4,7 +4,7 @@ use std::collections::HashMap;
 use crate::calc::drink_calc::calculate_drinking_speed_without_team;
 use crate::calc::running_data::{RunningDiff, TeamRunningStatistics};
 use crate::data::{Game, Team, TeamMember};
-use crate::data::AdditionalType::{FINISHED, STRAFBIER, STRAFSCHLUCK};
+use crate::data::AdditionalType::*;
 use crate::util::{team_from_player, team_id_from_player, team_is_in_game};
 
 pub fn calculate_running_speeds(games: &Vec<Game>, players: &Vec<TeamMember>, teams: &Vec<Team>, schluck_effect: f32) -> TeamRunningStatistics {

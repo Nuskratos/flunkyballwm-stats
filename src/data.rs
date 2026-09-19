@@ -330,6 +330,7 @@ pub struct Game {
     pub(crate) result: Result,
     pub(crate) rounds: Vec<Round>,
     pub(crate) special_first_throw: Option<Round>,
+    pub(crate) won_rps_but_decided_to_run: bool,
 }
 
 impl Game {
@@ -377,6 +378,9 @@ impl Game {
             println!("{0:^5}|{1:^5}|{2:^5}|{3:^5}|{4:^5}|{5:^5}|{6:^5}|{7:^5}", left1.0, left2.0, left1.1, left2.1, right1.0, right2.0, right1.1, right2.1);
         }
         println!("Punkte: {0:>14} | Punkte: {1:<14}", self.result.points_left, self.result.points_right);
+        if self.won_rps_but_decided_to_run{
+            println!("RPS wurde gewonnen, aber entschieden zuerst zu laufen.");
+        }
     }
     pub fn winning_team_id(&self) -> u32 {
         if self.result.points_left > self.result.points_right {
@@ -413,7 +417,8 @@ pub fn player_round_string(player: &TeamMember, round: &Round, left_team: bool) 
         match &additionals.kind {
             FINISHED => add_string.push('\u{2713}'),
             STRAFSCHLUCK => add_string.push('S'),
-            STRAFBIER => add_string.push('B')
+            STRAFBIER => add_string.push('B'),
+            WONRPS => add_string.push('W'),
         }
     }
     if round.runner.named_entity.id == player.named_entity.id {
